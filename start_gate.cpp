@@ -1,0 +1,172 @@
+#include "start_gate.h"
+#include "config.h"
+#include "wled_integration.h"
+
+// Forward declaration from web_server
+extern void broadcastState();
+
+// Trigger detection
+static volatile bool triggerDetected = false;
+static volatile uint64_t triggerTime_us = 0;
+
+// Timing
+static unsigned long lastPingTime = 0;
+static unsigned long lastSyncTime = 0;
+static unsigned long triggeredTime = 0;
+
+// ============================================================================
+// START TRIGGER INTERRUPT
+// ============================================================================
+void IRAM_ATTR startTriggerISR() {
+  if (!triggerDetected) {
+    triggerTime_us = esp_timer_get_time();
+    triggerDetected = true;
+  }
+}
+
+// ============================================================================
+// SETUP
+// ============================================================================
+void startGateSetup() {
+  pinMode(cfg.sensor_pin, INPUT_PULLUP);
+  pinMode(cfg.led_pin, OUTPUT);
+  // Don't attach interrupt yet - only when ARMED
+  Serial.printf("[START] Setup complete. Trigger=GPIO%d, LED=GPIO%d\n",
+                cfg.sensor_pin, cfg.led_pin);
+}
+
+// ============================================================================
+// LED breathing effect for idle state
+// ============================================================================
+static void breatheLED() {
+  // Simple on/off breathing using millis
+  int brightness = (millis() / 10) % 512;
+  if (brightness > 255) brightness = 511 - brightness;
+  analogWrite(cfg.led_pin, brightness);
+}
+
+// ============================================================================
+// MAIN LOOP
+// ============================================================================
+void startGateLoop() {
+  // Ping finish gate every 2 seconds
+  if (millis() - lastPingTime > 2000) {
+    sendToPeer(MSG_PING, nowUs(), 0);
+    lastPingTime = millis();
+  }
+
+  // Request clock sync every 10 seconds
+  if (millis() - lastSyncTime > 10000) {
+    sendToPeer(MSG_SYNC_REQ, nowUs(), 0);
+    lastSyncTime = millis();
+  }
+
+  // Check peer connectivity timeout
+  if (peerConnected && millis() - lastPeerSeen > 10000) {
+    peerConnected = false;
+  }
+
+  switch (raceState) {
+    case IDLE:
+      breatheLED();
+      break;
+
+    case ARMED:
+      // Solid LED when armed
+      digitalWrite(cfg.led_pin, HIGH);
+
+      if (triggerDetected) {
+        // Beam broken - race starts!
+        raceState = RACING;
+        triggerDetected = false;
+        triggeredTime = millis();
+
+        // Send START with precise timestamp to finish gate
+        sendToPeer(MSG_START, triggerTime_us, 0);
+
+        // Detach interrupt to prevent re-trigger
+        detachInterrupt(digitalPinToInterrupt(cfg.sensor_pin));
+
+        setWLEDState("racing");
+        Serial.println("[START] TRIGGERED! Race started.");
+        broadcastState();
+      }
+      break;
+
+    case RACING:
+      // Flash LED rapidly while racing
+      digitalWrite(cfg.led_pin, (millis() / 100) % 2);
+
+      // Timeout: if no CONFIRM after 30 seconds, reset
+      if (millis() - triggeredTime > 30000) {
+        Serial.println("[START] Race timeout - no finish confirmation");
+        raceState = IDLE;
+        setWLEDState("idle");
+        broadcastState();
+      }
+      break;
+
+    case FINISHED:
+      // Brief flash then return to idle
+      digitalWrite(cfg.led_pin, HIGH);
+      delay(2000);
+      raceState = IDLE;
+      setWLEDState("idle");
+      broadcastState();
+      break;
+  }
+}
+
+// ============================================================================
+// ESP-NOW MESSAGE HANDLER
+// ============================================================================
+void onStartGateESPNow(const ESPMessage& msg, uint64_t receiveTime) {
+  switch (msg.type) {
+    case MSG_PING:
+      // Reply with PONG
+      sendToPeer(MSG_PONG, nowUs(), 0);
+      break;
+
+    case MSG_CONFIRM:
+      // Finish gate confirmed race complete
+      raceState = FINISHED;
+      Serial.println("[START] Race confirmed complete!");
+      broadcastState();
+      break;
+
+    case MSG_SYNC_REQ:
+      // Respond with our timestamp
+      sendToPeer(MSG_OFFSET, nowUs(), 0);
+      break;
+
+    case MSG_OFFSET:
+      // Clock sync response
+      clockOffset_us = msg.timestamp - receiveTime;
+      Serial.printf("[START] Clock offset: %lld us\n", clockOffset_us);
+      break;
+
+    case MSG_ARM_CMD:
+      // Finish gate says to arm
+      if (raceState == IDLE) {
+        raceState = ARMED;
+        triggerDetected = false;
+        triggerTime_us = 0;
+        // Attach interrupt to detect beam break
+        attachInterrupt(digitalPinToInterrupt(cfg.sensor_pin), startTriggerISR, FALLING);
+        setWLEDState("armed");
+        Serial.println("[START] ARMED - waiting for trigger");
+        broadcastState();
+      }
+      break;
+
+    case MSG_DISARM_CMD:
+      // Finish gate says to reset
+      raceState = IDLE;
+      triggerDetected = false;
+      detachInterrupt(digitalPinToInterrupt(cfg.sensor_pin));
+      setWLEDState("idle");
+      Serial.println("[START] DISARMED");
+      broadcastState();
+      break;
+  }
+}

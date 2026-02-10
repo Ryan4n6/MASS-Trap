@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hot Wheels Physics Lab</title>
+  <style>
+    /* ===== VARIABLES ===== */
+    :root {
+      --hw-orange: #FF4400;
+      --hw-blue: #007ACC;
+      --hw-yellow: #FFCC00;
+      --hw-green: #28a745;
+      --hw-red: #dc3545;
+      --bg: #1a1a1a;
+      --card: #ffffff;
+      --text: #333;
+    }
+
+    /* ===== RESET & BASE ===== */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--hw-orange) 0%, #ff8800 100%);
+      min-height: 100vh;
+      padding: 15px;
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      text-align: center;
+      color: white;
+      margin-bottom: 20px;
+      text-shadow: 3px 3px 0px #000;
+    }
+
+    .header h1 {
+      font-size: 3rem;
+      font-weight: 900;
+      font-style: italic;
+      letter-spacing: -2px;
+      margin: 0;
+    }
+
+    .header p {
+      font-weight: bold;
+      color: var(--hw-yellow);
+      margin-top: 5px;
+      font-size: 1.2rem;
+    }
+
+    /* ===== SETTINGS LINK ===== */
+    .settings-link {
+      position: fixed;
+      top: 10px;
+      left: 10px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 1.2rem;
+      z-index: 1000;
+      border: 2px solid var(--hw-blue);
+    }
+    .settings-link:hover {
+      background: var(--hw-blue);
+    }
+
+    /* ===== CONNECTION STATUS ===== */
+    .connection-status {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 10px 15px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      z-index: 1000;
+      border: 2px solid var(--hw-yellow);
+    }
+
+    .connection-status.connected {
+      border-color: var(--hw-green);
+    }
+
+    .connection-status.disconnected {
+      border-color: var(--hw-red);
+    }
+
+    /* ===== STATE BANNER ===== */
+    .state-banner {
+      background: #000;
+      color: var(--hw-yellow);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 2rem;
+      font-weight: 900;
+      border: 4px solid var(--hw-blue);
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.3);
+      transition: all 0.3s;
+    }
+
+    .state-banner.armed {
+      background: var(--hw-green);
+      color: white;
+      animation: pulse 1s infinite;
+    }
+
+    .state-banner.racing {
+      background: var(--hw-red);
+      color: white;
+      animation: flash 0.5s infinite;
+    }
+
+    .state-banner.finished {
+      background: white;
+      color: var(--hw-orange);
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.02); }
+    }
+
+    @keyframes flash {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+
+    /* ===== CARDS & GRID ===== */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.1);
+      border-bottom: 4px solid var(--hw-blue);
+    }
+
+    .card-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: #888;
+      font-weight: 800;
+      margin-bottom: 8px;
+    }
+
+    .card-value {
+      font-size: 2.5rem;
+      color: var(--hw-blue);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .card-unit {
+      font-size: 1rem;
+      color: #666;
+      font-weight: normal;
+      margin-left: 4px;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      padding: 15px 30px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 900;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+      transition: all 0.1s;
+      width: 100%;
+      margin-bottom: 10px;
+    }
+
+    .btn:active {
+      transform: translateY(4px);
+      box-shadow: none;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--hw-blue);
+      color: white;
+    }
+
+    .btn-success {
+      background: var(--hw-green);
+      color: white;
+    }
+
+    .btn-warning {
+      background: var(--hw-yellow);
+      color: black;
+    }
+
+    .btn-danger {
+      background: var(--hw-red);
+      color: white;
+    }
+
+    /* ===== GARAGE ===== */
+    .garage-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .garage-car {
+      background: white;
+      border: 3px solid #ddd;
+      border-radius: 10px;
+      padding: 15px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .garage-car:hover {
+      border-color: var(--hw-blue);
+      transform: translateY(-4px);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+    }
+
+    .garage-car.active {
+      border-color: var(--hw-green);
+      background: #f0fff4;
+      border-width: 4px;
+    }
+
+    .garage-car h3 {
+      font-size: 1.2rem;
+      margin-bottom: 8px;
+      color: var(--hw-blue);
+    }
+
+    .garage-car p {
+      font-size: 0.9rem;
+      color: #666;
+      margin: 4px 0;
+    }
+
+    .garage-stats {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: #888;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: var(--hw-red);
+      color: white;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: none;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ===== INPUTS ===== */
+    input, select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      margin-bottom: 10px;
+      font-family: inherit;
+    }
+
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--hw-blue);
+    }
+
+    /* ===== SECTION BOX ===== */
+    .section {
+      background: white;
+      border: 4px solid var(--hw-blue);
+      border-radius: 12px;
+      padding: 25px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .section-title {
+      position: absolute;
+      top: -18px;
+      left: 20px;
+      background: var(--hw-blue);
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: 900;
+      font-size: 1rem;
+      text-transform: uppercase;
+    }
+
+    /* ===== HISTORY TABLE ===== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    thead {
+      background: var(--hw-blue);
+      color: white;
+    }
+
+    th, td {
+      padding: 12px;
+      text-align: left;
+    }
+
+    tbody tr:nth-child(even) {
+      background: #f8f9fa;
+    }
+
+    tbody tr:hover {
+      background: #e9ecef;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 768px) {
+      .header h1 {
+        font-size: 2rem;
+      }
+
+      .grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .garage-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Settings Link -->
+    <a href="/config" class="settings-link" title="Device Settings">&#x2699;</a>
+
+    <!-- Connection Status -->
+    <div id="connection" class="connection-status disconnected">
+      Disconnected
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+      <h1>HOT WHEELS PHYSICS LAB</h1>
+      <p>REAL-TIME RACE TIMING SYSTEM</p>
+    </div>
+
+    <!-- State Banner -->
+    <div id="stateBanner" class="state-banner">
+      INITIALIZING...
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid" style="grid-template-columns: repeat(3, 1fr);">
+      <button id="btnArm" class="btn btn-success" onclick="armRace()">
+        ARM SYSTEM
+      </button>
+      <button id="btnReset" class="btn btn-warning" onclick="resetRace()">
+        RESET
+      </button>
+      <button id="btnSync" class="btn btn-primary" onclick="syncClock()">
+        SYNC CLOCK
+      </button>
+    </div>
+
+    <!-- Live Stats -->
+    <div class="grid">
+      <div class="card">
+        <div class="card-label">Time</div>
+        <div>
+          <span id="statTime" class="card-value">--</span>
+          <span class="card-unit">s</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Real Speed</div>
+        <div>
+          <span id="statSpeed" class="card-value">--</span>
+          <span class="card-unit">mph</span>
+        </div>
+      </div>
+      <div class="card" style="border-bottom-color: var(--hw-orange);">
+        <div class="card-label" id="scaleLabel">Scale Speed (1:64)</div>
+        <div>
+          <span id="statScale" class="card-value" style="color: var(--hw-orange);">--</span>
+          <span class="card-unit">mph</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Physics -->
+    <div class="grid">
+      <div class="card">
+        <div class="card-label">Momentum</div>
+        <div>
+          <span id="statMomentum" class="card-value">--</span>
+          <span class="card-unit">kg*m/s</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Kinetic Energy</div>
+        <div>
+          <span id="statKE" class="card-value">--</span>
+          <span class="card-unit">J</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Total Runs</div>
+        <div>
+          <span id="statRuns" class="card-value">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Garage -->
+    <div class="section">
+      <div class="section-title">THE GARAGE</div>
+
+      <div class="grid" style="grid-template-columns: 2fr 1fr 1fr;">
+        <input type="text" id="carName" placeholder="Car Name (e.g. Twin Mill)">
+        <input type="text" id="carColor" placeholder="Color">
+        <input type="number" id="carWeight" placeholder="Weight (g)" step="0.1">
+      </div>
+
+      <button class="btn btn-warning" onclick="addCar()">
+        ADD TO GARAGE
+      </button>
+
+      <div id="currentCar" style="text-align: center; margin: 15px 0; font-size: 1.2rem; font-weight: bold;">
+        No car selected
+      </div>
+
+      <div id="garageGrid" class="garage-grid">
+        <!-- Cars will be rendered here -->
+      </div>
+    </div>
+
+    <!-- Settings -->
+    <div class="section">
+      <div class="section-title">SETTINGS</div>
+
+      <div class="grid">
+        <div>
+          <div class="card-label">Track Length (meters)</div>
+          <input type="number" id="trackLength" value="2.0" step="0.01" onchange="updateTrackLength()">
+        </div>
+        <div>
+          <div class="card-label">Google Sheets URL (optional)</div>
+          <input type="text" id="sheetsUrl" placeholder="https://script.google.com/...">
+        </div>
+      </div>
+
+      <div class="grid" style="grid-template-columns: repeat(2, 1fr);">
+        <button class="btn btn-primary" onclick="exportCSV()">
+          DOWNLOAD CSV
+        </button>
+        <button class="btn btn-danger" onclick="clearHistory()">
+          CLEAR HISTORY
+        </button>
+      </div>
+    </div>
+
+    <!-- History -->
+    <div class="section">
+      <div class="section-title">RACE HISTORY</div>
+      <div style="overflow-x: auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>Run</th>
+              <th>Car</th>
+              <th>Weight</th>
+              <th>Time</th>
+              <th>Real MPH</th>
+              <th>Scale MPH</th>
+              <th>Momentum</th>
+            </tr>
+          </thead>
+          <tbody id="historyTable">
+            <tr>
+              <td colspan="7" style="text-align: center; color: #999;">
+                No races yet - start racing!
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ========================================================================
+    // WEBSOCKET CONNECTION
+    // ========================================================================
+    let ws = null;
+    let wsReconnectTimer = null;
+    let currentScaleFactor = 64; // Updated from ESP32 state
+    let configSheetsUrl = ''; // Updated from ESP32 state
+
+    function connectWebSocket() {
+      const wsUrl = `ws://${window.location.hostname}:81`;
+      ws = new WebSocket(wsUrl);
+
+      ws.onopen = () => {
+        updateConnectionStatus(true);
+        clearTimeout(wsReconnectTimer);
+      };
+
+      ws.onclose = () => {
+        updateConnectionStatus(false);
+        wsReconnectTimer = setTimeout(connectWebSocket, 2000);
+      };
+
+      ws.onerror = () => {};
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          handleStateUpdate(data);
+        } catch (e) {
+          console.error('Parse error:', e);
+        }
+      };
+    }
+
+    function updateConnectionStatus(connected) {
+      const el = document.getElementById('connection');
+      if (connected) {
+        el.className = 'connection-status connected';
+        el.textContent = 'Connected';
+      } else {
+        el.className = 'connection-status disconnected';
+        el.textContent = 'Disconnected';
+      }
+    }
+
+    function send(data) {
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify(data));
+      } else {
+        alert('Not connected to race system!');
+      }
+    }
+
+    // ========================================================================
+    // STATE HANDLING
+    // ========================================================================
+    function handleStateUpdate(data) {
+      // Update scale factor from ESP32 config
+      if (data.scaleFactor) {
+        currentScaleFactor = data.scaleFactor;
+        document.getElementById('scaleLabel').textContent = 'Scale Speed (1:' + currentScaleFactor + ')';
+      }
+
+      // Update Google Sheets URL from config if not manually set
+      if (data.google_sheets_url && !document.getElementById('sheetsUrl').value) {
+        document.getElementById('sheetsUrl').value = data.google_sheets_url;
+        configSheetsUrl = data.google_sheets_url;
+      }
+
+      // Update track length from ESP32
+      if (data.trackLength) {
+        document.getElementById('trackLength').value = data.trackLength;
+      }
+
+      // Update banner
+      const banner = document.getElementById('stateBanner');
+      banner.className = 'state-banner ' + data.state.toLowerCase();
+      banner.textContent = data.state;
+
+      // Update stats
+      document.getElementById('statTime').textContent = data.time ? data.time.toFixed(3) : '--';
+      document.getElementById('statSpeed').textContent = data.speed_mph ? data.speed_mph.toFixed(1) : '--';
+      document.getElementById('statScale').textContent = data.scale_mph ? data.scale_mph.toFixed(0) : '--';
+      document.getElementById('statMomentum').textContent = data.momentum ? data.momentum.toFixed(4) : '--';
+      document.getElementById('statKE').textContent = data.ke ? data.ke.toFixed(4) : '--';
+      document.getElementById('statRuns').textContent = data.totalRuns || 0;
+
+      // If race finished, update garage stats
+      if (data.state === 'FINISHED' && data.time) {
+        updateGarageStats(data);
+        addToHistory(data);
+
+        // Auto-upload to Google Sheets if configured
+        const sheetsUrl = document.getElementById('sheetsUrl').value || configSheetsUrl;
+        if (sheetsUrl) {
+          uploadToSheets(data, sheetsUrl);
+        }
+      }
+
+      // Update button states
+      const btnArm = document.getElementById('btnArm');
+      if (data.state === 'IDLE') {
+        btnArm.disabled = false;
+        btnArm.textContent = 'ARM SYSTEM';
+      } else {
+        btnArm.disabled = true;
+        btnArm.textContent = data.state;
+      }
+    }
+
+    // ========================================================================
+    // RACE CONTROL
+    // ========================================================================
+    function armRace() {
+      send({ cmd: 'arm' });
+    }
+
+    function resetRace() {
+      send({ cmd: 'reset' });
+    }
+
+    function syncClock() {
+      send({ cmd: 'syncClock' });
+      alert('Clock sync requested!');
+    }
+
+    function updateTrackLength() {
+      const length = parseFloat(document.getElementById('trackLength').value);
+      if (length > 0 && length < 100) {
+        send({ cmd: 'setTrack', length: length });
+      }
+    }
+
+    // ========================================================================
+    // GARAGE MANAGEMENT
+    // ========================================================================
+    let garage = JSON.parse(localStorage.getItem('hw_garage') || '[]');
+    let activeCar = JSON.parse(localStorage.getItem('hw_active_car') || 'null');
+
+    function saveGarage() {
+      localStorage.setItem('hw_garage', JSON.stringify(garage));
+      renderGarage();
+    }
+
+    function addCar() {
+      const name = document.getElementById('carName').value.trim();
+      const color = document.getElementById('carColor').value.trim();
+      const weight = parseFloat(document.getElementById('carWeight').value);
+
+      if (!name || name.length < 1 || name.length > 30) {
+        alert('Car name must be 1-30 characters!');
+        return;
+      }
+
+      if (!weight || weight < 1 || weight > 200) {
+        alert('Weight must be between 1-200 grams!');
+        return;
+      }
+
+      if (garage.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+        alert('Car already exists!');
+        return;
+      }
+
+      garage.push({
+        id: Date.now(),
+        name: name,
+        color: color || 'N/A',
+        weight: weight,
+        stats: { runs: 0, bestTime: Infinity, bestSpeed: 0 }
+      });
+
+      saveGarage();
+      document.getElementById('carName').value = '';
+      document.getElementById('carColor').value = '';
+      document.getElementById('carWeight').value = '';
+    }
+
+    function selectCar(index) {
+      activeCar = garage[index];
+      localStorage.setItem('hw_active_car', JSON.stringify(activeCar));
+      send({ cmd: 'setCar', name: activeCar.name, weight: activeCar.weight });
+      document.getElementById('currentCar').innerHTML =
+        'Currently Racing: <span style="color: var(--hw-green);">' + activeCar.name + '</span> (' + activeCar.weight + 'g)';
+      renderGarage();
+    }
+
+    function deleteCar(index, event) {
+      event.stopPropagation();
+      if (confirm('Delete ' + garage[index].name + '?')) {
+        const deletedId = garage[index].id;
+        garage.splice(index, 1);
+        if (activeCar && activeCar.id === deletedId) {
+          activeCar = null;
+          localStorage.removeItem('hw_active_car');
+          document.getElementById('currentCar').textContent = 'No car selected';
+        }
+        saveGarage();
+      }
+    }
+
+    function renderGarage() {
+      const grid = document.getElementById('garageGrid');
+      if (garage.length === 0) {
+        grid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">No cars in garage - add one above!</p>';
+        return;
+      }
+      grid.innerHTML = garage.map((car, i) =>
+        '<div class="garage-car ' + (activeCar && activeCar.id === car.id ? 'active' : '') + '" onclick="selectCar(' + i + ')">' +
+          '<button class="delete-btn" onclick="deleteCar(' + i + ', event)">x</button>' +
+          '<h3>' + car.name + '</h3>' +
+          '<p>' + car.color + '</p>' +
+          '<p>' + car.weight + 'g</p>' +
+          '<div class="garage-stats">' +
+            '<span>Runs: ' + car.stats.runs + '</span>' +
+            '<span>Best: ' + (car.stats.bestTime === Infinity ? '--' : car.stats.bestTime.toFixed(3)) + 's</span>' +
+          '</div>' +
+        '</div>'
+      ).join('');
+    }
+
+    function updateGarageStats(raceData) {
+      if (!activeCar) return;
+      const carIndex = garage.findIndex(c => c.id === activeCar.id);
+      if (carIndex === -1) return;
+      garage[carIndex].stats.runs++;
+      if (raceData.time < garage[carIndex].stats.bestTime) garage[carIndex].stats.bestTime = raceData.time;
+      if (raceData.speed_mph > garage[carIndex].stats.bestSpeed) garage[carIndex].stats.bestSpeed = raceData.speed_mph;
+      saveGarage();
+    }
+
+    // ========================================================================
+    // HISTORY MANAGEMENT
+    // ========================================================================
+    let history = JSON.parse(localStorage.getItem('hw_history') || '[]');
+
+    function addToHistory(raceData) {
+      history.unshift({
+        timestamp: Date.now(),
+        run: raceData.totalRuns,
+        car: raceData.car,
+        weight: raceData.weight,
+        time: raceData.time,
+        speed_mph: raceData.speed_mph,
+        scale_mph: raceData.scale_mph,
+        momentum: raceData.momentum,
+        ke: raceData.ke
+      });
+      if (history.length > 100) history = history.slice(0, 100);
+      localStorage.setItem('hw_history', JSON.stringify(history));
+      renderHistory();
+    }
+
+    function renderHistory() {
+      const tbody = document.getElementById('historyTable');
+      if (history.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: #999;">No races yet</td></tr>';
+        return;
+      }
+      tbody.innerHTML = history.slice(0, 20).map(h =>
+        '<tr>' +
+          '<td>#' + h.run + '</td>' +
+          '<td><strong>' + h.car + '</strong></td>' +
+          '<td>' + h.weight + 'g</td>' +
+          '<td>' + h.time.toFixed(3) + 's</td>' +
+          '<td>' + h.speed_mph.toFixed(1) + ' mph</td>' +
+          '<td><strong style="color: var(--hw-orange);">' + h.scale_mph.toFixed(0) + ' mph</strong></td>' +
+          '<td>' + h.momentum.toFixed(3) + '</td>' +
+        '</tr>'
+      ).join('');
+    }
+
+    function clearHistory() {
+      const c = prompt('Type DELETE to clear all history:');
+      if (c === 'DELETE') {
+        history = [];
+        localStorage.setItem('hw_history', JSON.stringify(history));
+        renderHistory();
+      }
+    }
+
+    // ========================================================================
+    // DATA EXPORT
+    // ========================================================================
+    function exportCSV() {
+      if (history.length === 0) { alert('No data to export!'); return; }
+      let csv = 'Run,Timestamp,Car,Weight(g),Time(s),Speed(mph),Scale(mph),Momentum,KE\n';
+      history.forEach(h => {
+        csv += h.run + ',' + new Date(h.timestamp).toISOString() + ',' + h.car + ',' + h.weight + ',' + h.time + ',' + h.speed_mph + ',' + h.scale_mph + ',' + h.momentum + ',' + h.ke + '\n';
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'hotwheels_' + Date.now() + '.csv';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+
+    function uploadToSheets(data, url) {
+      fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timestamp: new Date().toISOString(),
+          car: data.car,
+          weight: data.weight,
+          time: data.time,
+          speed_mph: data.speed_mph,
+          scale_mph: data.scale_mph,
+          momentum: data.momentum,
+          ke: data.ke
+        })
+      }).catch(err => console.error('Sheets upload failed:', err));
+    }
+
+    // ========================================================================
+    // INITIALIZATION
+    // ========================================================================
+    window.onload = () => {
+      renderGarage();
+      renderHistory();
+      connectWebSocket();
+      if (activeCar) {
+        document.getElementById('currentCar').innerHTML =
+          'Currently Racing: <span style="color: var(--hw-green);">' + activeCar.name + '</span> (' + activeCar.weight + 'g)';
+      }
+    };
+  </script>
+</body>
+</html>

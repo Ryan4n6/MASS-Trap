@@ -1,0 +1,263 @@
+#include "config.h"
+#include <ArduinoJson.h>
+#include <LittleFS.h>
+
+DeviceConfig cfg;
+
+void setDefaults(DeviceConfig& c) {
+  c.configured = false;
+  c.version = CONFIG_VERSION;
+
+  memset(c.wifi_ssid, 0, sizeof(c.wifi_ssid));
+  memset(c.wifi_pass, 0, sizeof(c.wifi_pass));
+  strncpy(c.hostname, "hotwheels", sizeof(c.hostname) - 1);
+  strncpy(c.network_mode, "wifi", sizeof(c.network_mode) - 1);
+
+  strncpy(c.role, "finish", sizeof(c.role) - 1);
+  c.device_id = 1;
+
+  c.sensor_pin = 4;
+  c.led_pin = 2;
+
+  memset(c.peer_mac, 0, 6);
+
+  c.track_length_m = 2.0f;
+  c.scale_factor = 64;
+
+  memset(c.google_sheets_url, 0, sizeof(c.google_sheets_url));
+  memset(c.wled_host, 0, sizeof(c.wled_host));
+  c.wled_effect_idle = 0;
+  c.wled_effect_armed = 28;
+  c.wled_effect_racing = 49;
+  c.wled_effect_finished = 11;
+
+  strncpy(c.ota_password, "admin", sizeof(c.ota_password) - 1);
+}
+
+bool loadConfig() {
+  setDefaults(cfg);
+
+  if (!LittleFS.exists(CONFIG_FILE)) {
+    Serial.println("[CONFIG] No config file found, using defaults");
+    return false;
+  }
+
+  File file = LittleFS.open(CONFIG_FILE, "r");
+  if (!file) {
+    Serial.println("[CONFIG] Failed to open config file");
+    return false;
+  }
+
+  String json = file.readString();
+  file.close();
+
+  return configFromJson(json);
+}
+
+bool saveConfig() {
+  String json = configToJson();
+
+  File file = LittleFS.open(CONFIG_FILE, "w");
+  if (!file) {
+    Serial.println("[CONFIG] Failed to open config file for writing");
+    return false;
+  }
+
+  file.print(json);
+  file.close();
+  Serial.println("[CONFIG] Config saved successfully");
+  return true;
+}
+
+bool isValidGPIO(uint8_t pin) {
+  if (pin > 48) return false;
+  for (int i = 0; i < GPIO_BLACKLIST_SIZE; i++) {
+    if (pin == GPIO_BLACKLIST[i]) return false;
+  }
+  return true;
+}
+
+bool validateConfig(const DeviceConfig& c) {
+  if (!isValidGPIO(c.sensor_pin)) {
+    Serial.printf("[CONFIG] Invalid sensor pin: %d\n", c.sensor_pin);
+    return false;
+  }
+  if (!isValidGPIO(c.led_pin)) {
+    Serial.printf("[CONFIG] Invalid LED pin: %d\n", c.led_pin);
+    return false;
+  }
+  if (c.sensor_pin == c.led_pin) {
+    Serial.println("[CONFIG] Sensor and LED pins cannot be the same");
+    return false;
+  }
+  if (c.device_id == 0) {
+    Serial.println("[CONFIG] Device ID must be > 0");
+    return false;
+  }
+  if (c.track_length_m <= 0 || c.track_length_m > 100) {
+    Serial.println("[CONFIG] Track length must be 0-100m");
+    return false;
+  }
+  if (c.scale_factor < 1 || c.scale_factor > 1000) {
+    Serial.println("[CONFIG] Scale factor must be 1-1000");
+    return false;
+  }
+  if (strlen(c.hostname) == 0) {
+    Serial.println("[CONFIG] Hostname cannot be empty");
+    return false;
+  }
+  if (strcmp(c.role, "start") != 0 && strcmp(c.role, "finish") != 0 &&
+      strcmp(c.role, "display") != 0 && strcmp(c.role, "judge") != 0 &&
+      strcmp(c.role, "lights") != 0) {
+    Serial.printf("[CONFIG] Invalid role: %s\n", c.role);
+    return false;
+  }
+  return true;
+}
+
+String configToJson() {
+  StaticJsonDocument<1024> doc;
+
+  doc["configured"] = cfg.configured;
+  doc["version"] = cfg.version;
+
+  JsonObject network = doc.createNestedObject("network");
+  network["wifi_ssid"] = cfg.wifi_ssid;
+  network["wifi_pass"] = cfg.wifi_pass;
+  network["hostname"] = cfg.hostname;
+  network["mode"] = cfg.network_mode;
+
+  JsonObject device = doc.createNestedObject("device");
+  device["role"] = cfg.role;
+  device["id"] = cfg.device_id;
+
+  JsonObject pins = doc.createNestedObject("pins");
+  pins["sensor_pin"] = cfg.sensor_pin;
+  pins["led_pin"] = cfg.led_pin;
+
+  JsonObject peer = doc.createNestedObject("peer");
+  peer["mac"] = formatMac(cfg.peer_mac);
+
+  JsonObject track = doc.createNestedObject("track");
+  track["length_m"] = cfg.track_length_m;
+  track["scale_factor"] = cfg.scale_factor;
+
+  JsonObject integrations = doc.createNestedObject("integrations");
+  integrations["google_sheets_url"] = cfg.google_sheets_url;
+  integrations["wled_host"] = cfg.wled_host;
+  JsonObject wled_fx = integrations.createNestedObject("wled_effects");
+  wled_fx["idle"] = cfg.wled_effect_idle;
+  wled_fx["armed"] = cfg.wled_effect_armed;
+  wled_fx["racing"] = cfg.wled_effect_racing;
+  wled_fx["finished"] = cfg.wled_effect_finished;
+
+  JsonObject ota = doc.createNestedObject("ota");
+  ota["password"] = cfg.ota_password;
+
+  String output;
+  serializeJsonPretty(doc, output);
+  return output;
+}
+
+bool configFromJson(const String& json) {
+  StaticJsonDocument<1024> doc;
+  DeserializationError err = deserializeJson(doc, json);
+  if (err) {
+    Serial.printf("[CONFIG] JSON parse error: %s\n", err.c_str());
+    return false;
+  }
+
+  cfg.configured = doc["configured"] | false;
+  cfg.version = doc["version"] | CONFIG_VERSION;
+
+  JsonObject network = doc["network"];
+  if (network) {
+    strncpy(cfg.wifi_ssid, network["wifi_ssid"] | "", sizeof(cfg.wifi_ssid) - 1);
+    strncpy(cfg.wifi_pass, network["wifi_pass"] | "", sizeof(cfg.wifi_pass) - 1);
+    strncpy(cfg.hostname, network["hostname"] | "hotwheels", sizeof(cfg.hostname) - 1);
+    strncpy(cfg.network_mode, network["mode"] | "wifi", sizeof(cfg.network_mode) - 1);
+  }
+
+  JsonObject device = doc["device"];
+  if (device) {
+    strncpy(cfg.role, device["role"] | "finish", sizeof(cfg.role) - 1);
+    cfg.device_id = device["id"] | 1;
+  }
+
+  JsonObject pins = doc["pins"];
+  if (pins) {
+    cfg.sensor_pin = pins["sensor_pin"] | 4;
+    cfg.led_pin = pins["led_pin"] | 2;
+  }
+
+  JsonObject peer = doc["peer"];
+  if (peer) {
+    const char* macStr = peer["mac"] | "00:00:00:00:00:00";
+    parseMacString(macStr, cfg.peer_mac);
+  }
+
+  JsonObject track = doc["track"];
+  if (track) {
+    cfg.track_length_m = track["length_m"] | 2.0f;
+    cfg.scale_factor = track["scale_factor"] | 64;
+  }
+
+  JsonObject integrations = doc["integrations"];
+  if (integrations) {
+    strncpy(cfg.google_sheets_url, integrations["google_sheets_url"] | "", sizeof(cfg.google_sheets_url) - 1);
+    strncpy(cfg.wled_host, integrations["wled_host"] | "", sizeof(cfg.wled_host) - 1);
+    JsonObject wled_fx = integrations["wled_effects"];
+    if (wled_fx) {
+      cfg.wled_effect_idle = wled_fx["idle"] | 0;
+      cfg.wled_effect_armed = wled_fx["armed"] | 28;
+      cfg.wled_effect_racing = wled_fx["racing"] | 49;
+      cfg.wled_effect_finished = wled_fx["finished"] | 11;
+    }
+  }
+
+  JsonObject ota = doc["ota"];
+  if (ota) {
+    strncpy(cfg.ota_password, ota["password"] | "admin", sizeof(cfg.ota_password) - 1);
+  }
+
+  if (cfg.configured) {
+    Serial.printf("[CONFIG] Loaded: role=%s, hostname=%s, wifi=%s\n",
+                  cfg.role, cfg.hostname, cfg.wifi_ssid);
+  }
+
+  return cfg.configured;
+}
+
+void resetConfig() {
+  Serial.println("[CONFIG] Factory reset - deleting config and rebooting");
+  LittleFS.remove(CONFIG_FILE);
+  LittleFS.remove("/runs.csv");
+  delay(500);
+  ESP.restart();
+}
+
+bool parseMacString(const char* macStr, uint8_t* macOut) {
+  if (!macStr || strlen(macStr) < 17) {
+    memset(macOut, 0, 6);
+    return false;
+  }
+  int values[6];
+  int matched = sscanf(macStr, "%x:%x:%x:%x:%x:%x",
+                        &values[0], &values[1], &values[2],
+                        &values[3], &values[4], &values[5]);
+  if (matched != 6) {
+    memset(macOut, 0, 6);
+    return false;
+  }
+  for (int i = 0; i < 6; i++) {
+    macOut[i] = (uint8_t)values[i];
+  }
+  return true;
+}
+
+String formatMac(const uint8_t* mac) {
+  char buf[18];
+  snprintf(buf, sizeof(buf), "%02X:%02X:%02X:%02X:%02X:%02X",
+           mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]);
+  return String(buf);
+}
