@@ -35,11 +35,13 @@
   --nav-hover:    #d4af37;
 }
 
-/* THEME 2: "Classic" — Hot Wheels Brand Heritage (Orange/Blue/Yellow) */
+/* THEME 2: "Classic" — Hot Wheels Brand Heritage (Orange/Blue/Yellow)
+   Reverse-engineered from the V1 "HotWheels_FinishGate_BULLETPROOF" dashboard
+   that started it all. Bold, toyish, 3D — white cards on a flame-orange gradient. */
 [data-theme="classic"] {
-  --bg:           #e85d00;
+  --bg:           #FF4400;
   --bg-card:      #ffffff;
-  --bg-dark:      #cc5200;
+  --bg-dark:      #cc3300;
   --bg-input:     #ffffff;
   --border:       #007ACC;
   --accent:       #FFCC00;
@@ -48,11 +50,11 @@
   --secondary-rgb:0,122,204;
   --success:      #28a745;
   --success-rgb:  40,167,69;
-  --danger:       #990000;
-  --danger-rgb:   153,0,0;
-  --text:         #222222;
-  --text-muted:   #444444;
-  --font-body:    'Arial Black', Impact, 'Segoe UI', sans-serif;
+  --danger:       #dc3545;
+  --danger-rgb:   220,53,69;
+  --text:         #333333;
+  --text-muted:   #666666;
+  --font-body:    'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   --font-data:    'Courier New', 'Consolas', monospace;
   --nav-bg:       #000000;
   --nav-border:   #FFCC00;
@@ -164,34 +166,416 @@ body {
    THEME BACKGROUNDS — Unique texture per theme (CSS only, no images)
    ================================================================= */
 
-/* Interceptor: Subtle grid / forensic graph paper */
+/* Interceptor: Forensic graph paper grid — evidence wall aesthetic */
 [data-theme="interceptor"] body {
   background-image:
     linear-gradient(rgba(42,42,74,0.3) 1px, transparent 1px),
     linear-gradient(90deg, rgba(42,42,74,0.3) 1px, transparent 1px);
   background-size: 40px 40px;
 }
+/* Interceptor: Stamped-metal header with gold foil text */
+[data-theme="interceptor"] .page-header {
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.6), 0 0 20px rgba(212,175,55,0.15);
+}
+[data-theme="interceptor"] .page-header-shield {
+  box-shadow: 0 4px 8px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+/* Interceptor: Evidence cards — raised with gold accent and deep shadow */
+[data-theme="interceptor"] .card {
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 8px 16px rgba(0,0,0,0.2);
+  border-top: 2px solid rgba(212,175,55,0.15);
+}
+[data-theme="interceptor"] .card:hover {
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 10px 24px rgba(0,0,0,0.3);
+  transform: translateY(-2px);
+}
+/* Interceptor: Sections — case file boxes with classified border */
+[data-theme="interceptor"] .section {
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 8px 16px rgba(0,0,0,0.15);
+  border-color: rgba(212,175,55,0.25);
+}
+[data-theme="interceptor"] .section-title {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+/* Interceptor: Heavy-duty tactical buttons */
+[data-theme="interceptor"] .btn {
+  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 6px 12px rgba(0,0,0,0.2);
+  border: 1px solid rgba(255,255,255,0.05);
+}
+[data-theme="interceptor"] .btn:active {
+  transform: translateY(4px);
+  box-shadow: 0 0 0 rgba(0,0,0,0.4);
+}
+/* Interceptor: State banner — armored tactical display */
+[data-theme="interceptor"] .state-banner {
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
+}
+[data-theme="interceptor"] .state-banner.armed {
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 0 20px rgba(var(--success-rgb),0.2);
+}
+[data-theme="interceptor"] .state-banner.racing {
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 0 20px rgba(var(--danger-rgb),0.3);
+}
+/* Interceptor: Table — dark ops with gold header accent */
+[data-theme="interceptor"] thead {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+  border-bottom: 2px solid var(--accent);
+}
+[data-theme="interceptor"] tbody tr:hover {
+  background: rgba(var(--accent-rgb), 0.06);
+}
+/* Interceptor: Garage — evidence locker feel */
+[data-theme="interceptor"] .garage-car {
+  box-shadow: 0 3px 0 rgba(0,0,0,0.2);
+}
+[data-theme="interceptor"] .garage-car:hover {
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4);
+}
+[data-theme="interceptor"] .garage-car.active {
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.2), 0 3px 0 rgba(0,0,0,0.2);
+}
+/* Interceptor: Connection badge — tactical HUD */
+[data-theme="interceptor"] .conn-badge {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+/* Interceptor: Most Wanted cards — heavy case files */
+[data-theme="interceptor"] .mw-card {
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 8px 16px rgba(0,0,0,0.15);
+}
+[data-theme="interceptor"] .mw-card.rank-1 {
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2), 0 0 16px rgba(var(--accent-rgb), 0.2);
+}
 
-/* Classic: Hot Wheels gradient with flame streaks */
+/* Classic: V1 Hot Wheels gradient — the flame-orange that started it all */
 [data-theme="classic"] body {
-  background-image:
-    linear-gradient(135deg, #FF4400 0%, #ff6600 25%, #ff8800 50%, #ff6600 75%, #FF4400 100%),
-    linear-gradient(180deg, rgba(0,0,0,0.1) 0%, transparent 40%);
-  background-blend-mode: multiply;
+  background: linear-gradient(135deg, #FF4400 0%, #ff8800 100%);
+  min-height: 100vh;
 }
+/* Classic: Racing logo header — bold italic white on flame orange */
 [data-theme="classic"] .page-header {
-  text-shadow: 2px 2px 0px #000;
+  text-shadow: 3px 3px 0px #000;
+  color: white;
 }
-[data-theme="classic"] .section {
+[data-theme="classic"] .page-header h1 {
+  color: white;
+  font-size: 3.5rem;
+  font-style: italic;
+  letter-spacing: -2px;
+  text-shadow: 4px 4px 0px #000, 0 0 20px rgba(255,204,0,0.3);
+  -webkit-text-stroke: 1px rgba(0,0,0,0.3);
+}
+[data-theme="classic"] .page-header .subtitle {
+  color: var(--accent);
+  font-weight: 900;
+  font-size: 0.9rem;
+  text-shadow: 2px 2px 0px rgba(0,0,0,0.5);
+  letter-spacing: 3px;
+}
+/* Classic: hide COMMAND CENTER — doesn't fit the race theme */
+[data-theme="classic"] .page-header .tagline {
+  display: none;
+}
+/* Classic: shield gets a blue racing outline */
+[data-theme="classic"] .page-header-shield {
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4), 0 0 0 3px var(--secondary);
+}
+/* Classic: V1 white cards — ONLY blue bottom border, clean white, chunky shadow */
+[data-theme="classic"] .card {
+  border: none;
   border-bottom: 4px solid var(--secondary);
-  box-shadow: 0 5px 0 rgba(0,0,0,0.1);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.1);
+  border-radius: 12px;
+  padding: 20px;
+}
+[data-theme="classic"] .card-value {
+  color: var(--secondary);
+  font-weight: 900;
+  font-size: 2.5rem;
+}
+/* Classic: V1 sections — blue border box with white interior */
+[data-theme="classic"] .section {
+  border: 4px solid var(--secondary);
+  border-radius: 12px;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.1);
 }
 [data-theme="classic"] .section-title {
-  color: var(--secondary);
+  background: var(--secondary);
+  color: white;
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-weight: 900;
 }
-[data-theme="classic"] .btn-primary { background: var(--secondary); }
+/* Classic: State banner — black scoreboard with diagonal racing shine sweep */
+[data-theme="classic"] .state-banner {
+  background: #000;
+  color: var(--accent);
+  border: 4px solid var(--secondary);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.3);
+  font-size: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+/* Sweeping shine effect across the idle banner */
+[data-theme="classic"] .state-banner.idle {
+  color: var(--accent);
+  border-color: var(--secondary);
+}
+[data-theme="classic"] .state-banner.idle::after {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255,204,0,0.06) 45%,
+    rgba(255,204,0,0.12) 50%,
+    rgba(255,204,0,0.06) 55%,
+    transparent 70%
+  );
+  animation: classic-shine 3s ease-in-out infinite;
+}
+@keyframes classic-shine {
+  0%   { left: -100%; }
+  100% { left: 200%; }
+}
+[data-theme="classic"] .state-banner.armed {
+  background: var(--success);
+  color: white;
+  border-color: var(--success);
+}
+[data-theme="classic"] .state-banner.racing {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+}
+[data-theme="classic"] .state-banner.finished {
+  background: white;
+  color: var(--bg);
+  border-color: var(--secondary);
+}
+/* Classic: V1 3D push-button effect — chunky, arcade feel */
+[data-theme="classic"] .btn {
+  box-shadow: 0 4px 0 rgba(0,0,0,0.2);
+  border-radius: 8px;
+  font-weight: 900;
+  font-size: 1.1rem;
+  padding: 15px 30px;
+  text-transform: uppercase;
+}
+[data-theme="classic"] .btn:active {
+  transform: translateY(4px);
+  box-shadow: none;
+}
+[data-theme="classic"] .btn-primary { background: var(--secondary); color: white; }
 [data-theme="classic"] .btn-accent { background: var(--accent); color: #000; }
-[data-theme="classic"] .status-bar { background: #000; color: var(--accent); border: 3px solid var(--secondary); }
+/* Classic: V1 status bar — black with yellow text */
+[data-theme="classic"] .status-bar {
+  background: #000;
+  color: var(--accent);
+  border: 4px solid var(--secondary);
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  box-shadow: 0 6px 0 rgba(0,0,0,0.3);
+}
+/* Classic: V1 connection badge — black with yellow border */
+[data-theme="classic"] .conn-badge {
+  border: 2px solid var(--accent);
+  background: rgba(0,0,0,0.8);
+  color: white;
+  border-radius: 8px;
+}
+/* Classic: V1 nav bar — solid black, no transparency bleed on mobile */
+[data-theme="classic"] .mass-nav {
+  background: #000;
+  border-bottom: 3px solid var(--accent);
+}
+[data-theme="classic"] .mass-nav-list a {
+  background: #000;
+}
+/* Classic: Garage car cards — white with hover lift */
+[data-theme="classic"] .garage-car {
+  background: white;
+  border: 3px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.08);
+}
+[data-theme="classic"] .garage-car:hover {
+  border-color: var(--secondary);
+  transform: translateY(-4px);
+  box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+}
+[data-theme="classic"] .garage-car.active {
+  border-color: var(--success);
+  background: #f0fff4;
+  border-width: 4px;
+}
+[data-theme="classic"] .garage-car h3 { color: var(--secondary); }
+/* Classic: Table header in Hot Wheels blue */
+[data-theme="classic"] thead { background: var(--secondary); color: white; }
+[data-theme="classic"] tbody tr:nth-child(even) { background: #f8f9fa; }
+[data-theme="classic"] tbody tr:hover { background: #e9ecef; }
+/* Classic: Most Wanted — white cards with blue accents */
+[data-theme="classic"] .mw-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.08);
+}
+[data-theme="classic"] .mw-card.rank-1 {
+  border-color: var(--accent);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.08), 0 0 12px rgba(var(--accent-rgb), 0.3);
+}
+/* Classic: Version badge — readable on orange background */
+[data-theme="classic"] .version-badge {
+  background: rgba(0,0,0,0.8);
+  color: white;
+  border: 1px solid var(--accent);
+}
+/* Classic: Outline buttons — white on orange bg instead of invisible yellow */
+[data-theme="classic"] .btn-outline {
+  background: white;
+  color: var(--secondary);
+  border: 3px solid var(--secondary);
+}
+[data-theme="classic"] .btn-outline:hover {
+  background: var(--secondary);
+  color: white;
+}
+
+/* Classic: NUKE the pumpkin — chart containers get clean white bg */
+[data-theme="classic"] .chart-container {
+  background: white;
+  border: 2px solid var(--secondary);
+  border-radius: 12px;
+  padding: 12px;
+}
+/* Classic: Formula cards — white bg, not pumpkin */
+[data-theme="classic"] .formula-card {
+  background: white;
+  border: 2px solid var(--secondary);
+  border-radius: 12px;
+}
+[data-theme="classic"] .formula-values {
+  background: #f0f4f8;
+}
+/* Classic: Most Wanted section title — yellow text-stroke to pop off orange */
+[data-theme="classic"] .most-wanted .section-title {
+  background: #000;
+  color: var(--accent);
+  text-shadow: 0 0 8px rgba(255,204,0,0.4);
+  border: 2px solid var(--accent);
+}
+/* Classic: All section titles — black bg with colored text to pop off orange */
+[data-theme="classic"] .section-title {
+  background: #000;
+  color: var(--accent);
+  text-shadow: 0 0 6px rgba(255,204,0,0.3);
+}
+/* Classic: Sort filter buttons — follow the blue/white/yellow palette */
+[data-theme="classic"] .mw-sort-btn {
+  background: white;
+  border: 2px solid var(--secondary);
+  color: var(--secondary);
+  font-weight: 900;
+  border-radius: 6px;
+}
+[data-theme="classic"] .mw-sort-btn.active {
+  background: var(--secondary);
+  color: white;
+  border-color: var(--secondary);
+}
+[data-theme="classic"] .mw-sort-btn:hover {
+  background: var(--secondary);
+  color: white;
+}
+/* Classic: Collapse/toggle link — readable on orange */
+[data-theme="classic"] .mw-toggle {
+  color: white;
+  background: rgba(0,0,0,0.6);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+/* Classic: Dry Run button — smaller, separated from stat cards */
+[data-theme="classic"] #btnDryRun {
+  font-size: 0.72rem;
+  padding: 6px 12px;
+  border: 2px solid var(--secondary);
+  margin-top: 4px;
+}
+/* Classic: Import label height fix — match sibling button height */
+[data-theme="classic"] .grid-4 label.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100%;
+}
+/* Classic: Version badge font — match body font, not monospace */
+[data-theme="classic"] .version-badge {
+  background: rgba(0,0,0,0.8);
+  color: white;
+  border: 1px solid var(--accent);
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+}
+/* Classic: Ghost edit/delete buttons — outline only, solid on hover */
+[data-theme="classic"] .delete-btn {
+  background: transparent;
+  border: 2px solid var(--danger);
+  color: var(--danger);
+  opacity: 0.5;
+  transition: all 0.2s;
+}
+[data-theme="classic"] .edit-btn {
+  background: transparent;
+  border: 2px solid var(--secondary);
+  color: var(--secondary);
+  opacity: 0.5;
+  transition: all 0.2s;
+}
+[data-theme="classic"] .garage-car:hover .delete-btn {
+  opacity: 1;
+  background: var(--danger);
+  color: white;
+}
+[data-theme="classic"] .garage-car:hover .edit-btn {
+  opacity: 1;
+  background: var(--secondary);
+  color: white;
+}
+/* Classic: Car names — truncate long names so they don't collide with buttons */
+[data-theme="classic"] .garage-car h3 {
+  color: var(--secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-right: 55px;
+}
+/* Classic: MW card backgrounds on orange (override --bg-dark) */
+[data-theme="classic"] .mw-card {
+  background: white;
+  border: 2px solid #ddd;
+}
+[data-theme="classic"] .mw-name { color: var(--secondary); }
+/* Classic: Section border — blue instead of whatever var(--border) gives */
+[data-theme="classic"] .section {
+  border-color: var(--secondary);
+}
+/* Classic: Explainer toggle button */
+[data-theme="classic"] #explainerToggle {
+  background: white;
+  color: var(--secondary);
+  border: 3px solid var(--secondary);
+  font-weight: 900;
+}
+/* Classic: LED bar — thicker, with dark border to pop on orange bg */
+[data-theme="classic"] .led-bar {
+  height: 10px;
+  border-radius: 5px;
+  border: 2px solid rgba(0,0,0,0.3);
+}
 
 /* Daytona: Asphalt texture with bold tire skid marks */
 [data-theme="daytona"] body {
@@ -220,12 +604,14 @@ body {
       rgba(255,255,255,0.01) 3px, rgba(255,255,255,0.01) 4px);
   background-attachment: fixed;
 }
-/* Daytona: Checkered flag border on nav */
+/* Daytona: Checkered flag border on nav + plate steel */
 [data-theme="daytona"] .mass-nav {
   border-bottom: 4px solid;
   border-image: repeating-linear-gradient(
     90deg, #ffffff 0, #ffffff 8px, #111111 8px, #111111 16px
   ) 4;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  background: linear-gradient(180deg, #1a1a1a 0%, #0e0e0e 100%);
 }
 
 /* Case File: Aged paper with coffee stain ring + faint ruled lines */
@@ -520,24 +906,39 @@ a:hover { color: var(--accent); }
   background: var(--border);
   transition: all 0.3s;
 }
-.led-bar.idle { background: var(--accent); box-shadow: 0 0 12px rgba(var(--accent-rgb),0.5); animation: mt-breathe 3s infinite; }
-.led-bar.armed { background: var(--success); box-shadow: 0 0 16px rgba(var(--success-rgb),0.6); animation: mt-pulse-fast 0.5s infinite; }
-.led-bar.racing {
-  background: linear-gradient(90deg, transparent 0%, var(--danger) 50%, transparent 100%);
-  background-size: 200% 100%;
-  animation: mt-chase 0.5s infinite linear;
+/* IDLE: WLED Effect 0 "Solid" — steady amber glow (#FFA000) */
+.led-bar.idle {
+  background: #FFA000;
+  box-shadow: 0 0 12px rgba(255,160,0,0.5);
+  animation: mt-breathe 3s infinite;
 }
+/* ARMED: WLED Effect 28 "Chase" — dot chasing along the strip */
+.led-bar.armed {
+  background: linear-gradient(90deg, transparent 0%, transparent 35%, #FFA000 48%, #FFA000 52%, transparent 65%, transparent 100%);
+  background-size: 300% 100%;
+  box-shadow: 0 0 16px rgba(255,160,0,0.6);
+  animation: mt-chase 0.8s infinite linear;
+}
+/* RACING: WLED Effect 49 "Fairy" — twinkling sparkles */
+.led-bar.racing {
+  background: linear-gradient(90deg, #FFA000 0%, transparent 8%, transparent 15%, #FFA000 20%, transparent 28%, transparent 40%, #FFA000 45%, transparent 52%, transparent 65%, #FFA000 70%, transparent 78%, transparent 88%, #FFA000 92%);
+  box-shadow: 0 0 16px rgba(255,160,0,0.5);
+  animation: mt-twinkle 0.4s infinite alternate;
+}
+/* FINISHED: WLED Effect 11 "Scan Dual" — two bars bouncing */
 .led-bar.finished {
-  background: linear-gradient(90deg, var(--accent), var(--secondary), var(--accent));
-  background-size: 400% 100%;
-  animation: mt-rainbow 2s infinite linear;
-  box-shadow: 0 0 16px rgba(var(--accent-rgb),0.4);
+  background:
+    linear-gradient(90deg, transparent 0%, transparent 20%, #FFA000 25%, #FFA000 30%, transparent 35%, transparent 100%),
+    linear-gradient(90deg, transparent 0%, transparent 65%, #FFA000 70%, #FFA000 75%, transparent 80%, transparent 100%);
+  background-size: 200% 100%, 200% 100%;
+  box-shadow: 0 0 20px rgba(255,160,0,0.6);
+  animation: mt-scan-dual 1.2s infinite alternate ease-in-out;
 }
 
 @keyframes mt-breathe { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
-@keyframes mt-pulse-fast { 0%,100% { opacity: 1; } 50% { opacity: 0.6; } }
-@keyframes mt-chase { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-@keyframes mt-rainbow { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+@keyframes mt-chase { 0% { background-position: 200% 0; } 100% { background-position: -100% 0; } }
+@keyframes mt-twinkle { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+@keyframes mt-scan-dual { 0% { background-position: -50% 0, 150% 0; } 100% { background-position: 150% 0, -50% 0; } }
 
 /* =================================================================
    CARDS — Data display containers
@@ -551,6 +952,8 @@ a:hover { color: var(--accent); }
 .grid-2 { grid-template-columns: 1fr 1fr; }
 .grid-3 { grid-template-columns: 1fr 1fr 1fr; }
 .grid-4 { grid-template-columns: repeat(4, 1fr); }
+/* Fix label-as-button height mismatch (e.g. Import button) */
+label.btn { display: flex; align-items: center; justify-content: center; }
 
 @media (max-width: 600px) {
   .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
@@ -619,12 +1022,48 @@ a:hover { color: var(--accent); }
 .section-title.danger { background: var(--danger); color: #fff; }
 .section-title.secondary { background: var(--secondary); color: #fff; }
 
-/* --- Case File: Evidence tag on section boxes --- */
+/* --- Case File: Detective dossier — manila folders, red tape, typewriter --- */
+[data-theme="casefile"] .page-header {
+  text-shadow: 1px 1px 0 rgba(0,0,0,0.08);
+}
+[data-theme="casefile"] .page-header h1 {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 6px;
+  color: #5a1a1a;
+}
+[data-theme="casefile"] .page-header .subtitle {
+  color: #8b0000;
+  font-weight: bold;
+}
+[data-theme="casefile"] .page-header .subtitle::before {
+  content: 'CASE #2026-';
+}
+[data-theme="casefile"] .page-header-shield {
+  background: #8b0000;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+}
+/* Case File: Cards — index card on cork board */
+[data-theme="casefile"] .card {
+  border: 1px solid #c4b99a;
+  border-bottom: 3px solid #8b0000;
+  border-radius: 2px;
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.08), 4px 4px 8px rgba(0,0,0,0.06);
+  background: #fffdf5;
+}
+[data-theme="casefile"] .card:hover {
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.08), 6px 6px 12px rgba(0,0,0,0.1);
+  transform: translateY(-2px) rotate(-0.3deg);
+}
+[data-theme="casefile"] .card-value {
+  color: #2f4f4f;
+}
+/* Case File: Sections — evidence folder with pushpin + paper clip shadow */
 [data-theme="casefile"] .section {
   border: 1px solid #b8a88a;
   border-radius: 2px;
-  box-shadow: 2px 2px 6px rgba(0,0,0,0.08);
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.06), 4px 4px 10px rgba(0,0,0,0.08);
   position: relative;
+  background: #fffdf5;
 }
 [data-theme="casefile"] .section::before {
   content: '';
@@ -633,7 +1072,7 @@ a:hover { color: var(--accent); }
   width: 12px; height: 12px;
   background: #cc2222;
   border-radius: 50%;
-  box-shadow: 0 0 0 2px #fffdf5, 0 0 0 3px #cc2222;
+  box-shadow: 0 0 0 2px #fffdf5, 0 0 0 3px #cc2222, 0 2px 3px rgba(0,0,0,0.3);
   z-index: 1;
 }
 [data-theme="casefile"] .section-title {
@@ -641,49 +1080,398 @@ a:hover { color: var(--accent); }
   font-family: 'Courier New', monospace;
   letter-spacing: 2px;
   text-transform: uppercase;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.15);
 }
-[data-theme="casefile"] .page-header h1 {
+/* Case File: Buttons — rubber stamp / typewriter key */
+[data-theme="casefile"] .btn {
+  border-radius: 3px;
   font-family: 'Courier New', monospace;
+  letter-spacing: 2px;
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.15), 0 4px 8px rgba(0,0,0,0.08);
+  border: 1px solid rgba(0,0,0,0.1);
+}
+[data-theme="casefile"] .btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 rgba(0,0,0,0.15);
+}
+[data-theme="casefile"] .btn-accent {
+  background: #8b0000;
+  color: #fff;
+}
+/* Case File: State banner — evidence room status board */
+[data-theme="casefile"] .state-banner {
+  border: 3px solid #8b0000;
+  background: #fffdf5;
+  color: #1a1a1a;
+  font-family: 'Courier New', monospace;
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.08), 4px 4px 10px rgba(0,0,0,0.06);
   letter-spacing: 6px;
 }
-[data-theme="casefile"] .page-header .subtitle::before {
-  content: 'CASE #2026-';
+[data-theme="casefile"] .state-banner.idle {
+  border-color: #8b0000;
+  color: #8b0000;
 }
+[data-theme="casefile"] .state-banner.armed {
+  background: rgba(var(--success-rgb), 0.08);
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.08), 0 0 12px rgba(var(--success-rgb),0.15);
+}
+[data-theme="casefile"] .state-banner.racing {
+  background: rgba(var(--danger-rgb), 0.08);
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.08), 0 0 12px rgba(var(--danger-rgb),0.2);
+}
+/* Case File: Tables — evidence log with dark header */
+[data-theme="casefile"] thead {
+  background: #3d3224;
+  color: #d4c8a8;
+  box-shadow: 0 2px 3px rgba(0,0,0,0.15);
+}
+[data-theme="casefile"] th {
+  font-family: 'Courier New', monospace;
+  letter-spacing: 1px;
+}
+[data-theme="casefile"] tbody tr:nth-child(even) {
+  background: rgba(244,240,232,0.5);
+}
+[data-theme="casefile"] tbody tr:hover {
+  background: rgba(139,0,0,0.05);
+}
+/* Case File: Garage — evidence tags */
+[data-theme="casefile"] .garage-car {
+  border-radius: 2px;
+  border: 1px solid #c4b99a;
+  box-shadow: 2px 2px 0 rgba(0,0,0,0.06);
+}
+[data-theme="casefile"] .garage-car:hover {
+  box-shadow: 3px 3px 8px rgba(0,0,0,0.12);
+  transform: translateY(-2px) rotate(-0.5deg);
+}
+[data-theme="casefile"] .garage-car.active {
+  border-color: #8b0000;
+  border-width: 2px;
+  box-shadow: 0 0 8px rgba(139,0,0,0.15), 2px 2px 0 rgba(0,0,0,0.06);
+}
+/* Case File: Connection badge — manila label */
 [data-theme="casefile"] .conn-badge {
   background: rgba(255,253,245,0.95);
   font-family: 'Courier New', monospace;
+  border-radius: 2px;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.1);
+  border-color: #b8a88a;
+}
+/* Case File: Most Wanted — suspect files */
+[data-theme="casefile"] .mw-card {
+  background: #fffdf5;
+  border-radius: 2px;
+  box-shadow: 2px 3px 0 rgba(0,0,0,0.06), 4px 4px 8px rgba(0,0,0,0.06);
+}
+[data-theme="casefile"] .mw-card.rank-1 {
+  border-top: 3px solid #8b0000;
+}
+/* Case File: Inputs — typewriter fields */
+[data-theme="casefile"] input[type="text"],
+[data-theme="casefile"] input[type="number"],
+[data-theme="casefile"] input[type="password"],
+[data-theme="casefile"] input[type="url"],
+[data-theme="casefile"] select,
+[data-theme="casefile"] textarea {
+  border-radius: 2px;
+  font-family: 'Courier New', monospace;
+  border-color: #c4b99a;
+}
+/* Case File: Version badge — readable on light paper */
+[data-theme="casefile"] .version-badge {
+  background: rgba(61,50,36,0.85);
+  color: #d4c8a8;
+  border: 1px solid #b8a88a;
 }
 
-/* --- Daytona: Bold racing stripes on sections --- */
+/* --- Daytona: NASCAR pit wall — heavy steel, speed stripes, bold impact --- */
+[data-theme="daytona"] .page-header {
+  text-shadow: 3px 3px 0px rgba(0,0,0,0.8);
+}
+[data-theme="daytona"] .page-header h1 {
+  text-shadow: 3px 3px 0px rgba(255,0,0,0.4), -1px -1px 0px rgba(255,204,0,0.3);
+  font-style: italic;
+}
+[data-theme="daytona"] .page-header .subtitle {
+  color: var(--accent);
+  font-weight: bold;
+  letter-spacing: 6px;
+}
+/* Daytona: Cards — pit board with red stripe + tire-stack layered shadow */
+[data-theme="daytona"] .card {
+  border-left: 4px solid var(--secondary);
+  border-bottom: 4px solid #222;
+  box-shadow: 0 3px 0 #1a1a1a, 0 5px 0 #222, 0 8px 16px rgba(0,0,0,0.3);
+  border-radius: 4px;
+}
+[data-theme="daytona"] .card:hover {
+  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.4);
+  transform: translateY(-2px);
+}
+[data-theme="daytona"] .card-value {
+  text-shadow: 0 0 8px rgba(var(--secondary-rgb), 0.3);
+}
+/* Daytona: Sections — tire-wall panels with stacked rubber layering */
 [data-theme="daytona"] .section {
   border-radius: 4px;
-  border-left: 4px solid var(--accent);
+  border-left: 5px solid var(--accent);
+  border-top: 3px solid var(--secondary);
+  border-bottom: 4px solid #222;
+  box-shadow: 0 4px 0 #1a1a1a, 0 6px 0 #222, 0 8px 0 #1a1a1a, 0 12px 20px rgba(0,0,0,0.3);
 }
 [data-theme="daytona"] .section-title {
   border-radius: 2px;
   font-family: Impact, 'Arial Narrow', sans-serif;
   letter-spacing: 3px;
   text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
 }
-[data-theme="daytona"] .page-header h1 {
-  text-shadow: 3px 3px 0px rgba(255,0,0,0.3), -1px -1px 0px rgba(255,204,0,0.3);
-}
+/* Daytona: State banner — scoreboard tower with checkered flag top border */
 [data-theme="daytona"] .state-banner {
-  border-width: 4px;
+  border: 4px solid var(--accent);
+  border-top: 6px solid;
+  border-image: repeating-linear-gradient(
+    90deg, #ffffff 0, #ffffff 8px, #111111 8px, #111111 16px
+  ) 6;
+  border-image-slice: 6 0 0 0;
+  border-left: 4px solid var(--accent);
+  border-right: 4px solid var(--accent);
+  border-bottom: 4px solid var(--accent);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
+  font-family: Impact, 'Arial Narrow', sans-serif;
+  font-style: italic;
+  border-radius: 4px;
 }
-[data-theme="daytona"] .card {
+[data-theme="daytona"] .state-banner.armed {
+  box-shadow: 0 6px 0 rgba(0,0,0,0.5), 0 0 24px rgba(var(--success-rgb),0.3);
+}
+[data-theme="daytona"] .state-banner.racing {
+  box-shadow: 0 6px 0 rgba(0,0,0,0.5), 0 0 30px rgba(var(--danger-rgb),0.4);
+}
+[data-theme="daytona"] .state-banner.finished {
+  box-shadow: 0 6px 0 rgba(0,0,0,0.5), 0 0 20px rgba(var(--accent-rgb),0.3);
+}
+/* Daytona: Buttons — heavy industrial push buttons */
+[data-theme="daytona"] .btn {
+  box-shadow: 0 5px 0 rgba(0,0,0,0.5), 0 8px 16px rgba(0,0,0,0.2);
+  border-radius: 4px;
+  font-family: Impact, 'Arial Narrow', sans-serif;
+  letter-spacing: 2px;
+  font-style: italic;
+}
+[data-theme="daytona"] .btn:active {
+  transform: translateY(5px);
+  box-shadow: 0 0 0 rgba(0,0,0,0.5);
+}
+/* Daytona: Tables — dark scoreboard with yellow header stripe */
+[data-theme="daytona"] thead {
+  background: var(--secondary);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+}
+[data-theme="daytona"] th {
+  font-family: Impact, 'Arial Narrow', sans-serif;
+  letter-spacing: 2px;
+}
+[data-theme="daytona"] tbody tr:hover {
+  background: rgba(var(--accent-rgb), 0.08);
+}
+/* Daytona: Garage — car cards with speed stripe accent */
+[data-theme="daytona"] .garage-car {
+  border-radius: 4px;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.3);
   border-left: 3px solid var(--secondary);
 }
-
-/* --- Cyber: Terminal glow on cards --- */
-[data-theme="cyber"] .card {
-  box-shadow: 0 0 8px rgba(0, 255, 0, 0.08), inset 0 0 1px rgba(0, 255, 0, 0.05);
+[data-theme="daytona"] .garage-car:hover {
+  box-shadow: 0 6px 16px rgba(0,0,0,0.5);
+  transform: translateY(-3px);
+  border-left-color: var(--accent);
 }
+[data-theme="daytona"] .garage-car.active {
+  border-color: var(--accent);
+  box-shadow: 0 0 12px rgba(var(--accent-rgb), 0.2), 0 3px 0 rgba(0,0,0,0.3);
+}
+/* Daytona: Connection badge — pit radio */
+[data-theme="daytona"] .conn-badge {
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+  border-width: 2px;
+}
+/* Daytona: Most Wanted — podium winners */
+[data-theme="daytona"] .mw-card {
+  border-radius: 4px;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 8px 16px rgba(0,0,0,0.2);
+}
+[data-theme="daytona"] .mw-card.rank-1 {
+  border-top: 3px solid var(--accent);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 0 16px rgba(var(--accent-rgb), 0.25);
+}
+
+/* --- Cyber: Full terminal / CRT monitor aesthetic — phosphor glow everything --- */
+[data-theme="cyber"] .page-header {
+  text-shadow: 0 0 10px rgba(0,255,0,0.4), 0 0 30px rgba(0,255,0,0.15);
+}
+[data-theme="cyber"] .page-header h1 {
+  text-shadow: 0 0 10px rgba(0,255,0,0.5), 0 0 40px rgba(0,255,0,0.2);
+  letter-spacing: 6px;
+}
+[data-theme="cyber"] .page-header .subtitle {
+  color: #00ff00;
+  text-shadow: 0 0 6px rgba(0,255,0,0.3);
+}
+[data-theme="cyber"] .page-header-shield {
+  box-shadow: 0 0 12px rgba(0,255,0,0.3), 0 0 24px rgba(0,255,0,0.1);
+}
+/* Cyber: Cards — terminal windows with phosphor border glow */
+[data-theme="cyber"] .card {
+  border: 1px solid #003300;
+  border-bottom: 2px solid #00ff00;
+  box-shadow: 0 0 8px rgba(0,255,0,0.1), 0 4px 0 rgba(0,0,0,0.4), inset 0 0 2px rgba(0,255,0,0.03);
+  border-radius: 2px;
+}
+[data-theme="cyber"] .card:hover {
+  box-shadow: 0 0 16px rgba(0,255,0,0.15), 0 4px 0 rgba(0,0,0,0.4), inset 0 0 4px rgba(0,255,0,0.05);
+  transform: translateY(-2px);
+}
+[data-theme="cyber"] .card-value {
+  text-shadow: 0 0 8px rgba(0,255,0,0.4);
+}
+[data-theme="cyber"] .card-label {
+  text-shadow: 0 0 4px rgba(0,255,0,0.2);
+}
+/* Cyber: Sections — terminal panels with glowing borders */
 [data-theme="cyber"] .section {
-  box-shadow: 0 0 12px rgba(0, 255, 0, 0.06);
+  border: 1px solid #003300;
+  border-radius: 2px;
+  box-shadow: 0 0 12px rgba(0,255,0,0.06), 0 4px 0 rgba(0,0,0,0.3);
+}
+[data-theme="cyber"] .section:hover {
+  box-shadow: 0 0 16px rgba(0,255,0,0.1), 0 4px 0 rgba(0,0,0,0.3);
 }
 [data-theme="cyber"] .section-title {
-  text-shadow: 0 0 8px rgba(0, 255, 0, 0.4);
+  text-shadow: 0 0 8px rgba(0,255,0,0.4);
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(0,255,0,0.2);
+}
+/* Cyber: Buttons — terminal command keys */
+[data-theme="cyber"] .btn {
+  border-radius: 2px;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.5), 0 0 6px rgba(0,255,0,0.1);
+  border: 1px solid rgba(0,255,0,0.15);
+  text-shadow: 0 0 4px rgba(0,0,0,0.5);
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+}
+[data-theme="cyber"] .btn:active {
+  transform: translateY(3px);
+  box-shadow: 0 0 0 rgba(0,0,0,0.5), 0 0 8px rgba(0,255,0,0.15);
+}
+[data-theme="cyber"] .btn-accent {
+  box-shadow: 0 3px 0 rgba(0,0,0,0.5), 0 0 10px rgba(0,255,0,0.2);
+}
+[data-theme="cyber"] .btn-primary {
+  box-shadow: 0 3px 0 rgba(0,0,0,0.5), 0 0 10px rgba(0,204,255,0.15);
+}
+/* Cyber: State banner — system status with CRT glow */
+[data-theme="cyber"] .state-banner {
+  border: 2px solid #003300;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 16px rgba(0,255,0,0.08), inset 0 0 40px rgba(0,255,0,0.02);
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+}
+[data-theme="cyber"] .state-banner.idle {
+  text-shadow: 0 0 10px rgba(0,255,0,0.5);
+  border-color: #004400;
+}
+[data-theme="cyber"] .state-banner.armed {
+  border-color: #00ff00;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 24px rgba(0,255,0,0.2), inset 0 0 40px rgba(0,255,0,0.03);
+  text-shadow: 0 0 12px rgba(0,255,0,0.6);
+}
+[data-theme="cyber"] .state-banner.racing {
+  border-color: #ff0040;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 24px rgba(255,0,64,0.25), inset 0 0 40px rgba(255,0,64,0.03);
+  text-shadow: 0 0 12px rgba(255,0,64,0.6);
+}
+[data-theme="cyber"] .state-banner.finished {
+  text-shadow: 0 0 12px rgba(0,255,0,0.5);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 20px rgba(0,255,0,0.15);
+}
+/* Cyber: Tables — dark terminal readout */
+[data-theme="cyber"] thead {
+  background: #001a00;
+  color: #00ff00;
+  text-shadow: 0 0 4px rgba(0,255,0,0.3);
+  box-shadow: 0 1px 0 #003300;
+}
+[data-theme="cyber"] tbody tr {
+  border-bottom-color: #002200;
+}
+[data-theme="cyber"] tbody tr:hover {
+  background: rgba(0,255,0,0.04);
+}
+/* Cyber: Garage — process list entries */
+[data-theme="cyber"] .garage-car {
+  border-radius: 2px;
+  border-color: #002200;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+}
+[data-theme="cyber"] .garage-car:hover {
+  border-color: #004400;
+  box-shadow: 0 0 12px rgba(0,255,0,0.1), 0 4px 8px rgba(0,0,0,0.3);
+}
+[data-theme="cyber"] .garage-car.active {
+  border-color: #00ff00;
+  box-shadow: 0 0 12px rgba(0,255,0,0.15), 0 2px 0 rgba(0,0,0,0.3);
+}
+[data-theme="cyber"] .garage-car h3 {
+  text-shadow: 0 0 6px rgba(0,255,0,0.3);
+}
+/* Cyber: Connection badge — system tray */
+[data-theme="cyber"] .conn-badge {
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(0,255,0,0.1);
+  border-color: #003300;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+}
+[data-theme="cyber"] .conn-badge.connected {
+  box-shadow: 0 0 10px rgba(0,255,0,0.15);
+}
+/* Cyber: Most Wanted — threat database */
+[data-theme="cyber"] .mw-card {
+  border-radius: 2px;
+  border-color: #002200;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.3), 0 0 8px rgba(0,255,0,0.05);
+}
+[data-theme="cyber"] .mw-card.rank-1 {
+  border-color: #00ff00;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.3), 0 0 16px rgba(0,255,0,0.15);
+}
+/* Cyber: Inputs — terminal input fields */
+[data-theme="cyber"] input[type="text"],
+[data-theme="cyber"] input[type="number"],
+[data-theme="cyber"] input[type="password"],
+[data-theme="cyber"] input[type="url"],
+[data-theme="cyber"] select,
+[data-theme="cyber"] textarea {
+  border-radius: 2px;
+  border-color: #003300;
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+}
+[data-theme="cyber"] input:focus,
+[data-theme="cyber"] select:focus,
+[data-theme="cyber"] textarea:focus {
+  box-shadow: 0 0 8px rgba(0,255,0,0.2);
+  border-color: #00ff00;
+}
+/* Cyber: Nav — terminal toolbar with glow */
+[data-theme="cyber"] .mass-nav {
+  border-color: #003300;
+  box-shadow: 0 1px 8px rgba(0,255,0,0.08);
+}
+/* Cyber: Version badge — system version readout */
+[data-theme="cyber"] .version-badge {
+  border: 1px solid #003300;
+  box-shadow: 0 0 4px rgba(0,255,0,0.1);
 }
 
 /* =================================================================
@@ -798,7 +1586,11 @@ tbody tr:hover { background: rgba(var(--secondary-rgb), 0.08); }
   background: rgba(var(--accent-rgb), 0.06);
   border-width: 3px;
 }
-.garage-car h3 { font-size: 1rem; color: var(--accent); margin-bottom: 6px; }
+.garage-car h3 {
+  font-size: 1rem; color: var(--accent); margin-bottom: 6px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  padding-right: 55px;
+}
 .garage-car p { font-size: 0.85rem; color: var(--text-muted); margin: 3px 0; }
 
 .garage-stats {
@@ -1003,6 +1795,7 @@ tbody tr:hover { background: rgba(var(--secondary-rgb), 0.08); }
   color: var(--success);
   animation: mt-pulse 1.5s infinite;
 }
+
 
 /* =================================================================
    CONNECTION STATUS BADGE

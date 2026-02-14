@@ -958,8 +958,21 @@
       // State banner
       const banner = document.getElementById('stateBanner');
       banner.className = 'state-banner ' + data.state.toLowerCase();
-      const bannerText = { IDLE: 'AWAITING SUSPECTS', ARMED: 'TRAP SET', RACING: 'IN PURSUIT', FINISHED: 'SUSPECT CLOCKED' };
-      banner.textContent = bannerText[data.state] || data.state;
+      var themeBannerText = {
+        interceptor: { IDLE: 'AWAITING SUSPECTS', ARMED: 'TRAP SET', RACING: 'IN PURSUIT', FINISHED: 'SUSPECT CLOCKED' },
+        classic:     { IDLE: 'READY TO RACE!', ARMED: 'ON YOUR MARKS...', RACING: 'GO GO GO!', FINISHED: 'FINISH LINE!' },
+        daytona:     { IDLE: 'PIT LANE', ARMED: 'GREEN FLAG', RACING: 'FULL SEND', FINISHED: 'CHECKERED FLAG' },
+        casefile:    { IDLE: 'CASE OPEN', ARMED: 'STAKEOUT ACTIVE', RACING: 'SUSPECT FLEEING', FINISHED: 'EVIDENCE LOGGED' },
+        cyber:       { IDLE: 'SYSTEM IDLE', ARMED: 'ARMED // READY', RACING: 'TRACKING...', FINISHED: 'TARGET ACQUIRED' }
+      };
+      var currentTheme = (localStorage.getItem('mass_theme') || 'interceptor').toLowerCase();
+      var bannerText = themeBannerText[currentTheme] || themeBannerText.interceptor;
+      var stateText = bannerText[data.state] || data.state;
+      if (activeCar && activeCar.name) {
+        banner.textContent = activeCar.name.toUpperCase() + ' \u2014 ' + stateText;
+      } else {
+        banner.textContent = stateText;
+      }
 
       // LED visualizer
       document.getElementById('ledBar').className = 'led-visualizer ' + data.state.toLowerCase();
@@ -1380,7 +1393,32 @@
       localStorage.setItem('hw_active_car', JSON.stringify(activeCar));
       send({ cmd: 'setCar', name: activeCar.name, weight: activeCar.weight });
       setCurrentCarDisplay(activeCar);
+      updateBannerCarName();
       renderGarage();
+    }
+
+    function updateBannerCarName() {
+      var banner = document.getElementById('stateBanner');
+      if (!banner) return;
+      var themeBannerText = {
+        interceptor: { IDLE: 'AWAITING SUSPECTS', ARMED: 'TRAP SET', RACING: 'IN PURSUIT', FINISHED: 'SUSPECT CLOCKED' },
+        classic:     { IDLE: 'READY TO RACE!', ARMED: 'ON YOUR MARKS...', RACING: 'GO GO GO!', FINISHED: 'FINISH LINE!' },
+        daytona:     { IDLE: 'PIT LANE', ARMED: 'GREEN FLAG', RACING: 'FULL SEND', FINISHED: 'CHECKERED FLAG' },
+        casefile:    { IDLE: 'CASE OPEN', ARMED: 'STAKEOUT ACTIVE', RACING: 'SUSPECT FLEEING', FINISHED: 'EVIDENCE LOGGED' },
+        cyber:       { IDLE: 'SYSTEM IDLE', ARMED: 'ARMED // READY', RACING: 'TRACKING...', FINISHED: 'TARGET ACQUIRED' }
+      };
+      var currentTheme = (localStorage.getItem('mass_theme') || 'interceptor').toLowerCase();
+      var texts = themeBannerText[currentTheme] || themeBannerText.interceptor;
+      var state = 'IDLE';
+      if (banner.classList.contains('armed')) state = 'ARMED';
+      else if (banner.classList.contains('racing')) state = 'RACING';
+      else if (banner.classList.contains('finished')) state = 'FINISHED';
+      var stateText = texts[state] || state;
+      if (activeCar && activeCar.name) {
+        banner.textContent = activeCar.name.toUpperCase() + ' \u2014 ' + stateText;
+      } else {
+        banner.textContent = stateText;
+      }
     }
 
     async function deleteCar(index, event) {

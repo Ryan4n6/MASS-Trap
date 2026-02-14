@@ -344,8 +344,22 @@
       // State banner
       var banner = document.getElementById('stateBanner');
       banner.className = 'state-banner ' + data.state.toLowerCase();
-      var bannerText = { IDLE: 'AWAITING SUSPECTS', ARMED: 'TRAP SET', RACING: 'IN PURSUIT', FINISHED: 'SUSPECT CLOCKED' };
-      banner.textContent = bannerText[data.state] || data.state;
+      var themeBannerText = {
+        interceptor: { IDLE: 'AWAITING SUSPECTS', ARMED: 'TRAP SET', RACING: 'IN PURSUIT', FINISHED: 'SUSPECT CLOCKED' },
+        classic:     { IDLE: 'READY TO RACE!', ARMED: 'ON YOUR MARKS...', RACING: 'GO GO GO!', FINISHED: 'FINISH LINE!' },
+        daytona:     { IDLE: 'PIT LANE', ARMED: 'GREEN FLAG', RACING: 'FULL SEND', FINISHED: 'CHECKERED FLAG' },
+        casefile:    { IDLE: 'CASE OPEN', ARMED: 'STAKEOUT ACTIVE', RACING: 'SUSPECT FLEEING', FINISHED: 'EVIDENCE LOGGED' },
+        cyber:       { IDLE: 'SYSTEM IDLE', ARMED: 'ARMED // READY', RACING: 'TRACKING...', FINISHED: 'TARGET ACQUIRED' }
+      };
+      var currentTheme = (localStorage.getItem('mass_theme') || 'interceptor').toLowerCase();
+      var bannerText = themeBannerText[currentTheme] || themeBannerText.interceptor;
+      var stateText = bannerText[data.state] || data.state;
+      // Prepend active car name so you always know what's loaded
+      if (activeCar && activeCar.name) {
+        banner.textContent = activeCar.name.toUpperCase() + ' \u2014 ' + stateText;
+      } else {
+        banner.textContent = stateText;
+      }
 
       // Dispatcher: announce state changes (once per transition)
       if (data.state !== _lastAnnouncedState) {
@@ -837,9 +851,36 @@
       localStorage.setItem('hw_active_car', JSON.stringify(activeCar));
       wsSend({ cmd: 'setCar', name: activeCar.name, weight: activeCar.weight });
       setCurrentCarDisplay(activeCar);
+      updateBannerCarName();
       renderGarage();
       // Dispatcher: announce car selection
       announce(activeCar.name + ' loaded. ' + activeCar.weight + ' grams.');
+    }
+
+    // Refresh banner text with current car name (called on car select + state change)
+    function updateBannerCarName() {
+      var banner = document.getElementById('stateBanner');
+      if (!banner) return;
+      var themeBannerText = {
+        interceptor: { IDLE: 'AWAITING SUSPECTS', ARMED: 'TRAP SET', RACING: 'IN PURSUIT', FINISHED: 'SUSPECT CLOCKED' },
+        classic:     { IDLE: 'READY TO RACE!', ARMED: 'ON YOUR MARKS...', RACING: 'GO GO GO!', FINISHED: 'FINISH LINE!' },
+        daytona:     { IDLE: 'PIT LANE', ARMED: 'GREEN FLAG', RACING: 'FULL SEND', FINISHED: 'CHECKERED FLAG' },
+        casefile:    { IDLE: 'CASE OPEN', ARMED: 'STAKEOUT ACTIVE', RACING: 'SUSPECT FLEEING', FINISHED: 'EVIDENCE LOGGED' },
+        cyber:       { IDLE: 'SYSTEM IDLE', ARMED: 'ARMED // READY', RACING: 'TRACKING...', FINISHED: 'TARGET ACQUIRED' }
+      };
+      var currentTheme = (localStorage.getItem('mass_theme') || 'interceptor').toLowerCase();
+      var texts = themeBannerText[currentTheme] || themeBannerText.interceptor;
+      // Detect current state from banner class
+      var state = 'IDLE';
+      if (banner.classList.contains('armed')) state = 'ARMED';
+      else if (banner.classList.contains('racing')) state = 'RACING';
+      else if (banner.classList.contains('finished')) state = 'FINISHED';
+      var stateText = texts[state] || state;
+      if (activeCar && activeCar.name) {
+        banner.textContent = activeCar.name.toUpperCase() + ' \u2014 ' + stateText;
+      } else {
+        banner.textContent = stateText;
+      }
     }
 
     async function deleteCar(index, event) {
@@ -1095,26 +1136,34 @@
 
     function initCharts() {
       if (typeof Chart === 'undefined') return;
-      Chart.defaults.color = '#8888aa';
-      Chart.defaults.borderColor = '#2a2a4a';
+      // Read theme colors from CSS variables so charts adapt per theme
+      var cs = getComputedStyle(document.documentElement);
+      var cAccent = cs.getPropertyValue('--accent').trim() || '#d4af37';
+      var cSecondary = cs.getPropertyValue('--secondary').trim() || '#4a90d9';
+      var cMuted = cs.getPropertyValue('--text-muted').trim() || '#8888aa';
+      var cBorder = cs.getPropertyValue('--border').trim() || '#2a2a4a';
+      var cSecRgb = cs.getPropertyValue('--secondary-rgb').trim() || '74,144,217';
+
+      Chart.defaults.color = cMuted;
+      Chart.defaults.borderColor = cBorder;
 
       var su = speedUnit();
       speedChart = new Chart(document.getElementById('speedChart').getContext('2d'), {
         type: 'line',
         data: { labels: [], datasets: [{ label: 'Speed (' + su + ')', data: [],
-          borderColor: '#4a90d9', backgroundColor: 'rgba(74,144,217,0.1)',
-          borderWidth: 2, pointBackgroundColor: '#d4af37', pointRadius: 4, tension: 0.1, fill: true }] },
+          borderColor: cSecondary, backgroundColor: 'rgba(' + cSecRgb + ',0.1)',
+          borderWidth: 2, pointBackgroundColor: cAccent, pointRadius: 4, tension: 0.1, fill: true }] },
         options: { responsive: true,
-          plugins: { title: { display: true, text: 'Speed vs Run', font: { size: 14, weight: 'bold' }, color: '#d4af37' }, legend: { display: false } },
+          plugins: { title: { display: true, text: 'Speed vs Run', font: { size: 14, weight: 'bold' }, color: cAccent }, legend: { display: false } },
           scales: { x: { title: { display: true, text: 'Run #' } }, y: { title: { display: true, text: 'Speed (' + su + ')' }, beginAtZero: true } } }
       });
 
       keChart = new Chart(document.getElementById('keChart').getContext('2d'), {
         type: 'scatter',
         data: { datasets: [{ label: 'KE vs Mass', data: [],
-          backgroundColor: '#d4af37', pointRadius: 6, pointHoverRadius: 8 }] },
+          backgroundColor: cAccent, pointRadius: 6, pointHoverRadius: 8 }] },
         options: { responsive: true,
-          plugins: { title: { display: true, text: 'Kinetic Energy vs Mass', font: { size: 14, weight: 'bold' }, color: '#d4af37' }, legend: { display: false },
+          plugins: { title: { display: true, text: 'Kinetic Energy vs Mass', font: { size: 14, weight: 'bold' }, color: cAccent }, legend: { display: false },
             tooltip: { callbacks: { label: function(ctx) { return ctx.raw.car + ': ' + safeFixed(ctx.raw.y, 4) + 'J @ ' + ctx.raw.x + 'g'; } } } },
           scales: { x: { title: { display: true, text: 'Mass (g)' } }, y: { title: { display: true, text: 'Kinetic Energy (J)' }, beginAtZero: true } } }
       });

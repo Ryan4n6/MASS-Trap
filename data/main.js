@@ -80,6 +80,21 @@ function setTheme(theme) {
   localStorage.setItem('mass_theme', theme);
   var sel = document.getElementById('themePicker');
   if (sel) sel.value = theme;
+  // Theme-aware header branding
+  var themeHeaders = {
+    interceptor: { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'COMMAND CENTER' },
+    classic:     { title: 'SPEED LAB', subtitle: 'REAL-TIME RACE TIMING SYSTEM', tagline: '' },
+    daytona:     { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'RACE CONTROL' },
+    casefile:    { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'COMMAND CENTER' },
+    cyber:       { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'COMMAND CENTER' }
+  };
+  var hdr = themeHeaders[theme] || themeHeaders.interceptor;
+  var h1 = document.querySelector('.page-header h1');
+  var sub = document.querySelector('.page-header .subtitle');
+  var tag = document.querySelector('.page-header .tagline');
+  if (h1) h1.textContent = hdr.title;
+  if (sub) sub.textContent = hdr.subtitle;
+  if (tag) { tag.textContent = hdr.tagline; tag.style.display = hdr.tagline ? '' : 'none'; }
 }
 
 function initTheme() {
