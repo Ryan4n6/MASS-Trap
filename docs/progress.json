@@ -82,6 +82,7 @@
     {"name": "Ben", "role": "Lead Forensicator — runs all experiments, catches cars, makes the calls on KEEP vs RETRY"},
     {"name": "Sam", "role": "Systems Engineer — wired the hardware, helped debug the sensors"},
     {"name": "Ryan (Dad)", "role": "Software Developer — wrote the firmware and dashboard code"},
-    {"name": "Claude", "role": "AI Assistant — helped design the 6-phase workflow and data export format"}
+    {"name": "Claude", "role": "AI Assistant — helped design the 6-phase workflow and data export format"},
+    {"name": "Richard (Grandpa)", "role": "The Original Builder — General Contractor, Formula Vee racer, and the inspiration for all of this. Built a 7ft pencil for a science fair in Park City, Utah. In memoriam."}
   ]
 }

@@ -2,6 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-61YKX0133N"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-61YKX0133N');</script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>M.A.S.S. Trap — Parent & Teacher Guide</title>
 <meta name="description" content="A step-by-step guide for parents and teachers helping kids run science fair experiments with M.A.S.S. Trap.">
@@ -82,6 +85,14 @@ body{font-family:var(--font);background:var(--navy);color:var(--text);line-heigh
 .footer{text-align:center;padding:24px 16px;color:var(--text-muted);font-size:0.8rem;margin-top:40px;border-top:1px solid rgba(212,175,55,0.1);}
 .footer a{color:var(--gold);text-decoration:none;}
 
+/* Story / Dedication */
+.story-block{position:relative;background:linear-gradient(135deg,rgba(212,175,55,0.06),rgba(212,175,55,0.02));border:1px solid rgba(212,175,55,0.25);border-radius:var(--radius);padding:24px 20px;margin:24px 0;line-height:1.85;font-size:0.95rem;}
+.story-block::before{content:'\201C';position:absolute;top:-8px;left:14px;font-size:4rem;color:var(--gold);opacity:0.3;font-family:Georgia,serif;line-height:1;}
+.story-block p{margin-bottom:14px;color:var(--text);text-indent:0;}
+.story-block p:last-of-type{margin-bottom:0;}
+.story-block .story-attribution{margin-top:16px;text-align:right;font-size:0.85rem;color:var(--gold);font-style:italic;}
+.story-block .story-moral{margin-top:16px;padding:12px;background:rgba(255,69,0,0.08);border-left:3px solid var(--orange);border-radius:4px;font-size:0.9rem;color:var(--orange);font-weight:600;text-indent:0;}
+
 /* Print friendly */
 @media print{body{background:#fff;color:#000;} .guide-section{border:1px solid #ccc;} .hero{border-bottom:2px solid #333;}}
 </style>
@@ -102,6 +113,7 @@ body{font-family:var(--font);background:var(--navy);color:var(--text);line-heigh
 <div class="toc">
   <h2>Quick Jump</h2>
   <a href="#whatisthis"><span class="toc-emoji">&#x1F914;</span> What Is This Thing?</a>
+  <a href="#whythismatters"><span class="toc-emoji">&#x270F;&#xFE0F;</span> Why This Matters (A Story for Every Parent)</a>
   <a href="#overview"><span class="toc-emoji">&#x1F3AF;</span> The 6 Phases (What Your Kid Sees)</a>
   <a href="#vocab"><span class="toc-emoji">&#x1F4DA;</span> Vocabulary Cheat Sheet</a>
   <a href="#phase1"><span class="toc-emoji">1&#xFE0F;&#x20E3;</span> Phase 1: Experiment Setup</a>
@@ -124,6 +136,33 @@ body{font-family:var(--font);background:var(--navy);color:var(--text);line-heigh
 
   <div class="tip-box tip-green">
     <strong>&#x2705; Your job:</strong> You don't need to understand the technology. You just need to ask the right questions and help your kid think about <em>why</em> they're doing each step &mdash; not just <em>what</em> they're doing.
+  </div>
+</div>
+
+<!-- WHY THIS MATTERS — RICHARD'S PENCIL -->
+<div class="guide-section" id="whythismatters">
+  <h2>&#x270F;&#xFE0F; Why This Matters</h2>
+
+  <div class="story-block">
+    <p>When Ryan was a kid in Utah, his class got an assignment based on <em>Gulliver's Travels</em>&thinsp;&mdash;&thinsp;the one with the Lilliputians. Build something tiny and scale it up ginormous. That was it. That was the whole prompt.</p>
+
+    <p>His father Richard was a general contractor. They were flat broke. But Richard dropped everything, and that weekend Ryan watched the master at his craft&thinsp;&mdash;&thinsp;picking out a huge piece of timber at the lumber yard, sitting on the curb outside while his dad struggled through the complex math of angles and hexagons (the bestagons, you know), laying the entire thing out on the edge of a ten-foot beam.</p>
+
+    <p>Then came the sawdust. The thin strips gently falling to the floor, covering them both in a cloud of progress. And through the haze emerged a dad standing at least a foot taller&thinsp;&mdash;&thinsp;holding a <strong>seven-foot-long #2 pencil</strong>, complete with a #10 coffee can and green florist foam for the eraser.</p>
+
+    <p>To this day, Ryan believes that pencil still hangs in the lobby of Park City Middle School.</p>
+
+    <div class="story-moral">
+      That's what a science fair project actually is. It's not the grade. It's not the rubric. It's the sawdust cloud. It's the weekend your kid watched you drop everything and build something impossible together. Richard did it for Ryan. Ryan built M.A.S.S. Trap for Ben. And Ben will do it for his kid someday.
+    </div>
+
+    <div class="story-attribution">
+      &mdash; In memory of Richard Massfeller, General Contractor, Formula Vee racer, and the original builder.
+    </div>
+  </div>
+
+  <div class="tip-box tip-orange">
+    <strong>&#x1F4A1; The point:</strong> You don't need to understand microcontrollers or physics formulas. You just need to show up, clear the weekend, and be the one standing in the sawdust with your kid. The M.A.S.S. Trap handles the science. <em>You</em> handle the being there.
   </div>
 </div>
 
@@ -663,7 +702,7 @@ body{font-family:var(--font);background:var(--navy);color:var(--text);line-heigh
 
 <!-- FOOTER -->
 <div class="footer">
-  <p>Built with &#x2764; by the Massfeller family</p>
+  <p>Built with &#x2764; by the Massfeller family &mdash; in memory of Richard, who started it all with a 7ft pencil.</p>
   <p style="margin-top:6px;">
     <a href="index.html">M.A.S.S. Trap Home</a> &nbsp;|&nbsp;
     <a href="store.html">Parts Store</a> &nbsp;|&nbsp;
