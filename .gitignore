@@ -33,3 +33,7 @@ desktop.ini
 credentials.h
 secrets.h
 *.env
+
+# --- Private data (order history, raw catalogs) ---
+amazon_orders_*.json
+amazon_parts_catalog.json

@@ -280,7 +280,7 @@ a:hover{text-decoration:underline}
     Built on a <strong>$7 ESP32 microcontroller</strong>, it measures race timing with <em>microsecond precision</em>,
     calculates velocity, momentum, and kinetic energy, and serves a full web dashboard over WiFi.
     <br><br>
-    It was built for <strong>Ben Massfeller's</strong> 5th grade ***REMOVED*** Science Fair 2026 project &mdash;
+    It was built for <strong>Ben Massfeller's</strong> 5th grade science fair project &mdash;
     an investigation into how mass affects the speed of 1:64 scale vehicles on an inclined track.
     Every race is logged. Every result has a chain of custody. Every data point is court-admissible.
     <br><br>

@@ -1491,7 +1491,7 @@ function uploadToSheets(data, url) {
 
 **Webhook URL** (from backup JSON):
 ```
-https://script.google.com/macros/s/***REMOVED***/exec
+<REDACTED — Google Apps Script deployment URL>
 ```
 
 ### Diagnosis Results
@@ -1500,7 +1500,7 @@ https://script.google.com/macros/s/***REMOVED***/exec
 
 ```bash
 curl -sL -X POST \
-  "https://script.google.com/macros/s/***REMOVED***/exec" \
+  "<REDACTED — Google Apps Script deployment URL>" \
   -H "Content-Type: application/json" \
   -d '{"timestamp":"2026-02-14T12:00:00Z","car":"TEST","weight":35,"time":1.234,"speed_mph":1.62,"scale_mph":103.7,"momentum":0.057,"ke":0.023}'
 ```
