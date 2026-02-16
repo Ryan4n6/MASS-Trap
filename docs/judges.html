@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.A.S.S. Trap — Science Fair Project by Ben Massfeller</title>
+<meta name="description" content="Interactive science fair project: Does adding weight to a car change its speed? Built with microsecond-precision sensors and a forensic evidence chain.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#091B2F;--navy-light:#0d2847;--navy-card:#0f2340;
+  --gold:#D4AF37;--gold-dim:rgba(212,175,55,0.2);--gold-glow:rgba(212,175,55,0.08);
+  --orange:#FF4500;--orange-dim:rgba(255,69,0,0.1);
+  --text:#E8E8E8;--text-muted:#8899AA;--text-dim:#556677;
+  --green:#28a745;--red:#dc3545;--cyan:#17a2b8;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"SF Mono",Monaco,"Cascadia Code",monospace;
+  --radius:12px;
+}
+body{font-family:var(--font);background:var(--navy);color:var(--text);line-height:1.7;padding:0 0 60px 0;font-size:16px;}
+.container{max-width:720px;margin:0 auto;padding:0 16px;}
+
+/* Hero */
+.hero{background:linear-gradient(135deg,var(--navy-light) 0%,var(--navy) 100%);padding:40px 20px;text-align:center;border-bottom:3px solid var(--gold);position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at center,var(--gold-glow) 0%,transparent 70%);pointer-events:none;}
+.hero-badge{display:inline-block;background:var(--orange);color:#fff;font-size:0.65rem;font-weight:900;padding:4px 12px;border-radius:20px;letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;}
+.hero h1{font-size:1.4rem;color:var(--gold);font-weight:900;letter-spacing:0.5px;position:relative;}
+.hero .question{font-size:1.1rem;color:var(--text);font-weight:400;margin-top:8px;font-style:italic;position:relative;}
+.hero .student{font-size:0.85rem;color:var(--text-muted);margin-top:12px;position:relative;}
+
+/* Cards */
+.card{background:var(--navy-card);border-radius:var(--radius);padding:20px;margin:20px 0;border:1px solid rgba(212,175,55,0.1);}
+.card h2{font-size:1.15rem;color:var(--gold);font-weight:900;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.card h3{font-size:0.95rem;color:var(--orange);font-weight:700;margin:14px 0 6px 0;}
+.card p{margin-bottom:10px;font-size:0.95rem;}
+.card ul,.card ol{margin:8px 0 12px 20px;font-size:0.9rem;}
+.card li{margin-bottom:5px;}
+
+/* Variable Tags */
+.var-grid{display:grid;grid-template-columns:1fr;gap:8px;margin:12px 0;}
+.var-tag{padding:12px;border-radius:8px;font-size:0.9rem;}
+.var-tag.iv{background:rgba(255,69,0,0.1);border-left:4px solid var(--orange);}
+.var-tag.dv{background:rgba(40,167,69,0.1);border-left:4px solid var(--green);}
+.var-tag.cv{background:rgba(23,162,184,0.1);border-left:4px solid var(--cyan);}
+.var-tag strong{display:block;font-size:0.75rem;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:2px;}
+.var-tag.iv strong{color:var(--orange);}
+.var-tag.dv strong{color:var(--green);}
+.var-tag.cv strong{color:var(--cyan);}
+
+/* Timeline */
+.timeline{position:relative;margin:16px 0;padding-left:28px;}
+.timeline::before{content:'';position:absolute;left:10px;top:0;bottom:0;width:2px;background:var(--gold-dim);}
+.tl-item{position:relative;margin-bottom:20px;}
+.tl-item::before{content:'';position:absolute;left:-22px;top:6px;width:12px;height:12px;border-radius:50%;background:var(--gold);border:2px solid var(--navy-card);}
+.tl-date{font-size:0.75rem;color:var(--gold);font-weight:700;letter-spacing:1px;}
+.tl-title{font-size:0.95rem;font-weight:700;color:var(--text);margin:2px 0;}
+.tl-desc{font-size:0.85rem;color:var(--text-muted);line-height:1.5;}
+.tl-discovery{margin-top:6px;padding:8px 10px;background:rgba(255,69,0,0.08);border-radius:6px;font-size:0.8rem;color:var(--orange);}
+.tl-learnings{margin-top:6px;padding:8px 10px;background:rgba(23,162,184,0.08);border-radius:6px;font-size:0.8rem;color:var(--cyan);}
+.tl-photos{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.tl-photos img{width:80px;height:60px;object-fit:cover;border-radius:6px;border:1px solid var(--gold-dim);cursor:pointer;}
+
+/* Methodology Steps */
+.method-step{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.03);}
+.method-step:last-child{border-bottom:none;}
+.method-num{flex-shrink:0;width:26px;height:26px;border-radius:50%;background:var(--gold);color:var(--navy);font-weight:900;display:flex;align-items:center;justify-content:center;font-size:0.75rem;}
+.method-text{font-size:0.88rem;color:var(--text-muted);}
+
+/* Team */
+.team-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;}
+.team-card{background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.1);border-radius:8px;padding:10px;text-align:center;}
+.team-name{font-weight:900;font-size:0.95rem;color:var(--gold);}
+.team-role{font-size:0.75rem;color:var(--text-muted);margin-top:2px;}
+
+/* Tech Specs */
+.spec-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0;}
+.spec-item{background:rgba(23,162,184,0.05);border:1px solid rgba(23,162,184,0.1);border-radius:8px;padding:10px;}
+.spec-label{font-size:0.7rem;color:var(--cyan);font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.spec-value{font-size:0.95rem;color:var(--text);font-weight:600;margin-top:2px;}
+
+/* Physics formulas */
+.formula{font-family:var(--mono);background:rgba(212,175,55,0.06);border:1px solid var(--gold-dim);border-radius:6px;padding:8px 12px;margin:4px 0;font-size:0.85rem;color:var(--gold);}
+
+/* Data placeholder */
+.data-placeholder{text-align:center;padding:30px;border:2px dashed var(--gold-dim);border-radius:var(--radius);margin:12px 0;}
+.data-placeholder .dp-icon{font-size:2rem;margin-bottom:8px;}
+.data-placeholder .dp-text{color:var(--text-muted);font-size:0.9rem;}
+.data-placeholder .dp-sub{color:var(--text-dim);font-size:0.75rem;margin-top:4px;}
+
+/* Live badge */
+.live-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(40,167,69,0.15);color:var(--green);font-size:0.7rem;font-weight:700;padding:2px 8px;border-radius:10px;}
+.live-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* Footer */
+.footer{text-align:center;padding:24px 16px;color:var(--text-muted);font-size:0.8rem;margin-top:40px;border-top:1px solid rgba(212,175,55,0.1);}
+.footer a{color:var(--gold);text-decoration:none;}
+
+/* Responsive */
+@media(max-width:500px){.team-grid,.spec-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-badge">Science Fair 2026</div>
+  <h1>M.A.S.S. Trap</h1>
+  <div class="question">"Does adding weight to a car change its speed?"</div>
+  <div class="student">
+    Ben Massfeller &bull; Grade 5 &bull; Science Academy
+    <br><span class="live-badge">LIVE PROJECT</span>
+  </div>
+</div>
+
+<div class="container">
+
+<!-- HYPOTHESIS -->
+<div class="card">
+  <h2>&#x1F9E0; Hypothesis</h2>
+  <p id="jHypothesis" style="font-size:1.05rem;font-style:italic;color:var(--gold);border-left:3px solid var(--gold);padding-left:12px;">
+    "I predict that adding weight to a Hot Wheels car will make it go faster because gravity pulls heavier objects with more force down the ramp."
+  </p>
+</div>
+
+<!-- VARIABLES -->
+<div class="card">
+  <h2>&#x1F50D; Variables</h2>
+  <div class="var-grid">
+    <div class="var-tag iv">
+      <strong>Independent Variable (what I change)</strong>
+      <span id="jIV">Added weight (tungsten weights: 0g, 3.5g, 7g, 14g)</span>
+    </div>
+    <div class="var-tag dv">
+      <strong>Dependent Variable (what I measure)</strong>
+      <span id="jDV">Speed (m/s) and time (seconds) measured by IR break-beam sensors</span>
+    </div>
+    <div class="var-tag cv">
+      <strong>Controlled Variables (what stays the same)</strong>
+      <span id="jCV">Track (6.01m), start height, release method (gravity only), car model per condition, NFC tag mass (0.025g)</span>
+    </div>
+  </div>
+</div>
+
+<!-- METHODOLOGY -->
+<div class="card">
+  <h2>&#x1F52C; Methodology</h2>
+  <p style="font-size:0.9rem;color:var(--text-muted);margin-bottom:12px;">Every experiment follows a forensic evidence chain &mdash; the same process real crime scene investigators use to make sure evidence is admissible in court.</p>
+  <div id="jMethodSteps">
+    <!-- Populated by JS from progress.json -->
+  </div>
+</div>
+
+<!-- EQUIPMENT -->
+<div class="card">
+  <h2>&#x2699; Equipment & Specifications</h2>
+  <div class="spec-grid">
+    <div class="spec-item">
+      <div class="spec-label">Timing Precision</div>
+      <div class="spec-value" id="jTimingPrecision">Microsecond (1/1,000,000s)</div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-label">Track Length</div>
+      <div class="spec-value">6.01 meters</div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-label">Scale Precision</div>
+      <div class="spec-value">0.001 grams</div>
+    </div>
+    <div class="spec-item">
+      <div class="spec-label">Clock Sync</div>
+      <div class="spec-value" id="jClockSync">Every 5 seconds</div>
+    </div>
+  </div>
+
+  <h3>Physics Calculations</h3>
+  <div class="formula">Speed = Distance / Time</div>
+  <div class="formula">Momentum = Mass &times; Velocity &nbsp;(kg&middot;m/s)</div>
+  <div class="formula">KE = &frac12; &times; Mass &times; Velocity&sup2; &nbsp;(Joules)</div>
+</div>
+
+<!-- PROJECT TIMELINE -->
+<div class="card">
+  <h2>&#x1F4C5; Project Timeline</h2>
+  <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:12px;">A record of every major milestone, from first build to final data collection.</p>
+  <div class="timeline" id="jTimeline">
+    <!-- Populated by JS from progress.json -->
+  </div>
+</div>
+
+<!-- DATA RESULTS -->
+<div class="card">
+  <h2>&#x1F4CA; Data & Results</h2>
+  <div class="data-placeholder" id="jDataPlaceholder">
+    <div class="dp-icon">&#x1F4CA;</div>
+    <div class="dp-text">Data collection in progress</div>
+    <div class="dp-sub">Results will appear here automatically after testing is complete</div>
+  </div>
+  <div id="jDataResults" style="display:none;">
+    <!-- Will be populated when experiment data is available -->
+  </div>
+</div>
+
+<!-- PHOTO EVIDENCE -->
+<div class="card">
+  <h2>&#x1F4F7; Photo Evidence</h2>
+  <div class="data-placeholder" id="jPhotoPlaceholder">
+    <div class="dp-icon">&#x1F4F7;</div>
+    <div class="dp-text">Evidence photos will be linked here</div>
+    <div class="dp-sub">Photos are captured at each phase and linked to case numbers</div>
+  </div>
+  <div id="jPhotoGallery" style="display:none;">
+    <!-- Photo grid populated from evidence data -->
+  </div>
+</div>
+
+<!-- THE TEAM -->
+<div class="card">
+  <h2>&#x1F46A; The Team</h2>
+  <div class="team-grid" id="jTeam">
+    <!-- Populated by JS from progress.json -->
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="card">
+  <h2>&#x1F4BB; How The Technology Works</h2>
+  <p>The M.A.S.S. Trap uses two ESP32-S3 microcontrollers connected over a radio mesh network (ESP-NOW). When a car breaks the infrared beam at the start gate, a microsecond timestamp is recorded. When it breaks the beam at the finish gate, another timestamp is recorded. The difference is the race time.</p>
+  <p>The system calculates speed, momentum, and kinetic energy in real-time and broadcasts results to a web dashboard over WiFi. Every measurement is traceable through a case number back to the exact car, weight, condition, and trial.</p>
+  <p style="font-size:0.85rem;color:var(--text-muted);margin-top:8px;">
+    <strong>Open source:</strong> All code is available at
+    <a href="https://github.com/Ryan4n6/MASS-Trap" style="color:var(--gold);">github.com/Ryan4n6/MASS-Trap</a>
+  </p>
+</div>
+
+<!-- INTERACTIVE DEMO LINK -->
+<div class="card" style="text-align:center;border-color:var(--gold-dim);">
+  <h2 style="justify-content:center;">&#x1F3AE; Try the Live Demo</h2>
+  <p>See the dashboard in action &mdash; with simulated races and all 5 themes:</p>
+  <a href="index.html#demo" style="display:inline-block;background:var(--gold);color:var(--navy);font-weight:900;padding:10px 24px;border-radius:8px;text-decoration:none;font-size:0.95rem;margin-top:8px;">LAUNCH INTERACTIVE DEMO &rarr;</a>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>Built with &#x2764; by the Massfeller family</p>
+  <p style="margin-top:6px;">
+    <a href="index.html">M.A.S.S. Trap Home</a> &nbsp;|&nbsp;
+    <a href="parents.html">Parent Guide</a> &nbsp;|&nbsp;
+    <a href="store.html">Parts List</a> &nbsp;|&nbsp;
+    <a href="https://github.com/Ryan4n6/MASS-Trap">Source Code</a>
+  </p>
+  <p style="margin-top:10px;font-size:0.7rem;">
+    M.A.S.S. Trap &mdash; Motion Analysis & Speed System &copy; 2026
+  </p>
+</div>
+
+</div><!-- /.container -->
+
+<script>
+// ============================================================
+// JUDGE PAGE — Load progress.json and populate everything
+// ============================================================
+(function() {
+  var BASE = '';
+  // Try to load progress.json from same directory
+  var xhr = new XMLHttpRequest();
+  xhr.open('GET', 'progress.json', true);
+  xhr.onload = function() {
+    if (xhr.status === 200) {
+      try {
+        var data = JSON.parse(xhr.responseText);
+        renderTimeline(data.timeline || []);
+        renderMethodology(data.methodology ? data.methodology.steps : []);
+        renderTeam(data.builders || []);
+        // Update text fields if present
+        if (data.student && data.student.hypothesis) {
+          var el = document.getElementById('jHypothesis');
+          if (el) el.textContent = '"' + data.student.hypothesis + '"';
+        }
+        if (data.experiment) {
+          if (data.experiment.iv) setText('jIV', data.experiment.iv);
+          if (data.experiment.dv) setText('jDV', data.experiment.dv);
+          if (data.experiment.cv) setText('jCV', data.experiment.cv);
+        }
+      } catch(e) {
+        console.log('Progress JSON parse error:', e);
+      }
+    }
+  };
+  xhr.send();
+
+  function setText(id, text) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = text;
+  }
+
+  function renderTimeline(items) {
+    var container = document.getElementById('jTimeline');
+    if (!container || items.length === 0) return;
+    var html = '';
+    for (var i = 0; i < items.length; i++) {
+      var item = items[i];
+      html += '<div class="tl-item">';
+      html += '<div class="tl-date">' + escHtml(item.date) + '</div>';
+      html += '<div class="tl-title">' + escHtml(item.title) + '</div>';
+      html += '<div class="tl-desc">' + escHtml(item.description) + '</div>';
+      if (item.discovery) {
+        html += '<div class="tl-discovery"><strong>Discovery:</strong> ' + escHtml(item.discovery) + '</div>';
+      }
+      if (item.learnings && item.learnings.length > 0) {
+        html += '<div class="tl-learnings"><strong>What we learned:</strong><ul style="margin:4px 0 0 16px;">';
+        for (var l = 0; l < item.learnings.length; l++) {
+          html += '<li>' + escHtml(item.learnings[l]) + '</li>';
+        }
+        html += '</ul></div>';
+      }
+      if (item.photos && item.photos.length > 0) {
+        html += '<div class="tl-photos">';
+        for (var p = 0; p < item.photos.length; p++) {
+          html += '<img src="' + escHtml(item.photos[p].thumb || item.photos[p].url) + '" alt="' + escHtml(item.photos[p].caption || 'Photo') + '" onclick="window.open(\'' + escHtml(item.photos[p].url) + '\')" title="' + escHtml(item.photos[p].caption || '') + '">';
+        }
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  function renderMethodology(steps) {
+    var container = document.getElementById('jMethodSteps');
+    if (!container || steps.length === 0) return;
+    var html = '';
+    for (var i = 0; i < steps.length; i++) {
+      html += '<div class="method-step">';
+      html += '<div class="method-num">' + (i + 1) + '</div>';
+      html += '<div class="method-text">' + escHtml(steps[i]) + '</div>';
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  function renderTeam(members) {
+    var container = document.getElementById('jTeam');
+    if (!container || members.length === 0) return;
+    var html = '';
+    for (var i = 0; i < members.length; i++) {
+      html += '<div class="team-card">';
+      html += '<div class="team-name">' + escHtml(members[i].name) + '</div>';
+      html += '<div class="team-role">' + escHtml(members[i].role) + '</div>';
+      html += '</div>';
+    }
+    container.innerHTML = html;
+  }
+
+  function escHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+{
+  "student": {
+    "name": "Ben Massfeller",
+    "grade": 5,
+    "school": "Science Academy",
+    "project": "Does Adding Weight to a Car Change Its Speed?",
+    "hypothesis": "I predict that adding weight to a Hot Wheels car will make it go faster because gravity pulls heavier objects with more force down the ramp."
+  },
+  "experiment": {
+    "iv": "Added weight (tungsten weights: 0g, 3.5g, 7g, 14g)",
+    "dv": "Speed (m/s) and time (seconds) measured by IR break-beam sensors",
+    "cv": "Track (6.01m), start height, release method (gravity only — no push), car model per condition, NFC tag mass (0.025g)"
+  },
+  "equipment": {
+    "system": "M.A.S.S. Trap v2.6.0-beta — Motion Analysis & Speed System",
+    "sensors": "Dual IR break-beam sensors (start gate + finish gate) with microsecond timing",
+    "processor": "ESP32-S3 microcontroller with WiFi dashboard",
+    "track": "Hot Wheels track, 6.01 meters, gravity-powered (no motors or launchers)",
+    "scale": "Milligram precision digital scale (0.001g resolution)",
+    "weights": "Tungsten calibration weights (~14g, ~7g, ~3.5g)"
+  },
+  "timeline": [
+    {
+      "date": "2026-02-14",
+      "title": "System Assembly & First Boot",
+      "description": "Assembled the M.A.S.S. Trap finish gate and start gate. Connected IR sensors, wired ESP32-S3 boards, and confirmed communication between devices over ESP-NOW mesh network. First successful race timed at the kitchen table.",
+      "phase": "build",
+      "photos": []
+    },
+    {
+      "date": "2026-02-15",
+      "title": "NFC Evidence Tags & Weighing Protocol",
+      "description": "Weighed all test vehicles on a milligram scale. Discovered that two 'identical' F-150 trucks differ by 6.479g (20.5% variance!). Applied NTAG213 NFC stickers (0.025g each) to every car for automatic identification. Created the evidence tag system with QR codes and case numbers.",
+      "phase": "calibration",
+      "photos": [],
+      "discovery": "Two identical Hot Wheels F-150 trucks weigh 38.000g and 31.521g — a 20.5% difference. Manufacturing variance is a real variable!"
+    },
+    {
+      "date": "2026-02-16",
+      "title": "Experiment Design & Variable Definition",
+      "description": "Defined the independent variable (added weight), dependent variable (speed and time), and controlled variables (track length, height, release method). Selected 'Mass vs Speed' experiment template. Chose tungsten weights for precise mass additions.",
+      "phase": "design",
+      "photos": []
+    },
+    {
+      "date": "2026-02-16",
+      "title": "6-Phase Lab Manager & Dry Run Testing",
+      "description": "Tested the full 6-phase forensic lab workflow in dry-run mode. Walked through experiment setup, vehicle intake, evidence prep (case number assignment), pre-flight check, and confirmed the data collection flow. Identified UX improvements needed and fixed them in real-time.",
+      "phase": "testing",
+      "photos": [],
+      "learnings": [
+        "Dry-run mode uses DRY26- prefix so real case numbers aren't consumed",
+        "Need to photograph cars on scale BEFORE testing begins (chain of custody)",
+        "The system auto-advances between runs — just follow the screen instructions"
+      ]
+    }
+  ],
+  "methodology": {
+    "title": "Forensic Evidence Chain Protocol",
+    "steps": [
+      "Each test run is assigned a unique case number (MASS26-XXXX) BEFORE data collection begins",
+      "Every vehicle is weighed to milligram precision and photographed on the scale",
+      "Evidence tags with QR codes are printed for each test condition",
+      "Photos are captured BEFORE testing (chain of custody — document before you touch)",
+      "The system randomizes run order using Locard's Exchange Principle to prevent systematic bias",
+      "Each condition is tested 3 times (trials) to verify reproducibility",
+      "Sanity checks flag suspicious readings (too fast, too slow, or identical) for review",
+      "All data is exported in metric units (seconds, m/s, grams) as required by the rubric"
+    ]
+  },
+  "tech_details": {
+    "timing_precision": "Microsecond (1/1,000,000 second) resolution using hardware interrupts",
+    "clock_sync": "Start and finish gates synchronize clocks every 5 seconds over ESP-NOW radio",
+    "data_integrity": "Dual persistence — data saved on phone AND on the ESP32 device after every run",
+    "physics_calcs": [
+      "Speed = Track Length / Elapsed Time",
+      "Momentum = Mass × Velocity (kg·m/s)",
+      "Kinetic Energy = ½ × Mass × Velocity² (Joules)"
+    ]
+  },
+  "builders": [
+    {"name": "Ben", "role": "Lead Forensicator — runs all experiments, catches cars, makes the calls on KEEP vs RETRY"},
+    {"name": "Sam", "role": "Systems Engineer — wired the hardware, helped debug the sensors"},
+    {"name": "Ryan (Dad)", "role": "Software Developer — wrote the firmware and dashboard code"},
+    {"name": "Claude", "role": "AI Assistant — helped design the 6-phase workflow and data export format"}
+  ]
+}
