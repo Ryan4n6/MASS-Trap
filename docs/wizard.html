@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.A.S.S. Trap — Build Wizard</title>
+<meta name="description" content="Interactive wiring guide for building a M.A.S.S. Trap physics lab. Step-by-step instructions with color-coded diagrams.">
+<style>
+/* ============================================================
+   M.A.S.S. Trap Build Wizard
+   Same design language as index.html (Navy + Gold)
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#091B2F;--navy-light:#0d2847;--navy-mid:#112d4e;--navy-card:#0f2340;
+  --gold:#D4AF37;--gold-dim:rgba(212,175,55,0.25);--gold-glow:rgba(212,175,55,0.08);
+  --orange:#FF4500;--orange-dim:rgba(255,69,0,0.15);
+  --text:#E8E8E8;--text-muted:#8899AA;--text-dim:#556677;
+  --green:#28a745;--red:#dc3545;--cyan:#17a2b8;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"SF Mono",Monaco,"Cascadia Code","Fira Code",monospace;
+  --max-w:900px;
+  --radius:12px;
+  /* Wire colors */
+  --wire-red:#ff3333;--wire-black:#333;--wire-blue:#4488ff;--wire-yellow:#ffcc00;
+  --wire-green:#33cc33;--wire-orange:#ff8800;--wire-white:#eeeeee;
+}
+html{scroll-behavior:smooth}
+body{background:var(--navy);color:var(--text);font-family:var(--font);line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--gold);text-decoration:none}
+a:hover{color:#e8c84a;text-decoration:underline}
+.container{max-width:var(--max-w);margin:0 auto;padding:0 20px}
+
+/* === HEADER === */
+.wiz-header{text-align:center;padding:40px 20px 24px;border-bottom:1px solid var(--gold-dim)}
+.wiz-header h1{font-size:2rem;color:var(--gold);letter-spacing:3px;font-weight:900}
+.wiz-header p{color:var(--text-muted);font-size:0.9rem;margin-top:4px}
+.wiz-back{display:inline-block;margin-bottom:12px;font-size:0.8rem;color:var(--text-muted)}
+.wiz-back:hover{color:var(--gold)}
+
+/* === MODULE SELECTOR === */
+.module-selector{padding:32px 0;text-align:center}
+.module-selector h2{font-size:1.3rem;color:var(--gold);letter-spacing:1px;margin-bottom:16px}
+.module-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px;max-width:var(--max-w);margin:0 auto;padding:0 20px}
+.module-card{background:var(--navy-card);border:2px solid var(--gold-dim);border-radius:var(--radius);padding:20px 16px;text-align:center;cursor:pointer;transition:all 0.2s}
+.module-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.module-card.active{border-color:var(--gold);background:linear-gradient(135deg,var(--navy-card),rgba(212,175,55,0.05))}
+.module-card.coming-soon{opacity:0.5;cursor:not-allowed}
+.module-card.coming-soon:hover{border-color:var(--gold-dim);transform:none}
+.module-emoji{font-size:2rem;margin-bottom:8px}
+.module-name{font-size:0.95rem;font-weight:700;color:var(--text)}
+.module-desc{font-size:0.75rem;color:var(--text-muted);margin-top:4px}
+.module-tag{display:inline-block;font-size:0.55rem;font-weight:900;padding:2px 8px;border-radius:4px;letter-spacing:1px;text-transform:uppercase;margin-top:6px}
+.module-tag.ready{background:rgba(40,167,69,0.15);color:var(--green);border:1px solid var(--green)}
+.module-tag.soon{background:rgba(255,255,255,0.05);color:var(--text-dim);border:1px solid var(--text-dim)}
+
+/* === WIRING GUIDE === */
+.wiring-guide{padding:24px 0;display:none}
+.wiring-guide.visible{display:block}
+.wg-title{text-align:center;margin-bottom:24px}
+.wg-title h2{font-size:1.5rem;color:var(--gold);letter-spacing:1px}
+.wg-title p{color:var(--text-muted);font-size:0.85rem;margin-top:4px}
+
+/* --- PARTS LIST --- */
+.parts-list{background:var(--navy-card);border:1px solid var(--gold-dim);border-radius:var(--radius);padding:20px;margin-bottom:24px}
+.parts-list h3{font-size:0.85rem;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
+.part-row{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.part-row:last-child{border-bottom:none}
+.part-icon{font-size:1.2rem;width:28px;text-align:center;flex-shrink:0}
+.part-name{font-size:0.85rem;font-weight:700;color:var(--text)}
+.part-detail{font-size:0.75rem;color:var(--text-muted)}
+
+/* --- STEP CARDS --- */
+.step-card{background:var(--navy-card);border:2px solid var(--gold-dim);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;transition:border-color 0.3s}
+.step-card.completed{border-color:var(--green)}
+.step-card.active{border-color:var(--gold);box-shadow:0 0 16px rgba(212,175,55,0.1)}
+.step-header{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;user-select:none}
+.step-number{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.8rem;font-weight:900;flex-shrink:0;transition:all 0.3s}
+.step-card:not(.completed) .step-number{background:rgba(var(--gold-rgb,212,175,55),0.15);color:var(--gold);border:2px solid var(--gold)}
+.step-card.completed .step-number{background:var(--green);color:#fff;border:2px solid var(--green)}
+.step-info{flex:1;min-width:0}
+.step-title{font-size:0.95rem;font-weight:700;color:var(--text)}
+.step-subtitle{font-size:0.75rem;color:var(--text-muted)}
+.step-check{width:24px;height:24px;border:2px solid var(--text-dim);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all 0.2s;flex-shrink:0;font-size:0.8rem;color:transparent}
+.step-check:hover{border-color:var(--green)}
+.step-card.completed .step-check{background:var(--green);border-color:var(--green);color:#fff}
+.step-body{padding:0 20px 16px;display:none}
+.step-card.active .step-body{display:block}
+
+/* --- WIRE DIAGRAM --- */
+.wire-diagram{background:var(--navy);border:1px solid var(--gold-dim);border-radius:8px;padding:20px;margin:12px 0;position:relative;overflow:hidden;min-height:180px}
+.wd-board{display:inline-block;background:#1a3a1a;border:2px solid #2d5a2d;border-radius:6px;padding:10px;position:relative}
+.wd-board-label{font-size:0.55rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:8px}
+.wd-pin-row{display:flex;gap:4px;justify-content:center;margin:4px 0}
+.wd-pin{width:24px;height:24px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:0.45rem;font-weight:900;color:#fff;position:relative;cursor:help}
+.wd-pin[data-active="true"]{box-shadow:0 0 8px currentColor;transform:scale(1.1)}
+.wd-pin.pin-pwr{background:#cc2222}
+.wd-pin.pin-gnd{background:#222}
+.wd-pin.pin-data{background:#2244aa}
+.wd-pin.pin-nc{background:#444}
+.wd-pin-tooltip{position:absolute;bottom:120%;left:50%;transform:translateX(-50%);background:#222;color:#fff;font-size:0.6rem;padding:3px 8px;border-radius:4px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity 0.2s;z-index:5}
+.wd-pin:hover .wd-pin-tooltip{opacity:1}
+
+/* Wire connections drawn as colored divs */
+.wd-wire{height:3px;border-radius:2px;margin:4px 0;position:relative}
+.wd-wire::before{content:attr(data-label);position:absolute;right:8px;top:-10px;font-size:0.55rem;font-weight:700;letter-spacing:0.5px}
+.wd-wire.wire-red{background:var(--wire-red)}.wd-wire.wire-red::before{color:var(--wire-red)}
+.wd-wire.wire-black{background:var(--wire-black);border:1px solid #555}.wd-wire.wire-black::before{color:#999}
+.wd-wire.wire-blue{background:var(--wire-blue)}.wd-wire.wire-blue::before{color:var(--wire-blue)}
+.wd-wire.wire-yellow{background:var(--wire-yellow)}.wd-wire.wire-yellow::before{color:var(--wire-yellow)}
+
+/* --- CONNECTION TABLE --- */
+.conn-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin:12px 0}
+.conn-table th{font-weight:700;color:var(--gold);font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;padding:8px 6px;border-bottom:2px solid var(--gold-dim);text-align:left}
+.conn-table td{padding:6px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text)}
+.conn-table .wire-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+/* --- PROGRESS BAR --- */
+.wg-progress{background:var(--navy-card);border:1px solid var(--gold-dim);border-radius:var(--radius);padding:16px 20px;margin-bottom:24px;text-align:center}
+.wg-progress-label{font-size:0.7rem;color:var(--gold);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.wg-progress-bar{height:8px;background:var(--navy);border-radius:4px;overflow:hidden;border:1px solid var(--gold-dim)}
+.wg-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));border-radius:4px;transition:width 0.5s ease}
+.wg-progress-text{font-size:0.7rem;color:var(--text-muted);margin-top:6px;font-family:var(--mono)}
+
+/* --- TIP BUBBLE --- */
+.wg-tip{background:var(--navy-light);border:1px solid var(--gold-dim);border-radius:8px;padding:12px 16px;margin:12px 0;font-size:0.8rem;color:var(--text-muted);line-height:1.6}
+.wg-tip strong{color:var(--text)}
+.wg-tip em{color:var(--cyan);font-style:normal}
+.wg-tip-label{display:inline-block;background:var(--gold);color:var(--navy);font-size:0.5rem;font-weight:900;padding:1px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+
+/* --- SUCCESS STATE --- */
+.wg-success{background:linear-gradient(135deg,rgba(40,167,69,0.1),rgba(40,167,69,0.05));border:2px solid var(--green);border-radius:var(--radius);padding:24px;text-align:center;margin-top:24px;display:none}
+.wg-success.visible{display:block}
+.wg-success h3{font-size:1.2rem;color:var(--green);margin-bottom:8px}
+.wg-success p{font-size:0.85rem;color:var(--text-muted)}
+
+/* === FOOTER === */
+.wiz-footer{border-top:1px solid var(--gold-dim);padding:24px 0;text-align:center;margin-top:48px}
+.wiz-footer a{color:var(--text-muted);font-size:0.8rem}
+
+/* === RESPONSIVE === */
+@media(max-width:600px){
+  .wiz-header h1{font-size:1.5rem}
+  .module-grid{grid-template-columns:1fr 1fr}
+  .wire-diagram{padding:12px}
+  .step-header{padding:12px 16px}
+  .step-body{padding:0 16px 12px}
+}
+</style>
+</head>
+<body>
+
+<div class="wiz-header">
+  <a href="index.html" class="wiz-back">&larr; Back to M.A.S.S. Trap</a>
+  <h1>BUILD WIZARD</h1>
+  <p>Pick a module. Follow the wires. Flash the firmware. Done.</p>
+</div>
+
+<!-- ==================== MODULE SELECTOR ==================== -->
+<div class="module-selector">
+  <h2>Choose Your Build</h2>
+  <div class="module-grid">
+    <div class="module-card active" onclick="showModule('telemetry')">
+      <div class="module-emoji">&#127918;</div>
+      <div class="module-name">Onboard Telemetry</div>
+      <div class="module-desc">XIAO ESP32-S3 + BNO055 IMU strapped to a Hot Wheels car. Measures g-force, tilt, and acceleration.</div>
+      <div class="module-tag ready">GUIDE READY</div>
+    </div>
+    <div class="module-card coming-soon">
+      <div class="module-emoji">&#127937;</div>
+      <div class="module-name">Finish Gate</div>
+      <div class="module-desc">ESP32-S3 + IR sensor + speaker. The main dashboard and race timer.</div>
+      <div class="module-tag soon">COMING SOON</div>
+    </div>
+    <div class="module-card coming-soon">
+      <div class="module-emoji">&#128681;</div>
+      <div class="module-name">Start Gate</div>
+      <div class="module-desc">ESP32-S3 + IR sensor + optional LiDAR. Detects car release and starts the clock.</div>
+      <div class="module-tag soon">COMING SOON</div>
+    </div>
+    <div class="module-card coming-soon">
+      <div class="module-emoji">&#128296;</div>
+      <div class="module-name">Speed Trap</div>
+      <div class="module-desc">ESP32-S3 + dual IR sensors. Measures mid-track velocity.</div>
+      <div class="module-tag soon">COMING SOON</div>
+    </div>
+    <div class="module-card coming-soon">
+      <div class="module-emoji">&#128266;</div>
+      <div class="module-name">Audio Module</div>
+      <div class="module-desc">DY-SV5W or MAX98357A. Race announcer and dispatcher voice system.</div>
+      <div class="module-tag soon">COMING SOON</div>
+    </div>
+    <div class="module-card coming-soon">
+      <div class="module-emoji">&#128161;</div>
+      <div class="module-name">WLED Strip</div>
+      <div class="module-desc">WS2812B addressable LEDs. Race state visualization.</div>
+      <div class="module-tag soon">COMING SOON</div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== TELEMETRY WIRING GUIDE ==================== -->
+<div id="guide-telemetry" class="wiring-guide visible">
+  <div class="container">
+    <div class="wg-title">
+      <h2>Onboard Telemetry: XIAO + BNO055</h2>
+      <p>Strap a 9-axis IMU to a Hot Wheels car. Measure g-forces, tilt, and acceleration as it races down the track.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="wg-progress">
+      <div class="wg-progress-label">WIRING PROGRESS</div>
+      <div class="wg-progress-bar">
+        <div class="wg-progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <div class="wg-progress-text" id="progressText">0 of 4 connections</div>
+    </div>
+
+    <!-- Parts List -->
+    <div class="parts-list">
+      <h3>Parts Needed</h3>
+      <div class="part-row">
+        <div class="part-icon">&#128187;</div>
+        <div>
+          <div class="part-name">Seeed Studio XIAO ESP32-S3</div>
+          <div class="part-detail">Dual-core WiFi MCU. Tiny enough to ride on a Hot Wheels car.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#127922;</div>
+        <div>
+          <div class="part-name">Adafruit BNO055 9-DOF IMU Breakout</div>
+          <div class="part-detail">Accelerometer + gyroscope + magnetometer with onboard sensor fusion. I2C interface.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128268;</div>
+        <div>
+          <div class="part-name">4x Dupont Jumper Wires (Female-Female)</div>
+          <div class="part-detail">Red, Black, Blue, Yellow recommended for color coding. Any F-F jumpers work.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128267;</div>
+        <div>
+          <div class="part-name">USB-C Cable</div>
+          <div class="part-detail">For programming the XIAO and initial testing. Any data-capable USB-C cable.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128267;</div>
+        <div>
+          <div class="part-name">Battery Pack (optional)</div>
+          <div class="part-detail">3.7V LiPo or battery holder for untethered operation on the car.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connection Table -->
+    <div class="parts-list" style="margin-bottom:24px">
+      <h3>Connection Map</h3>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Wire</th><th>XIAO Pin</th><th>BNO055 Pin</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+            <td><strong>3V3</strong></td>
+            <td><strong>VIN</strong></td>
+            <td>3.3V Power</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+            <td><strong>GND</strong></td>
+            <td><strong>GND</strong></td>
+            <td>Ground</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-blue)"></span>Blue</td>
+            <td><strong>D4</strong> (GPIO 5)</td>
+            <td><strong>SDA</strong></td>
+            <td>I2C Data</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-yellow)"></span>Yellow</td>
+            <td><strong>D5</strong> (GPIO 6)</td>
+            <td><strong>SCL</strong></td>
+            <td>I2C Clock</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Step 1: Power -->
+    <div class="step-card active" id="step1" data-step="1">
+      <div class="step-header" onclick="toggleStep(1)">
+        <div class="step-number">1</div>
+        <div class="step-info">
+          <div class="step-title">Connect Power (3.3V)</div>
+          <div class="step-subtitle">Red wire: XIAO 3V3 &rarr; BNO055 VIN</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();completeStep(1)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">Find the Pin</div>
+          On the <strong>XIAO</strong>: The <em>3V3</em> pin is on the left side, 2nd pin from the top (when USB-C port faces up).<br>
+          On the <strong>BNO055</strong>: The <em>VIN</em> pin is clearly labeled on the board. It accepts 3.3V&ndash;5V.
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-red" data-label="3.3V POWER" style="width:80%;margin:16px auto"></div>
+        </div>
+        <div class="wg-tip">
+          <div class="wg-tip-label">Why Red?</div>
+          Convention: <strong>Red = power, black = ground.</strong> Always. This prevents accidentally swapping power and ground, which can fry your components instantly.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Ground -->
+    <div class="step-card" id="step2" data-step="2">
+      <div class="step-header" onclick="toggleStep(2)">
+        <div class="step-number">2</div>
+        <div class="step-info">
+          <div class="step-title">Connect Ground</div>
+          <div class="step-subtitle">Black wire: XIAO GND &rarr; BNO055 GND</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();completeStep(2)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">Find the Pin</div>
+          On the <strong>XIAO</strong>: <em>GND</em> is on the left side, 3rd pin from the top.<br>
+          On the <strong>BNO055</strong>: <em>GND</em> is labeled on the board, usually right next to VIN.
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-black" data-label="GROUND" style="width:80%;margin:16px auto"></div>
+        </div>
+        <div class="wg-tip">
+          <div class="wg-tip-label">Safety Check</div>
+          <strong>Power + Ground done!</strong> Before connecting data wires, double-check: red goes to 3V3/VIN, black goes to GND/GND. Swapping these is the #1 way to kill electronics. <em>It's happened to all of us.</em>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: SDA -->
+    <div class="step-card" id="step3" data-step="3">
+      <div class="step-header" onclick="toggleStep(3)">
+        <div class="step-number">3</div>
+        <div class="step-info">
+          <div class="step-title">Connect I2C Data (SDA)</div>
+          <div class="step-subtitle">Blue wire: XIAO D4 (GPIO 5) &rarr; BNO055 SDA</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();completeStep(3)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">What is I2C?</div>
+          <strong>I2C</strong> (pronounced "eye-two-see") is a communication protocol that lets chips talk to each other using just 2 wires: <em>SDA</em> (data) and <em>SCL</em> (clock). The XIAO asks the BNO055 "what's your acceleration?" and the BNO055 answers on these wires. It's like two people passing notes using a shared clipboard.
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-blue" data-label="I2C DATA (SDA)" style="width:80%;margin:16px auto"></div>
+        </div>
+        <div class="wg-tip">
+          <div class="wg-tip-label">Pin D4?</div>
+          The XIAO labels its pins as <strong>D0&ndash;D10</strong>, but internally the ESP32-S3 uses GPIO numbers. <em>D4 = GPIO 5</em>. This is the default SDA (I2C data) pin on the XIAO ESP32-S3. You don't need to remember the GPIO number &mdash; the code handles the mapping.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: SCL -->
+    <div class="step-card" id="step4" data-step="4">
+      <div class="step-header" onclick="toggleStep(4)">
+        <div class="step-number">4</div>
+        <div class="step-info">
+          <div class="step-title">Connect I2C Clock (SCL)</div>
+          <div class="step-subtitle">Yellow wire: XIAO D5 (GPIO 6) &rarr; BNO055 SCL</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();completeStep(4)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">SDA + SCL = Complete I2C Bus</div>
+          <em>SCL</em> is the clock signal &mdash; it keeps the XIAO and BNO055 in sync, like a metronome. The XIAO controls the clock speed (100kHz or 400kHz). Without SCL, the data on SDA would be meaningless &mdash; like listening to someone talk without knowing when each word starts and stops.
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-yellow" data-label="I2C CLOCK (SCL)" style="width:80%;margin:16px auto"></div>
+        </div>
+        <div class="wg-tip">
+          <div class="wg-tip-label">That's It!</div>
+          <strong>4 wires. That's the whole connection.</strong> I2C is beautiful because you only need 4 wires total (power, ground, data, clock) to talk to incredibly sophisticated sensors. The BNO055 has 3 sensors and a full fusion processor &mdash; all accessible through these 4 wires.
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Banner -->
+    <div class="wg-success" id="successBanner">
+      <h3>&#10003; WIRING COMPLETE!</h3>
+      <p>All 4 connections verified. Plug the XIAO into your computer via USB-C and proceed to firmware flashing.</p>
+      <div style="margin-top:16px">
+        <div class="wg-tip" style="text-align:left;margin:0">
+          <div class="wg-tip-label">Next Steps</div>
+          <strong>1.</strong> Plug XIAO into Mac/PC via USB-C<br>
+          <strong>2.</strong> Open a terminal and flash the telemetry firmware<br>
+          <strong>3.</strong> Open serial monitor &mdash; you should see accelerometer readings<br>
+          <strong>4.</strong> Strap both boards to a Hot Wheels car and race!
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Reference -->
+    <div class="parts-list" style="margin-top:24px">
+      <h3>Quick Reference: XIAO ESP32-S3 Pinout</h3>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Pin Label</th><th>GPIO</th><th>Function</th><th>Used By</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>3V3</td><td>&mdash;</td><td>3.3V output</td><td style="color:var(--wire-red)">BNO055 VIN</td></tr>
+          <tr><td>GND</td><td>&mdash;</td><td>Ground</td><td style="color:var(--text-muted)">BNO055 GND</td></tr>
+          <tr><td>D0</td><td>GPIO 1</td><td>Digital I/O</td><td style="color:var(--text-dim)">&mdash;</td></tr>
+          <tr><td>D1</td><td>GPIO 2</td><td>Digital I/O</td><td style="color:var(--text-dim)">&mdash;</td></tr>
+          <tr><td>D2</td><td>GPIO 3</td><td>Digital I/O</td><td style="color:var(--text-dim)">&mdash;</td></tr>
+          <tr><td>D3</td><td>GPIO 4</td><td>Digital I/O</td><td style="color:var(--text-dim)">&mdash;</td></tr>
+          <tr><td>D4</td><td>GPIO 5</td><td>I2C SDA (default)</td><td style="color:var(--wire-blue)">BNO055 SDA</td></tr>
+          <tr><td>D5</td><td>GPIO 6</td><td>I2C SCL (default)</td><td style="color:var(--wire-yellow)">BNO055 SCL</td></tr>
+          <tr><td>D6</td><td>GPIO 43</td><td>UART TX</td><td style="color:var(--text-dim)">&mdash;</td></tr>
+          <tr><td>D7</td><td>GPIO 44</td><td>UART RX</td><td style="color:var(--text-dim)">&mdash;</td></tr>
+          <tr><td>D8</td><td>GPIO 7</td><td>Digital I/O</td><td style="color:var(--text-dim)">Onboard LED</td></tr>
+          <tr><td>D9</td><td>GPIO 8</td><td>Digital I/O</td><td style="color:var(--text-dim)">&mdash;</td></tr>
+          <tr><td>D10</td><td>GPIO 9</td><td>Digital I/O</td><td style="color:var(--text-dim)">&mdash;</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="wiz-footer">
+  <div class="container">
+    <a href="index.html">M.A.S.S. Trap</a> &bull;
+    <a href="https://github.com/Ryan4n6/MASS-Trap" target="_blank">GitHub</a> &bull;
+    <a href="store.html">Parts Store</a>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   M.A.S.S. Trap Build Wizard — Interactive Wiring Guide
+   ES5 compatible (var only)
+   ============================================================= */
+(function() {
+  'use strict';
+
+  var totalSteps = 4;
+  var completedSteps = {};
+
+  function updateProgress() {
+    var count = Object.keys(completedSteps).length;
+    var pct = Math.round((count / totalSteps) * 100);
+    var fill = document.getElementById('progressFill');
+    var text = document.getElementById('progressText');
+    if (fill) fill.style.width = pct + '%';
+    if (text) text.textContent = count + ' of ' + totalSteps + ' connections';
+
+    // Show success banner when all done
+    var banner = document.getElementById('successBanner');
+    if (banner) {
+      if (count >= totalSteps) {
+        banner.classList.add('visible');
+        banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        banner.classList.remove('visible');
+      }
+    }
+
+    // Save state
+    try { localStorage.setItem('mass_wizard_telemetry', JSON.stringify(completedSteps)); } catch(e) {}
+  }
+
+  window.toggleStep = function(n) {
+    var card = document.getElementById('step' + n);
+    if (!card) return;
+    var wasActive = card.classList.contains('active');
+    // Close all
+    for (var i = 1; i <= totalSteps; i++) {
+      var c = document.getElementById('step' + i);
+      if (c) c.classList.remove('active');
+    }
+    // Toggle this one
+    if (!wasActive) card.classList.add('active');
+  };
+
+  window.completeStep = function(n) {
+    var card = document.getElementById('step' + n);
+    if (!card) return;
+    if (completedSteps[n]) {
+      delete completedSteps[n];
+      card.classList.remove('completed');
+    } else {
+      completedSteps[n] = true;
+      card.classList.add('completed');
+      card.classList.remove('active');
+      // Auto-open next step
+      var next = document.getElementById('step' + (n + 1));
+      if (next && !completedSteps[n + 1]) {
+        next.classList.add('active');
+        next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+    // Update number display
+    var num = card.querySelector('.step-number');
+    if (num) num.textContent = completedSteps[n] ? '\u2713' : n;
+    updateProgress();
+  };
+
+  window.showModule = function(moduleId) {
+    // Hide all guides
+    var guides = document.querySelectorAll('.wiring-guide');
+    for (var i = 0; i < guides.length; i++) {
+      guides[i].classList.remove('visible');
+    }
+    // Show selected
+    var guide = document.getElementById('guide-' + moduleId);
+    if (guide) {
+      guide.classList.add('visible');
+      guide.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    // Update module cards
+    var cards = document.querySelectorAll('.module-card');
+    for (var j = 0; j < cards.length; j++) {
+      cards[j].classList.remove('active');
+    }
+    // Mark clicked one active (only if not coming-soon)
+    // We can't easily get the clicked card here, so just find the one with matching onclick
+    // For now, this works with the telemetry card
+  };
+
+  // Restore state on load
+  function init() {
+    try {
+      var saved = localStorage.getItem('mass_wizard_telemetry');
+      if (saved) {
+        completedSteps = JSON.parse(saved);
+        for (var n in completedSteps) {
+          if (completedSteps.hasOwnProperty(n)) {
+            var card = document.getElementById('step' + n);
+            if (card) {
+              card.classList.add('completed');
+              card.classList.remove('active');
+              var num = card.querySelector('.step-number');
+              if (num) num.textContent = '\u2713';
+            }
+          }
+        }
+        updateProgress();
+      }
+    } catch(e) {}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>
