@@ -2,6 +2,8 @@
 
 ### **M**otion **A**nalysis & **S**peed **S**ystem
 
+[![Firmware](https://img.shields.io/badge/firmware-v2.6.0--beta-blue)](https://github.com/Ryan4n6/MASS-Trap/releases/tag/v2.6.0-beta) [![ESP32-S3](https://img.shields.io/badge/ESP32--S3-N16R8-red)](https://www.espressif.com/en/products/socs/esp32-s3) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) [![Live Demo](https://img.shields.io/badge/demo-live-orange)](https://ryan4n6.github.io/MASS-Trap/#demo)
+
 > *"Respect the Laws of Physics."*
 
 **The M.A.S.S. Trap** is a forensic-grade physics laboratory disguised as a Hot Wheels track speedometer. It utilizes commercial LiDAR and enterprise IoT hardware to enforce the laws of **Mass**, **Momentum**, and **Kinetic Energy** on 1:64 scale traffic.
@@ -29,6 +31,34 @@ This project was engineered by a former **Police Detective** and **Digital Foren
 | [Judge Showcase](https://ryan4n6.github.io/MASS-Trap/judges.html) | Science fair project page for judges |
 | [Parts Store](https://ryan4n6.github.io/MASS-Trap/store.html) | Curated parts lists by budget tier |
 | [Build Wizard](https://ryan4n6.github.io/MASS-Trap/wizard.html) | Interactive wiring guide |
+
+---
+
+## Quick Start (5 Minutes to First Race)
+
+> **Already have an ESP32-S3 N16R8 and an IR break-beam sensor? You're 5 minutes from your first race.**
+
+```bash
+# 1. Clone & flash
+git clone https://github.com/Ryan4n6/MASS-Trap.git && cd MASS-Trap
+pio run -t upload                    # Flash firmware via USB
+pio run -t uploadfs                  # Upload web UI + audio files
+
+# 2. Configure
+# Connect to WiFi: "MASSTrap-Setup-XXXX" → browser opens automatically
+# Pick role (finish/start/speedtrap), enter your WiFi creds, save
+
+# 3. Race
+# Open http://masstrap.local on any device → ARM → release car → data appears
+```
+
+**That's it.** One ESP32 as a finish gate gives you timing, speed, momentum, kinetic energy, a leaderboard, 5 themes, and a full physics dashboard served from the chip itself. Add a second ESP32 as a start gate for precision split timing. Add a third as a speed trap for mid-track velocity profiling. All auto-discover each other via ESP-NOW.
+
+**No internet required. No app to install. No account to create.** Just physics.
+
+→ *Need the full parts list?* **[Parts Store](https://ryan4n6.github.io/MASS-Trap/store.html)** — 3 budget tiers from $25 to $120.
+→ *Building with your kid?* **[Parent's Wiring Guide](https://ryan4n6.github.io/MASS-Trap/parents-guide.html)** — Ages 8+ with parent supervision.
+→ *Science fair?* **[Parent & Teacher Guide](https://ryan4n6.github.io/MASS-Trap/parents.html)** — Variables, hypothesis, and rubric mapping done for you.
 
 ---
 
@@ -299,6 +329,7 @@ The OTA password defaults to `admin` — change it in the config page for securi
 | `/api/firmware/status` | GET | Check for firmware updates against GitHub releases |
 | `/api/firmware/update-from-url` | POST | Download and flash firmware from URL |
 | `/api/firmware/upload` | POST | Upload firmware binary for manual OTA update |
+| `/api/diagnostics` | GET | Hardware diagnostic scan (IR, LiDAR, audio, ESP-NOW, WiFi) |
 | `/api/reset` | POST | Factory reset (deletes config, reboots) |
 
 ## Project Structure
@@ -317,28 +348,41 @@ MASS-Trap/
 ├── lidar_sensor.h / .cpp      # TF-Luna UART: frame parsing, presence state machine
 ├── audio_manager.h / .cpp     # MAX98357A I2S: WAV loading, non-blocking DMA playback
 ├── wled_integration.h / .cpp  # WLED HTTP API: effect control, auto-sleep
-├── html_index.h               # Dashboard HTML (PROGMEM fallback)
-├── html_config.h              # Config page HTML (PROGMEM fallback)
-├── html_console.h             # Console page HTML (PROGMEM fallback)
-├── html_start_status.h        # Start gate status page (PROGMEM fallback)
-├── html_speedtrap_status.h    # Speed trap status page (PROGMEM fallback)
-├── html_chartjs.h             # Chart.js v4.4.7 (PROGMEM)
+├── html_*.h                   # PROGMEM fallback pages (index, config, console, start, speedtrap, chartjs)
 ├── push_ui.sh                 # Convert data/*.html to PROGMEM html_*.h headers
-├── data/                      # LittleFS source files (uploaded via pio run -t uploadfs)
-│   ├── dashboard.html         # Command Center (primary, served from LittleFS)
-│   ├── history.html           # Evidence Log page
-│   ├── system.html            # System configuration page
-│   ├── about.html             # The Special K Report™ (project status page)
-│   ├── science_fair_report.html  # Auto-generated forensic lab report
+├── generate_stats.sh          # Auto-regenerate docs/stats.json from live git data
+├── kristina.sh                # Generate The Special K Report (terminal, JSON, HTML modes)
+│
+├── data/                      # LittleFS files (uploaded via pio run -t uploadfs)
+│   ├── dashboard.html         # Command Center — 6-phase lab manager, evidence, all features (~185KB)
+│   ├── history.html           # Evidence Log — race history with full physics data
+│   ├── system.html            # System Config — WiFi, pins, peers, track, audio, LiDAR, WLED
+│   ├── about.html             # The Special K Report™ — project stats, builders, live API status
+│   ├── science_fair_report.html  # Auto-generated forensic lab report from experiment data
 │   ├── main.js                # Shared JavaScript utilities
-│   ├── style.css              # Shared stylesheet
-│   ├── index.html             # Legacy dashboard source
-│   ├── config.html            # Legacy config page source
-│   ├── console.html           # Console page source
-│   ├── start_status.html      # Start gate status source
-│   └── speedtrap_status.html  # Speed trap status source
+│   ├── style.css              # Shared stylesheet (5 themes, dual-layout nav)
+│   ├── console.html           # Debug console with NTP-timestamped serial log
+│   ├── start_status.html      # Start gate lightweight status page
+│   ├── speedtrap_status.html  # Speed trap lightweight status page
+│   └── *.wav                  # Audio effect files (8-bit, 16kHz mono)
+│
+├── docs/                      # GitHub Pages site (https://ryan4n6.github.io/MASS-Trap/)
+│   ├── index.html             # Landing page with live interactive dashboard demo
+│   ├── wizard.html            # Build Wizard — interactive wiring guide, 3-tier telemetry
+│   ├── parents.html           # Parent & Teacher Guide — science fair helper
+│   ├── parents-guide.html     # Parent's Wiring Guide — terminal block migration
+│   ├── judges.html            # Judge Showcase — science fair project page
+│   ├── store.html             # Curated parts store by budget tier
+│   ├── stats.js               # Shared auto-populator (data-stat attributes from stats.json)
+│   └── stats.json             # Centralized project metrics (auto-generated)
+│
+├── BACKLOG_PLANS.md           # 14 backlog items with full implementation designs
+├── MESH_AUTONOMY_DESIGN.md    # "10-Code" distributed ESP-NOW protocol upgrade design
+├── DAYTONA_THEME_BRIEF.md     # Daytona NASCAR theme design specification
+├── DAYTONA_NARRATIVE.md       # Personal essay on the Daytona heritage
+├── HARDWARE_CATALOG.md        # Hardware inventory reference
+├── CHANGELOG.md               # Detailed release notes (Keep a Changelog format)
 ├── README.md
-├── CHANGELOG.md
 └── .gitignore
 ```
 
@@ -418,9 +462,15 @@ MASS-Trap/
 - [x] Unified firmware, Captive portal config, ESP-NOW, Embedded web UI
 - [x] WLED integration, Google Sheets, OTA, Backup/restore, Web console
 
-## Changelog
+## Design Documents
 
-See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
+| Document | Purpose |
+|----------|---------|
+| [CHANGELOG.md](CHANGELOG.md) | Detailed release notes for every version (Keep a Changelog format) |
+| [BACKLOG_PLANS.md](BACKLOG_PLANS.md) | 14 backlog items with full implementation designs — security, mesh networking, fleet updates |
+| [MESH_AUTONOMY_DESIGN.md](MESH_AUTONOMY_DESIGN.md) | "10-Code" distributed ESP-NOW protocol — removes finish gate as single authority |
+| [DAYTONA_THEME_BRIEF.md](DAYTONA_THEME_BRIEF.md) | NASCAR-inspired theme design spec — typography, colors, personal easter eggs |
+| [HARDWARE_CATALOG.md](HARDWARE_CATALOG.md) | Complete hardware inventory with ASINs, costs, and role assignments |
 
 ## License
 
