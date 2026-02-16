@@ -215,7 +215,7 @@ a:hover{color:#e8c84a;text-decoration:underline}
     <div class="module-card active" onclick="showModule('telemetry')">
       <div class="module-emoji">&#127918;</div>
       <div class="module-name">Onboard Telemetry</div>
-      <div class="module-desc">XIAO ESP32-S3 + BNO055 IMU strapped to a Hot Wheels car. Measures g-force, tilt, and acceleration.</div>
+      <div class="module-desc">IMU strapped to a Hot Wheels car. 3 tiers: Street (MG24 + built-in), Forensic (XIAO + BNO055), Lab Grade (XIAO + WT901).</div>
       <div class="module-tag ready">GUIDE READY</div>
     </div>
     <div class="module-card" onclick="showModule('finish')">
@@ -255,8 +255,54 @@ a:hover{color:#e8c84a;text-decoration:underline}
 <div id="guide-telemetry" class="wiring-guide visible">
   <div class="container">
     <div class="wg-title">
-      <h2>Onboard Telemetry: XIAO + BNO055</h2>
-      <p>Strap a 9-axis IMU to a Hot Wheels car. Measure g-forces, tilt, and acceleration as it races down the track.</p>
+      <h2>Onboard Telemetry Logger</h2>
+      <p>Strap an IMU to a Hot Wheels car. Measure g-forces, tilt, and acceleration as it races down the track.</p>
+    </div>
+
+    <!-- Telemetry Tier Selector -->
+    <div class="parts-list" style="margin-bottom:24px;text-align:center">
+      <h3>Choose Your Build Tier</h3>
+      <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Each tier measures acceleration &mdash; higher tiers add precision, fusion quality, and data rate.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px">
+        <button onclick="setTelemetryTier('street')" id="btnTierStreet" class="tier-btn" style="background:var(--navy-card);color:var(--text-muted);border:2px solid var(--gold-dim);padding:12px 14px;border-radius:8px;cursor:pointer;font-family:var(--font);text-align:left;transition:all 0.2s">
+          <div style="font-weight:800;font-size:0.85rem;color:var(--text)">&#127918; Tier 1: Street</div>
+          <div style="font-size:0.7rem;margin-top:4px">XIAO MG24 Sense<br><span style="color:var(--text-dim)">Built-in LSM6DS3TR-C 6-axis<br>BLE 5.3 &bull; ~$13 &bull; ~3g</span></div>
+        </button>
+        <button onclick="setTelemetryTier('forensic')" id="btnTierForensic" class="tier-btn tier-active" style="background:var(--navy-light);color:var(--gold);border:2px solid var(--gold);padding:12px 14px;border-radius:8px;cursor:pointer;font-family:var(--font);text-align:left;transition:all 0.2s">
+          <div style="font-weight:800;font-size:0.85rem;color:var(--gold)">&#128270; Tier 2: Forensic</div>
+          <div style="font-size:0.7rem;margin-top:4px">XIAO ESP32-S3 + BNO055<br><span style="color:var(--text-dim)">9-axis hardware fusion<br>ESP-NOW &bull; ~$28 &bull; ~6g</span></div>
+        </button>
+        <button onclick="setTelemetryTier('lab')" id="btnTierLab" class="tier-btn" style="background:var(--navy-card);color:var(--text-muted);border:2px solid var(--gold-dim);padding:12px 14px;border-radius:8px;cursor:pointer;font-family:var(--font);text-align:left;transition:all 0.2s">
+          <div style="font-weight:800;font-size:0.85rem;color:var(--text)">&#128300; Tier 3: Lab Grade</div>
+          <div style="font-size:0.7rem;margin-top:4px">XIAO ESP32-S3 + WitMotion WT901<br><span style="color:var(--text-dim)">9-axis Kalman AHRS &bull; 200Hz<br>ESP-NOW &bull; ~$42 &bull; ~4g</span></div>
+        </button>
+      </div>
+    </div>
+
+    <!-- Tier comparison table -->
+    <div class="parts-list" id="tierComparison" style="margin-bottom:24px">
+      <h3>Tier Comparison</h3>
+      <table class="conn-table" style="font-size:0.75rem">
+        <thead>
+          <tr><th>Spec</th><th style="color:var(--text-muted)">Street</th><th style="color:var(--gold)">Forensic</th><th style="color:var(--orange)">Lab Grade</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>MCU</td><td>XIAO MG24 Sense</td><td>XIAO ESP32-S3</td><td>XIAO ESP32-S3</td></tr>
+          <tr><td>IMU Sensor</td><td>LSM6DS3TR-C (built-in)</td><td>Adafruit BNO055</td><td>WitMotion WT901</td></tr>
+          <tr><td>Axes</td><td>6 (accel + gyro)</td><td>9 (accel + gyro + mag)</td><td>9 (accel + gyro + mag)</td></tr>
+          <tr><td>Fusion</td><td>None (software DIY)</td><td>Hardware (BNO055 M0+)</td><td>Kalman filter (48MHz MCU)</td></tr>
+          <tr><td>Accel Range</td><td>&plusmn;2 / 4 / 8 / 16g</td><td>&plusmn;2 / 4 / 8 / 16g</td><td>&plusmn;2 / 4 / 8 / 16g</td></tr>
+          <tr><td>Max Data Rate</td><td>6.66 kHz (raw)</td><td>100 Hz (fused)</td><td>200 Hz (fused)</td></tr>
+          <tr><td>Angle Accuracy</td><td>Depends on code</td><td>&plusmn;0.5&deg; (static)</td><td>&plusmn;0.05&deg; (static)</td></tr>
+          <tr><td>Radio</td><td>BLE 5.3 / Thread</td><td>WiFi / ESP-NOW</td><td>WiFi / ESP-NOW</td></tr>
+          <tr><td>Interface</td><td>On-chip SPI</td><td>I2C (4 wires)</td><td>UART TTL (4 wires)</td></tr>
+          <tr><td>IMU Weight</td><td>0g (built-in)</td><td>~3.5g (breakout board)</td><td>~1g (bare module)</td></tr>
+          <tr><td>IMU Power</td><td>0.9 mA</td><td>12 mA</td><td>20 mA</td></tr>
+          <tr><td>IMU Price</td><td>$0 (included)</td><td>~$15</td><td>~$34</td></tr>
+          <tr><td>Total Cost</td><td>~$13</td><td>~$28</td><td>~$42</td></tr>
+          <tr><td>Best For</td><td style="color:var(--text-muted)">Quick demos, weight-limited</td><td style="color:var(--gold)">Science fair, ESP-NOW mesh</td><td style="color:var(--orange)">Max precision, research</td></tr>
+        </tbody>
+      </table>
     </div>
 
     <!-- Progress -->
@@ -342,6 +388,15 @@ a:hover{color:#e8c84a;text-decoration:underline}
           </tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- WT901 UART Info (shown when Lab tier selected) -->
+    <div id="wt901Info" class="wg-tip" style="display:none;margin-bottom:20px;border-left:3px solid var(--orange)">
+      <div class="wg-tip-label" style="color:var(--orange)">WT901 UART Wiring Notes</div>
+      <strong>The WT901 uses UART (serial), not I2C.</strong> This means TX/RX are crossed: XIAO&rsquo;s TX pin connects to the WT901&rsquo;s RX, and vice versa. Default baud rate is <strong>9600</strong> (configurable up to 230400 via WitMotion PC software).<br><br>
+      <strong>Logic levels:</strong> The WT901 has an onboard LDO and accepts 3.3V&ndash;5V on VCC. The TX/RX pins are 3.3V-tolerant, so direct connection to the XIAO (3.3V logic) is safe &mdash; no level shifter needed.<br><br>
+      <strong>Data protocol:</strong> The WT901 continuously outputs binary packets at the configured rate (10Hz default, up to 200Hz). Each packet contains acceleration, angular velocity, angles, and magnetic field. The XIAO reads and parses these packets &mdash; no polling commands needed.<br><br>
+      <strong>Calibration:</strong> Use the WitMotion MiniIMU.exe PC software (Windows) to calibrate the magnetometer and set output rate before mounting on the car. Calibration persists in the WT901&rsquo;s flash memory.
     </div>
 
     <!-- Step 1: Power -->
@@ -503,6 +558,10 @@ a:hover{color:#e8c84a;text-decoration:underline}
             <input type="radio" name="battMcuRadio" value="xiao-mg24" onchange="document.getElementById('battMcu').value='xiao-mg24';calcBattery()">
             <span><strong>XIAO MG24 Sense</strong> <em style="color:var(--gold);font-size:0.7rem">(built-in IMU)</em></span>
           </label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.8rem">
+            <input type="radio" name="battMcuRadio" value="xiao-wt901" onchange="document.getElementById('battMcu').value='xiao-wt901';calcBattery()">
+            <span><strong>XIAO ESP32-S3</strong> + WT901 <em style="color:var(--orange);font-size:0.7rem">(200Hz Kalman)</em></span>
+          </label>
         </div>
         <input type="hidden" id="battMcu" value="xiao-s3">
       </div>
@@ -585,8 +644,9 @@ a:hover{color:#e8c84a;text-decoration:underline}
       <div class="wg-tip" style="margin-top:16px">
         <div class="wg-tip-label">Firmware Power Tips</div>
         <strong>Use ESP-NOW (ESP32-S3) or BLE (MG24), not full WiFi.</strong> Short radio bursts (1-2ms) vs sustained 150mA+ WiFi draw. The firmware should:<br>
-        &#8226; <strong>ESP32-S3:</strong> Use ESP-NOW only &mdash; never call <em>WiFi.begin()</em><br>
-        &#8226; <strong>MG24 Sense:</strong> Use BLE 5.3 advertisements &mdash; 1.95&micro;A deep sleep<br>
+        &#8226; <strong>ESP32-S3 (Tier 2/3):</strong> Use ESP-NOW only &mdash; never call <em>WiFi.begin()</em><br>
+        &#8226; <strong>MG24 Sense (Tier 1):</strong> Use BLE 5.3 advertisements &mdash; 1.95&micro;A deep sleep<br>
+        &#8226; <strong>WT901 (Tier 3):</strong> Draws 20mA continuously when outputting &mdash; no sleep mode. Reduce output rate to 10Hz between runs.<br>
         &#8226; Log IMU data to local flash during the run (no radio needed)<br>
         &#8226; Send one summary packet after the run ends<br>
         &#8226; Use deep sleep with accelerometer wake-on-motion between runs<br>
@@ -1368,10 +1428,14 @@ a:hover{color:#e8c84a;text-decoration:underline}
     var mcu = { active: 150, idle: 20, sleep: 0.5, weight: 2.5, name: 'XIAO ESP32-S3' };
     if (mcuType === 'xiao-mg24') {
       mcu = { active: 35, idle: 8, sleep: 0.002, weight: 2.5, name: 'XIAO MG24 Sense' };
+    } else if (mcuType === 'xiao-wt901') {
+      mcu = { active: 150, idle: 20, sleep: 0.5, weight: 2.5, name: 'XIAO ESP32-S3' };
     }
     var imuDraw = 12;  // BNO055 in NDOF mode (mA)
-    if (mcuType === 'xiao-mg24') imuDraw = 0.9; // LSM6DS3TR-C built-in (mA)
-    var imuWeight = (mcuType === 'xiao-mg24') ? 0 : 3.5; // external BNO055 board weight
+    var imuName = 'BNO055';
+    if (mcuType === 'xiao-mg24') { imuDraw = 0.9; imuName = 'LSM6DS3TR-C'; } // built-in (mA)
+    else if (mcuType === 'xiao-wt901') { imuDraw = 20; imuName = 'WT901'; } // Kalman AHRS (mA)
+    var imuWeight = (mcuType === 'xiao-mg24') ? 0 : (mcuType === 'xiao-wt901' ? 1.0 : 3.5); // WT901=~1g, BNO055=~3.5g
 
     // Calculate runtimes
     var activeDraw = mcu.active + imuDraw;   // Full logging (mA)
@@ -1449,7 +1513,7 @@ a:hover{color:#e8c84a;text-decoration:underline}
     if (wGrid) {
       wGrid.innerHTML =
         '<div class="batt-weight-row"><span>MCU (' + mcu.name + ')</span><span>' + mcu.weight.toFixed(1) + 'g</span></div>' +
-        (imuWeight > 0 ? '<div class="batt-weight-row"><span>IMU (BNO055 board)</span><span>' + imuWeight.toFixed(1) + 'g</span></div>' : '') +
+        (imuWeight > 0 ? '<div class="batt-weight-row"><span>IMU (' + imuName + ')</span><span>' + imuWeight.toFixed(1) + 'g</span></div>' : '') +
         '<div class="batt-weight-row"><span>Battery</span><span>' + battW.toFixed(1) + 'g</span></div>' +
         '<div class="batt-weight-row"><span>Wires / mount</span><span>' + wiresW.toFixed(1) + 'g</span></div>' +
         '<div class="batt-weight-row" style="border-top:1px solid var(--border);padding-top:6px;font-weight:700"><span>Telemetry Package</span><span>' + totalW.toFixed(1) + 'g</span></div>' +
@@ -1495,6 +1559,144 @@ a:hover{color:#e8c84a;text-decoration:underline}
         verdict.innerHTML = '&#10060; <strong>NO GO</strong> — ' + problems.join('; ') + '.';
       }
     }
+  };
+
+  /* ---- Telemetry Tier Selector ---- */
+  window.setTelemetryTier = function(tier) {
+    // Update tier buttons
+    var btns = ['btnTierStreet', 'btnTierForensic', 'btnTierLab'];
+    for (var i = 0; i < btns.length; i++) {
+      var btn = document.getElementById(btns[i]);
+      if (!btn) continue;
+      btn.classList.remove('tier-active');
+      btn.style.background = 'var(--navy-card)';
+      btn.style.color = 'var(--text-muted)';
+      btn.style.borderColor = 'var(--gold-dim)';
+    }
+    var activeBtn = document.getElementById(
+      tier === 'street' ? 'btnTierStreet' : (tier === 'lab' ? 'btnTierLab' : 'btnTierForensic')
+    );
+    if (activeBtn) {
+      activeBtn.classList.add('tier-active');
+      activeBtn.style.background = 'var(--navy-light)';
+      activeBtn.style.color = 'var(--gold)';
+      activeBtn.style.borderColor = 'var(--gold)';
+    }
+
+    // Map tier → MCU radio value & select it
+    var mcuVal = 'xiao-s3';
+    if (tier === 'street') mcuVal = 'xiao-mg24';
+    else if (tier === 'lab') mcuVal = 'xiao-wt901';
+    var radios = document.getElementsByName('battMcuRadio');
+    for (var r = 0; r < radios.length; r++) {
+      radios[r].checked = (radios[r].value === mcuVal);
+    }
+    var hidden = document.getElementById('battMcu');
+    if (hidden) hidden.value = mcuVal;
+
+    // Update wiring guide title
+    var guideTitle = document.querySelector('#guide-telemetry .wg-title h2');
+    var guideDesc = document.querySelector('#guide-telemetry .wg-title p');
+    if (tier === 'street') {
+      if (guideTitle) guideTitle.textContent = 'Tier 1: XIAO MG24 Sense (Built-in IMU)';
+      if (guideDesc) guideDesc.textContent = 'No external IMU needed \u2014 the MG24 Sense has a 6-axis LSM6DS3TR-C on board. Just flash and ride.';
+    } else if (tier === 'lab') {
+      if (guideTitle) guideTitle.textContent = 'Tier 3: XIAO ESP32-S3 + WitMotion WT901';
+      if (guideDesc) guideDesc.textContent = '200Hz Kalman-filtered AHRS with \u00b10.05\u00b0 static accuracy. UART interface \u2014 4 wires: VCC, GND, TX, RX.';
+    } else {
+      if (guideTitle) guideTitle.textContent = 'Tier 2: XIAO ESP32-S3 + BNO055';
+      if (guideDesc) guideDesc.textContent = '9-axis IMU with hardware sensor fusion. I2C interface \u2014 4 wires. The recommended build for science fair.';
+    }
+
+    // Update parts list names (step cards remain — wiring is 4 wires for all tiers with external IMU)
+    var partNameEls = document.querySelectorAll('#guide-telemetry .part-name');
+    for (var p = 0; p < partNameEls.length; p++) {
+      var txt = partNameEls[p].textContent;
+      if (txt.indexOf('BNO055') !== -1 || txt.indexOf('WT901') !== -1 || txt.indexOf('LSM6DS3') !== -1) {
+        if (tier === 'street') {
+          partNameEls[p].textContent = 'Built-in LSM6DS3TR-C 6-Axis IMU';
+          partNameEls[p].nextElementSibling.textContent = 'Already on the MG24 Sense board \u2014 no external sensor to wire.';
+        } else if (tier === 'lab') {
+          partNameEls[p].textContent = 'WitMotion WT901 9-Axis AHRS Module';
+          partNameEls[p].nextElementSibling.textContent = 'MPU9250 + 48MHz Kalman fusion processor. UART output up to 200Hz. 15.24\u00d715.24\u00d72mm, ~1g.';
+        } else {
+          partNameEls[p].textContent = 'Adafruit BNO055 9-DOF IMU Breakout';
+          partNameEls[p].nextElementSibling.textContent = 'Accelerometer + gyroscope + magnetometer with onboard sensor fusion. I2C interface.';
+        }
+      }
+      if (txt.indexOf('XIAO ESP32-S3') !== -1 || txt.indexOf('XIAO MG24') !== -1) {
+        if (tier === 'street') {
+          partNameEls[p].textContent = 'Seeed Studio XIAO MG24 Sense';
+          partNameEls[p].nextElementSibling.textContent = 'Silicon Labs EFR32MG24, BLE 5.3/Thread/Zigbee. Built-in 6-axis IMU. Ultra-low power (1.95\u00b5A sleep).';
+        } else {
+          partNameEls[p].textContent = 'Seeed Studio XIAO ESP32-S3';
+          partNameEls[p].nextElementSibling.textContent = 'Dual-core WiFi MCU. Tiny enough to ride on a Hot Wheels car.';
+        }
+      }
+    }
+
+    // Update connection table for tier
+    var connBody = document.querySelector('#guide-telemetry .conn-table tbody');
+    if (connBody) {
+      if (tier === 'street') {
+        connBody.innerHTML =
+          '<tr><td colspan="4" style="text-align:center;color:var(--gold);font-style:italic;padding:16px">No external wiring needed \u2014 IMU is built into the MG24 Sense board.</td></tr>';
+      } else if (tier === 'lab') {
+        connBody.innerHTML =
+          '<tr><td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td><td><strong>3V3</strong></td><td><strong>VCC</strong></td><td>3.3V Power</td></tr>' +
+          '<tr><td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td><td><strong>GND</strong></td><td><strong>GND</strong></td><td>Ground</td></tr>' +
+          '<tr><td><span class="wire-dot" style="background:var(--wire-green)"></span>Green</td><td><strong>D6</strong> (GPIO 43 TX)</td><td><strong>RX</strong></td><td>UART Receive (XIAO TX \u2192 WT901 RX)</td></tr>' +
+          '<tr><td><span class="wire-dot" style="background:var(--wire-orange)"></span>Orange</td><td><strong>D7</strong> (GPIO 44 RX)</td><td><strong>TX</strong></td><td>UART Transmit (WT901 TX \u2192 XIAO RX)</td></tr>';
+      } else {
+        connBody.innerHTML =
+          '<tr><td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td><td><strong>3V3</strong></td><td><strong>VIN</strong></td><td>3.3V Power</td></tr>' +
+          '<tr><td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td><td><strong>GND</strong></td><td><strong>GND</strong></td><td>Ground</td></tr>' +
+          '<tr><td><span class="wire-dot" style="background:var(--wire-blue)"></span>Blue</td><td><strong>D4</strong> (GPIO 5)</td><td><strong>SDA</strong></td><td>I2C Data</td></tr>' +
+          '<tr><td><span class="wire-dot" style="background:var(--wire-yellow)"></span>Yellow</td><td><strong>D5</strong> (GPIO 6)</td><td><strong>SCL</strong></td><td>I2C Clock</td></tr>';
+      }
+    }
+
+    // Show/hide WT901 info box
+    var wt901Box = document.getElementById('wt901Info');
+    if (wt901Box) wt901Box.style.display = (tier === 'lab') ? 'block' : 'none';
+
+    // For street tier, hide the step cards (no wiring needed) and show a message
+    var stepCards = document.querySelectorAll('#guide-telemetry .step-card');
+    for (var s = 0; s < stepCards.length; s++) {
+      stepCards[s].style.display = (tier === 'street') ? 'none' : '';
+    }
+
+    // Update step card labels for lab tier (UART vs I2C)
+    if (tier === 'lab') {
+      var titles = [
+        ['Connect Power (3.3V)', 'Red wire: XIAO 3V3 \u2192 WT901 VCC'],
+        ['Connect Ground', 'Black wire: XIAO GND \u2192 WT901 GND'],
+        ['Connect UART TX \u2192 RX', 'Green wire: XIAO D6 (TX) \u2192 WT901 RX'],
+        ['Connect UART RX \u2190 TX', 'Orange wire: WT901 TX \u2192 XIAO D7 (RX)']
+      ];
+      for (var t = 0; t < stepCards.length && t < titles.length; t++) {
+        var titleEl = stepCards[t].querySelector('.step-title');
+        var subEl = stepCards[t].querySelector('.step-subtitle');
+        if (titleEl) titleEl.textContent = titles[t][0];
+        if (subEl) subEl.textContent = titles[t][1];
+      }
+    } else if (tier === 'forensic') {
+      var bnoTitles = [
+        ['Connect Power (3.3V)', 'Red wire: XIAO 3V3 \u2192 BNO055 VIN'],
+        ['Connect Ground', 'Black wire: XIAO GND \u2192 BNO055 GND'],
+        ['Connect I2C Data (SDA)', 'Blue wire: XIAO D4 (GPIO 5) \u2192 BNO055 SDA'],
+        ['Connect I2C Clock (SCL)', 'Yellow wire: XIAO D5 (GPIO 6) \u2192 BNO055 SCL']
+      ];
+      for (var u = 0; u < stepCards.length && u < bnoTitles.length; u++) {
+        var titleEl2 = stepCards[u].querySelector('.step-title');
+        var subEl2 = stepCards[u].querySelector('.step-subtitle');
+        if (titleEl2) titleEl2.textContent = bnoTitles[u][0];
+        if (subEl2) subEl2.textContent = bnoTitles[u][1];
+      }
+    }
+
+    // Recalculate battery with new MCU
+    calcBattery();
   };
 
   /* ---- Module switcher ---- */
