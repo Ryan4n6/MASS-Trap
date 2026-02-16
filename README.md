@@ -269,7 +269,7 @@ The OTA password defaults to `admin` — change it in the config page for securi
 | `/history.html` | Evidence Log | Race history with full physics data |
 | `/config` | System Config | WiFi, pins, peer, track, audio, LiDAR, WLED, OTA settings |
 | `/console` | Debug Console | Timestamped serial log viewer, file browser, device info |
-| `/about.html` | The Kristina Report™ | Project stats, builders, live device status, commit timeline |
+| `/about.html` | The Special K Report™ | Project stats, builders, live device status, commit timeline |
 
 ## API Endpoints
 
@@ -328,7 +328,7 @@ MASS-Trap/
 │   ├── dashboard.html         # Command Center (primary, served from LittleFS)
 │   ├── history.html           # Evidence Log page
 │   ├── system.html            # System configuration page
-│   ├── about.html             # The Kristina Report™ (project status page)
+│   ├── about.html             # The Special K Report™ (project status page)
 │   ├── science_fair_report.html  # Auto-generated forensic lab report
 │   ├── main.js                # Shared JavaScript utilities
 │   ├── style.css              # Shared stylesheet

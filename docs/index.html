@@ -5,6 +5,7 @@
 <!-- Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-61YKX0133N"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-61YKX0133N');</script>
+<script src="stats.js" defer></script>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>M.A.S.S. Trap — Forensic-Grade Physics Lab for $7</title>
 <meta name="description" content="Turn a Hot Wheels track into a forensic-grade physics laboratory. Microsecond timing, evidence chain of custody, and a full web dashboard — all on a $7 ESP32.">
@@ -164,11 +165,11 @@ img{max-width:100%;height:auto}
 <!-- ==================== STATS BANNER ==================== -->
 <div class="stats-banner">
   <div class="stats-row">
-    <div class="stat"><div class="stat-val">21,500+</div><div class="stat-lbl">Lines of Code</div></div>
-    <div class="stat"><div class="stat-val">$7</div><div class="stat-lbl">Hardware Cost</div></div>
+    <div class="stat"><div class="stat-val"><span data-stat="codebase.total_lines" data-stat-fallback="35,000+">35,000+</span></div><div class="stat-lbl">Lines of Code</div></div>
+    <div class="stat"><div class="stat-val">$<span data-stat="economics.mcu_unit_cost_usd" data-stat-format="raw" data-stat-fallback="7">7</span></div><div class="stat-lbl">Hardware Cost</div></div>
     <div class="stat"><div class="stat-val">&micro;s</div><div class="stat-lbl">Timing Precision</div></div>
-    <div class="stat"><div class="stat-val">25+</div><div class="stat-lbl">API Endpoints</div></div>
-    <div class="stat"><div class="stat-val">0</div><div class="stat-lbl">Frameworks Used</div></div>
+    <div class="stat"><div class="stat-val"><span data-stat="codebase.api_endpoints" data-stat-fallback="58">58</span></div><div class="stat-lbl">API Endpoints</div></div>
+    <div class="stat"><div class="stat-val"><span data-stat="firmware.external_deps" data-stat-fallback="2">2</span></div><div class="stat-lbl">External Deps</div></div>
   </div>
 </div>
 
@@ -470,7 +471,7 @@ img{max-width:100%;height:auto}
       </div>
 
       <!-- Version Badge -->
-      <div class="demo-version">FW v2.6.0-beta</div>
+      <div class="demo-version">FW v<span data-stat="firmware.version" data-stat-format="raw">2.6.0-beta</span></div>
     </div>
 
     <div class="tip-bubble" style="max-width:700px;margin:32px auto 0">
@@ -1450,7 +1451,7 @@ img{max-width:100%;height:auto}
         A dad, his two sons, and an AI &mdash; proving that the best tools in the world are worthless
         without the people willing to stay up all night using them.&rdquo;
       </blockquote>
-      <cite>&mdash; The Kristina Report&trade;</cite>
+      <cite>&mdash; The Special K Report&trade;</cite>
     </div>
   </div>
 </div>
