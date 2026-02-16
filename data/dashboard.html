@@ -6,6 +6,49 @@
   <meta name="fw-version" content="2.5.0">
   <title>M.A.S.S. Trap Command Center</title>
   <link rel="stylesheet" href="/style.css">
+  <style>
+    /* ===== Playlist Mode Styles ===== */
+    .playlist-badge{background:var(--accent);color:var(--bg);font-size:0.7rem;font-weight:900;padding:2px 8px;border-radius:10px;vertical-align:middle;}
+    .pl-car-selector{display:flex;flex-wrap:wrap;gap:6px;}
+    .pl-car-check{display:flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:0.85rem;transition:all 0.2s;}
+    .pl-car-check:hover{border-color:var(--accent);}
+    .pl-car-check input[type="checkbox"]{margin:0;accent-color:var(--accent);width:16px;height:16px;}
+    .pl-car-check.checked{border-color:var(--accent);background:rgba(var(--accent-rgb,212,175,55),0.1);}
+    .pl-condition-row{display:flex;align-items:center;gap:6px;margin-bottom:4px;}
+    .pl-cond-label{flex:1;min-width:120px;}
+    .pl-cond-weight{width:80px;text-align:right;}
+    .pl-cond-unit{font-size:0.8rem;color:var(--text-muted);width:12px;}
+    .pl-cond-remove{background:var(--danger);color:#fff;border:none;border-radius:4px;padding:2px 8px;cursor:pointer;font-size:0.8rem;}
+    .pl-banner{background:linear-gradient(135deg,rgba(var(--accent-rgb,212,175,55),0.15),rgba(var(--secondary-rgb,74,144,217),0.1));border:2px solid var(--accent);border-radius:12px;padding:16px;text-align:center;margin:12px 0;}
+    .pl-run-label{font-size:0.85rem;font-weight:700;color:var(--text-muted);letter-spacing:1px;text-transform:uppercase;}
+    .pl-instruction{font-size:1.4rem;font-weight:900;color:var(--text);margin:8px 0;line-height:1.3;}
+    .pl-trial-label{font-size:0.9rem;color:var(--secondary);font-weight:600;}
+    .pl-progress-container{position:relative;height:24px;background:var(--card-bg);border-radius:12px;overflow:hidden;border:1px solid var(--border);margin:8px 0;}
+    .pl-progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--secondary));border-radius:12px;transition:width 0.4s ease;}
+    .pl-progress-text{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:0.75rem;font-weight:900;color:var(--text);}
+    .pl-condition-alert{background:rgba(var(--danger-rgb,220,53,69),0.15);border:2px solid var(--danger);border-radius:8px;padding:12px;text-align:center;margin:8px 0;font-size:1.1rem;font-weight:700;animation:plAlertPulse 1.5s ease-in-out 3;}
+    @keyframes plAlertPulse{0%,100%{opacity:1;}50%{opacity:0.6;}}
+    .pl-results-table{width:100%;font-size:0.8rem;border-collapse:collapse;}
+    .pl-results-table th,.pl-results-table td{padding:4px 8px;border-bottom:1px solid var(--border);text-align:left;}
+    .pl-results-table th{font-weight:700;color:var(--accent);font-size:0.75rem;text-transform:uppercase;}
+    .pl-results-table tr.pl-current{background:rgba(var(--accent-rgb,212,175,55),0.1);}
+    .pl-results-table tr.pl-skipped{opacity:0.5;text-decoration:line-through;}
+    .pl-complete-banner{background:linear-gradient(135deg,rgba(40,167,69,0.2),rgba(var(--accent-rgb,212,175,55),0.15));border:2px solid #28a745;border-radius:12px;padding:20px;text-align:center;font-size:1.3rem;font-weight:900;color:#28a745;margin:12px 0;}
+    .pl-summary-table{width:100%;font-size:0.8rem;border-collapse:collapse;margin-top:8px;}
+    .pl-summary-table th,.pl-summary-table td{padding:4px 8px;border:1px solid var(--border);text-align:center;}
+    .pl-summary-table th{background:rgba(var(--accent-rgb,212,175,55),0.1);font-weight:700;color:var(--accent);}
+    .pl-summary-table .pl-avg{font-weight:900;color:var(--secondary);}
+    #plSetup input[type="text"],#plSetup input[type="number"]{background:var(--card-bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:6px 8px;}
+    /* ===== Evidence Tag Styles ===== */
+    .ev-tag{border:2px solid var(--accent);border-radius:8px;padding:12px;margin:10px 0;background:var(--card-bg);}
+    .ev-tag-header{text-align:center;border-bottom:2px solid var(--accent);padding-bottom:8px;margin-bottom:8px;}
+    .ev-tag-badge{font-size:0.7rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);}
+    .ev-tag-case{font-size:1.4rem;font-weight:900;letter-spacing:3px;color:var(--accent);}
+    .ev-tag-body{display:flex;gap:12px;align-items:flex-start;}
+    .ev-tag-qr{flex-shrink:0;background:#fff;padding:4px;border-radius:4px;}
+    .ev-tag-info{font-size:0.85rem;line-height:1.7;}
+    .ev-tag-ts{font-size:0.7rem;color:var(--text-muted);margin-top:4px;}
+  </style>
 </head>
 <body>
   <a href="#stateBanner" class="skip-link">Skip to race status</a>
@@ -66,6 +109,133 @@
     <div class="kiosk-hide" style="margin-top:8px;">
       <button id="btnDryRun" class="btn btn-outline btn-sm" onclick="toggleDryRun()" style="width:100%;">&#x1F9EA; ENABLE DRY RUN</button>
     </div>
+
+    <!-- Science Fair Testing (Playlist Mode) — hidden in kiosk mode -->
+    <details id="playlistSection" class="section kiosk-hide">
+      <summary class="section-title" style="cursor:pointer; list-style:none; display:flex; align-items:center; gap:8px;">
+        <span aria-hidden="true" style="font-size:1.2em;">&#x1F9EA;</span>
+        SCIENCE FAIR TESTING
+        <span id="playlistBadge" class="playlist-badge" style="display:none;"></span>
+      </summary>
+
+      <!-- ===== SETUP PHASE ===== -->
+      <div id="plSetup">
+        <!-- Car Selector -->
+        <div style="margin:12px 0;">
+          <h3 style="font-size:0.9rem; font-weight:700; margin-bottom:8px; color:var(--accent);">SELECT TEST VEHICLES</h3>
+          <div id="plCarSelector" class="pl-car-selector" role="group" aria-label="Select cars to include in test playlist">
+            <p class="text-muted">Add cars to the garage first</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="plSelectAllCars()" style="margin-top:4px;">Select All</button>
+        </div>
+
+        <!-- Weight Conditions -->
+        <div style="margin:12px 0;">
+          <h3 style="font-size:0.9rem; font-weight:700; margin-bottom:8px; color:var(--accent);">WEIGHT CONDITIONS</h3>
+          <p class="text-muted" style="font-size:0.8rem; margin-bottom:6px;">
+            Define each weight condition. Enter exact scale readings for precise calculations.
+          </p>
+          <div id="plConditions">
+            <!-- Baseline always present -->
+            <div class="pl-condition-row" data-index="0">
+              <input type="text" value="No added weight" class="pl-cond-label" aria-label="Condition label" readonly>
+              <input type="number" value="0" class="pl-cond-weight" step="0.1" min="0" aria-label="Added weight in grams" readonly>
+              <span class="pl-cond-unit">g</span>
+              <span style="width:30px;"></span>
+            </div>
+          </div>
+          <div class="grid grid-3" style="margin-top:6px; gap:6px;">
+            <input type="text" id="plNewCondLabel" placeholder="e.g. +14g tungsten" aria-label="New condition label">
+            <input type="number" id="plNewCondWeight" placeholder="e.g. 14.2" step="0.001" min="0.001" aria-label="Added weight in grams">
+            <button class="btn btn-accent btn-sm" onclick="plAddCondition()">ADD CONDITION</button>
+          </div>
+        </div>
+
+        <!-- Trials Per Condition -->
+        <div style="margin:12px 0;">
+          <label for="plTrials" style="font-size:0.9rem; font-weight:700; color:var(--accent);">TRIALS PER CONDITION</label>
+          <input type="number" id="plTrials" value="3" min="2" max="10" style="width:80px; margin-left:8px;">
+        </div>
+
+        <!-- Test Plan Preview -->
+        <div id="plPreview" style="display:none; margin:12px 0;">
+          <h3 style="font-size:0.9rem; font-weight:700; margin-bottom:8px; color:var(--secondary);">TEST PLAN PREVIEW</h3>
+          <div id="plPreviewTable" style="max-height:300px; overflow-y:auto; font-size:0.8rem;"></div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-2" style="margin-top:12px;">
+          <button class="btn btn-primary" onclick="plGeneratePlan()">GENERATE TEST PLAN</button>
+          <button class="btn btn-success" id="plStartBtn" onclick="plStartTesting()" disabled>START TESTING</button>
+        </div>
+      </div>
+
+      <!-- ===== ACTIVE PHASE ===== -->
+      <div id="plActive" style="display:none;">
+        <!-- Big instruction banner -->
+        <div id="plBanner" class="pl-banner" role="status" aria-live="assertive">
+          <div id="plRunLabel" class="pl-run-label">Run 1 of 1</div>
+          <div id="plInstruction" class="pl-instruction">Loading...</div>
+          <div id="plTrialLabel" class="pl-trial-label">Trial 1 of 3</div>
+        </div>
+
+        <!-- Progress bar -->
+        <div class="pl-progress-container" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-label="Test progress">
+          <div id="plProgressBar" class="pl-progress-bar" style="width:0%;"></div>
+          <span id="plProgressText" class="pl-progress-text">0%</span>
+        </div>
+
+        <!-- Condition change alert (hidden until needed) -->
+        <div id="plConditionAlert" class="pl-condition-alert" style="display:none;" role="alert">
+          <strong>ATTENTION:</strong> <span id="plConditionAlertText"></span>
+        </div>
+
+        <!-- Active controls -->
+        <div class="grid grid-3" style="margin:8px 0;">
+          <button class="btn btn-accent" onclick="plSkipRun()">SKIP RUN</button>
+          <button class="btn btn-primary" id="plPauseBtn" onclick="plTogglePause()">PAUSE</button>
+          <button class="btn btn-danger" onclick="plStopTesting()">STOP TESTING</button>
+        </div>
+
+        <!-- Live results table -->
+        <div style="margin-top:12px; overflow-x:auto;">
+          <table class="pl-results-table">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Car</th>
+                <th scope="col">Condition</th>
+                <th scope="col">Trial</th>
+                <th scope="col">Time (s)</th>
+                <th scope="col">Speed (m/s)</th>
+                <th scope="col">Weight (g)</th>
+              </tr>
+            </thead>
+            <tbody id="plResultsBody">
+              <tr><td colspan="7" class="text-center text-muted">Waiting for first run...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ===== COMPLETED PHASE ===== -->
+      <div id="plCompleted" style="display:none;">
+        <div class="pl-complete-banner" role="status">
+          <span style="font-size:1.5em;" aria-hidden="true">&#x1F3C6;</span>
+          ALL TESTS COMPLETE!
+        </div>
+
+        <!-- Summary table with averages -->
+        <div id="plSummary" style="margin:12px 0; overflow-x:auto;"></div>
+
+        <!-- Export buttons -->
+        <div class="grid grid-3" style="margin-top:12px;">
+          <button class="btn btn-primary" onclick="plExportCSV()">EXPORT RAW CSV</button>
+          <button class="btn btn-success" onclick="plExportSummary()">EXPORT SUMMARY</button>
+          <button class="btn btn-danger" onclick="plClearAndRestart()">CLEAR &amp; START OVER</button>
+        </div>
+      </div>
+    </details>
 
     <!-- System Status Panel (shown in dry-run, collapsible otherwise) -->
     <div id="systemStatusPanel" class="section" style="display:none;">
@@ -209,7 +379,7 @@
         <div><label for="carColor" class="card-label">Color</label>
         <input type="text" id="carColor" placeholder="e.g. Red"></div>
         <div><label for="carWeight" class="card-label">Mass (grams)</label>
-        <input type="number" id="carWeight" placeholder="e.g. 35" min="0" step="0.1"></div>
+        <input type="number" id="carWeight" placeholder="e.g. 35.000" min="0" step="0.001"></div>
       </div>
       <button id="addCarBtn" class="btn btn-accent" onclick="addCar()">ADD TO GARAGE</button>
       <div id="currentCar" class="text-center text-muted" style="margin:15px 0; font-size:1.2rem; font-weight:bold;">
@@ -225,6 +395,11 @@
           <input type="file" accept=".json" onchange="importGarage(event)" style="display:none;">
         </label>
         <button class="btn btn-danger" onclick="clearGarage()">CLEAR</button>
+      </div>
+      <div class="grid grid-3" style="margin-top:6px;">
+        <button class="btn btn-outline btn-sm" onclick="evShowNfcWriterHelper()">&#x1F4F1; NFC TAGS</button>
+        <button class="btn btn-outline btn-sm" onclick="evShowTagsOverlay(evidenceLog.slice(-10))">&#x1F3F7; EVIDENCE LOG</button>
+        <button class="btn btn-outline btn-sm" onclick="evShowTagsOverlay([{caseNumber:evGetCaseNumber(),timestamp:new Date().toISOString(),car:activeCar?activeCar.name:'Select a car',weight:activeCar?activeCar.weight:0,time_s:0,speed_mps:0}])">&#x1F4CB; BLANK TAG</button>
       </div>
     </div>
 
@@ -421,13 +596,25 @@
         }
         addRaceToCharts(data);
         updateExplainerValues(data);
-        showLeaderboardOverlay(data);
 
-        // Dispatcher: announce race result
-        var carName = data.car || (activeCar ? activeCar.name : 'Unknown vehicle');
-        _lastRaceTime = safeFixed(data.time, 3) + ' seconds';
-        var dryLabel = data.dryRun ? ' (dry run)' : '';
-        announce('Suspect clocked. ' + carName + '. ' + _lastRaceTime + '.' + dryLabel);
+        // Playlist mode: suppress leaderboard overlay during testing, record result instead
+        if (playlistMode.active && !playlistMode.paused) {
+          // Record evidence with playlist context
+          var plTest = playlistMode.tests[playlistMode.currentIndex] || null;
+          if (!data.dryRun) evRecordRun(data, plTest);
+          plOnRaceFinished(data);
+          // Announce within playlist context (plOnRaceFinished handles the advance announce)
+          _lastRaceTime = safeFixed(data.time, 3) + ' seconds';
+        } else {
+          // Record evidence for non-playlist runs
+          if (!data.dryRun) evRecordRun(data, null);
+          showLeaderboardOverlay(data);
+          // Dispatcher: announce race result
+          var carName = data.car || (activeCar ? activeCar.name : 'Unknown vehicle');
+          _lastRaceTime = safeFixed(data.time, 3) + ' seconds';
+          var dryLabel = data.dryRun ? ' (dry run)' : '';
+          announce('Suspect clocked. ' + carName + '. ' + _lastRaceTime + '.' + dryLabel);
+        }
 
         var sheetsUrl = document.getElementById('sheetsUrl').value || configSheetsUrl;
         if (sheetsUrl && data.time > 0 && !data.dryRun) { uploadToSheets(data, sheetsUrl); }
@@ -911,6 +1098,8 @@
 
     function renderGarage() {
       var grid = document.getElementById('garageGrid');
+      // Keep playlist car selector in sync with garage
+      if (typeof plRenderCarSelector === 'function') { try { plRenderCarSelector(); } catch(e) {} }
       if (garage.length === 0) {
         grid.innerHTML = '<p style="grid-column:1/-1;" class="text-center text-muted">No suspects in garage</p>';
         return;
@@ -1279,6 +1468,1010 @@
     }
 
     // ========================================================================
+    // PLAYLIST MODE — Science Fair Guided Testing
+    // ========================================================================
+    var playlistMode = {
+      active: false,
+      paused: false,
+      tests: [],
+      currentIndex: 0,
+      results: [],
+      config: {
+        trialsPerCondition: 3,
+        conditions: [{ label: 'No added weight', addedWeight: 0 }],
+        selectedCarIds: []
+      }
+    };
+
+    // --- Restore from localStorage on load ---
+    function plRestoreState() {
+      try {
+        var savedConfig = JSON.parse(localStorage.getItem('mass_playlist_config') || 'null');
+        if (savedConfig) {
+          playlistMode.config = savedConfig;
+          plRenderConditions();
+        }
+        var savedState = JSON.parse(localStorage.getItem('mass_playlist_state') || 'null');
+        if (savedState && savedState.active) {
+          playlistMode.active = savedState.active;
+          playlistMode.paused = savedState.paused || false;
+          playlistMode.tests = savedState.tests;
+          playlistMode.currentIndex = savedState.currentIndex;
+          playlistMode.results = savedState.results;
+          // Resume active UI
+          plShowPhase('active');
+          plUpdateActiveUI();
+          if (playlistMode.paused) {
+            document.getElementById('plPauseBtn').textContent = 'RESUME';
+          }
+        }
+      } catch (e) { console.error('[PLAYLIST] Restore failed:', e); }
+    }
+
+    function plSaveConfig() {
+      localStorage.setItem('mass_playlist_config', JSON.stringify(playlistMode.config));
+    }
+
+    function plSaveState() {
+      localStorage.setItem('mass_playlist_state', JSON.stringify({
+        active: playlistMode.active,
+        paused: playlistMode.paused,
+        tests: playlistMode.tests,
+        currentIndex: playlistMode.currentIndex,
+        results: playlistMode.results
+      }));
+    }
+
+    // --- Car Selector ---
+    function plRenderCarSelector() {
+      var container = document.getElementById('plCarSelector');
+      if (garage.length === 0) {
+        container.innerHTML = '<p class="text-muted">Add cars to the garage first</p>';
+        return;
+      }
+      container.innerHTML = garage.map(function(car) {
+        var checked = playlistMode.config.selectedCarIds.indexOf(car.id) !== -1;
+        return '<label class="pl-car-check' + (checked ? ' checked' : '') + '">' +
+          '<input type="checkbox" ' + (checked ? 'checked' : '') +
+          ' onchange="plToggleCar(' + car.id + ', this)" aria-label="Include ' + escHtml(car.name) + '">' +
+          escHtml(car.name) + ' (' + car.weight + 'g)</label>';
+      }).join('');
+    }
+
+    function plToggleCar(carId, checkbox) {
+      var idx = playlistMode.config.selectedCarIds.indexOf(carId);
+      if (checkbox.checked && idx === -1) {
+        playlistMode.config.selectedCarIds.push(carId);
+      } else if (!checkbox.checked && idx !== -1) {
+        playlistMode.config.selectedCarIds.splice(idx, 1);
+      }
+      // Update visual state
+      checkbox.parentElement.classList.toggle('checked', checkbox.checked);
+      plSaveConfig();
+      // Hide preview when selection changes
+      document.getElementById('plPreview').style.display = 'none';
+      document.getElementById('plStartBtn').disabled = true;
+    }
+
+    function plSelectAllCars() {
+      playlistMode.config.selectedCarIds = garage.map(function(c) { return c.id; });
+      plSaveConfig();
+      plRenderCarSelector();
+    }
+
+    // --- Weight Conditions ---
+    function plRenderConditions() {
+      var container = document.getElementById('plConditions');
+      container.innerHTML = playlistMode.config.conditions.map(function(cond, i) {
+        var isBaseline = (i === 0);
+        return '<div class="pl-condition-row" data-index="' + i + '">' +
+          '<input type="text" value="' + escHtml(cond.label) + '" class="pl-cond-label"' +
+            (isBaseline ? ' readonly' : ' onchange="plUpdateCondLabel(' + i + ', this.value)"') +
+            ' aria-label="Condition ' + (i + 1) + ' label">' +
+          '<input type="number" value="' + cond.addedWeight + '" class="pl-cond-weight" step="0.1" min="0"' +
+            (isBaseline ? ' readonly' : ' onchange="plUpdateCondWeight(' + i + ', this.value)"') +
+            ' aria-label="Condition ' + (i + 1) + ' weight">' +
+          '<span class="pl-cond-unit">g</span>' +
+          (isBaseline ? '<span style="width:30px;"></span>' :
+            '<button class="pl-cond-remove" onclick="plRemoveCondition(' + i + ')" aria-label="Remove condition ' + escHtml(cond.label) + '">X</button>') +
+        '</div>';
+      }).join('');
+      // Sync trials input
+      document.getElementById('plTrials').value = playlistMode.config.trialsPerCondition;
+    }
+
+    function plAddCondition() {
+      var label = document.getElementById('plNewCondLabel').value.trim();
+      var weight = parseFloat(document.getElementById('plNewCondWeight').value);
+      if (!label) { alert('Enter a label for this condition (e.g. "+14g tungsten")'); return; }
+      if (isNaN(weight) || weight <= 0) { alert('Enter the added weight in grams (must be > 0)'); return; }
+      playlistMode.config.conditions.push({ label: label, addedWeight: weight });
+      document.getElementById('plNewCondLabel').value = '';
+      document.getElementById('plNewCondWeight').value = '';
+      plRenderConditions();
+      plSaveConfig();
+      // Hide preview when conditions change
+      document.getElementById('plPreview').style.display = 'none';
+      document.getElementById('plStartBtn').disabled = true;
+    }
+
+    function plRemoveCondition(index) {
+      if (index === 0) return; // Can't remove baseline
+      playlistMode.config.conditions.splice(index, 1);
+      plRenderConditions();
+      plSaveConfig();
+      document.getElementById('plPreview').style.display = 'none';
+      document.getElementById('plStartBtn').disabled = true;
+    }
+
+    function plUpdateCondLabel(index, value) {
+      playlistMode.config.conditions[index].label = value.trim();
+      plSaveConfig();
+    }
+
+    function plUpdateCondWeight(index, value) {
+      var w = parseFloat(value);
+      if (!isNaN(w) && w >= 0) {
+        playlistMode.config.conditions[index].addedWeight = w;
+        plSaveConfig();
+      }
+    }
+
+    // --- Test Matrix Generator (Locard's Principle) ---
+    // Order: for each condition (ascending weight) → for each trial → for each car
+    // This spreads trials apart and cycles cars within each trial round
+    function plGenerateMatrix() {
+      var selectedCars = garage.filter(function(c) {
+        return playlistMode.config.selectedCarIds.indexOf(c.id) !== -1;
+      });
+      var conditions = playlistMode.config.conditions;
+      var trials = parseInt(document.getElementById('plTrials').value) || 3;
+      playlistMode.config.trialsPerCondition = trials;
+      plSaveConfig();
+
+      var tests = [];
+      var runNum = 0;
+      for (var ci = 0; ci < conditions.length; ci++) {
+        for (var ti = 0; ti < trials; ti++) {
+          for (var cari = 0; cari < selectedCars.length; cari++) {
+            runNum++;
+            var car = selectedCars[cari];
+            tests.push({
+              index: runNum,
+              carId: car.id,
+              carName: car.name,
+              baseWeight: car.weight,
+              addedWeight: conditions[ci].addedWeight,
+              totalWeight: Math.round((car.weight + conditions[ci].addedWeight) * 10) / 10,
+              conditionLabel: conditions[ci].label,
+              conditionIndex: ci,
+              trial: ti + 1,
+              totalTrials: trials
+            });
+          }
+        }
+      }
+      return tests;
+    }
+
+    function plGeneratePlan() {
+      // Validate
+      if (playlistMode.config.selectedCarIds.length === 0) {
+        alert('Select at least one car from the garage!');
+        return;
+      }
+      if (playlistMode.config.conditions.length < 2) {
+        alert('Add at least one weight condition beyond the baseline!');
+        return;
+      }
+
+      var tests = plGenerateMatrix();
+      playlistMode.tests = tests;
+
+      // Render preview
+      var preview = document.getElementById('plPreview');
+      var table = document.getElementById('plPreviewTable');
+      var html = '<table class="pl-results-table">' +
+        '<thead><tr><th>#</th><th>Car</th><th>Condition</th><th>Added (g)</th><th>Total (g)</th><th>Trial</th></tr></thead><tbody>';
+      var lastCondIdx = -1;
+      for (var i = 0; i < tests.length; i++) {
+        var t = tests[i];
+        var condChange = (t.conditionIndex !== lastCondIdx);
+        lastCondIdx = t.conditionIndex;
+        html += '<tr' + (condChange && i > 0 ? ' style="border-top:2px solid var(--accent);"' : '') + '>' +
+          '<td>' + t.index + '</td>' +
+          '<td>' + escHtml(t.carName) + '</td>' +
+          '<td>' + escHtml(t.conditionLabel) + '</td>' +
+          '<td>' + t.addedWeight.toFixed(1) + '</td>' +
+          '<td>' + t.totalWeight.toFixed(1) + '</td>' +
+          '<td>' + t.trial + ' of ' + t.totalTrials + '</td></tr>';
+      }
+      html += '</tbody></table>';
+      table.innerHTML = html;
+      preview.style.display = 'block';
+      document.getElementById('plStartBtn').disabled = false;
+
+      // Update badge
+      var badge = document.getElementById('playlistBadge');
+      badge.textContent = tests.length + ' runs';
+      badge.style.display = 'inline';
+
+      announce('Test plan generated. ' + tests.length + ' total runs across ' +
+        playlistMode.config.conditions.length + ' conditions.');
+    }
+
+    // --- Phase Switching ---
+    function plShowPhase(phase) {
+      document.getElementById('plSetup').style.display = phase === 'setup' ? 'block' : 'none';
+      document.getElementById('plActive').style.display = phase === 'active' ? 'block' : 'none';
+      document.getElementById('plCompleted').style.display = phase === 'completed' ? 'block' : 'none';
+    }
+
+    // --- Start Testing ---
+    function plStartTesting() {
+      if (playlistMode.tests.length === 0) {
+        alert('Generate a test plan first!');
+        return;
+      }
+      playlistMode.active = true;
+      playlistMode.paused = false;
+      playlistMode.currentIndex = 0;
+      playlistMode.results = new Array(playlistMode.tests.length);
+      for (var i = 0; i < playlistMode.results.length; i++) {
+        playlistMode.results[i] = null;
+      }
+
+      plShowPhase('active');
+      plSaveState();
+
+      // Open the details element if closed
+      var details = document.getElementById('playlistSection');
+      if (details) details.open = true;
+
+      // Load first test
+      plLoadCurrentTest();
+
+      var firstTest = playlistMode.tests[0];
+      announce('Science fair testing started. ' + playlistMode.tests.length + ' runs total. ' +
+        'First up: ' + firstTest.carName + ', ' + firstTest.conditionLabel + ', trial 1.');
+    }
+
+    // --- Load Current Test into System ---
+    function plLoadCurrentTest() {
+      var test = playlistMode.tests[playlistMode.currentIndex];
+      if (!test) return;
+
+      // Send setCar to firmware with total weight
+      wsSend({ cmd: 'setCar', name: test.carName, weight: test.totalWeight });
+
+      // Update activeCar locally for banner display
+      var carIndex = garage.findIndex(function(c) { return c.id === test.carId; });
+      if (carIndex !== -1) {
+        activeCar = garage[carIndex];
+        localStorage.setItem('hw_active_car', JSON.stringify(activeCar));
+        setCurrentCarDisplay({ name: test.carName, weight: test.totalWeight });
+      }
+
+      // Update active phase UI
+      plUpdateActiveUI();
+
+      // Auto-arm after a short delay
+      setTimeout(function() {
+        if (playlistMode.active && !playlistMode.paused) {
+          wsSend({ cmd: 'arm' });
+        }
+      }, 1000);
+    }
+
+    // --- Update Active Phase UI ---
+    function plUpdateActiveUI() {
+      var test = playlistMode.tests[playlistMode.currentIndex];
+      if (!test) return;
+
+      var total = playlistMode.tests.length;
+      var current = playlistMode.currentIndex + 1;
+
+      // Banner
+      document.getElementById('plRunLabel').textContent = 'Run ' + current + ' of ' + total;
+      document.getElementById('plInstruction').textContent =
+        test.carName + ' \u2014 ' + test.conditionLabel;
+      document.getElementById('plTrialLabel').textContent =
+        'Trial ' + test.trial + ' of ' + test.totalTrials +
+        ' | Total weight: ' + test.totalWeight.toFixed(1) + 'g';
+
+      // Progress bar
+      var pct = Math.round((playlistMode.currentIndex / total) * 100);
+      var progressBar = document.getElementById('plProgressBar');
+      var progressContainer = progressBar.parentElement;
+      progressBar.style.width = pct + '%';
+      document.getElementById('plProgressText').textContent = pct + '%';
+      progressContainer.setAttribute('aria-valuenow', pct);
+
+      // Badge
+      var badge = document.getElementById('playlistBadge');
+      badge.textContent = current + '/' + total;
+      badge.style.display = 'inline';
+
+      // Results table
+      plRenderResultsTable();
+    }
+
+    // --- Results Table ---
+    function plRenderResultsTable() {
+      var tbody = document.getElementById('plResultsBody');
+      var rows = [];
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        var test = playlistMode.tests[i];
+        var result = playlistMode.results[i];
+        var isCurrent = (i === playlistMode.currentIndex && playlistMode.active);
+        var cls = isCurrent ? ' class="pl-current"' : '';
+        if (result && result.skipped) cls = ' class="pl-skipped"';
+
+        if (result && !result.skipped) {
+          rows.push('<tr' + cls + '>' +
+            '<td>' + test.index + '</td>' +
+            '<td>' + escHtml(test.carName) + '</td>' +
+            '<td>' + escHtml(test.conditionLabel) + '</td>' +
+            '<td>' + test.trial + '</td>' +
+            '<td class="font-data">' + safeFixed(result.time_s, 4) + '</td>' +
+            '<td>' + safeFixed(result.speed_mps, 3) + '</td>' +
+            '<td>' + test.totalWeight.toFixed(1) + '</td></tr>');
+        } else if (result && result.skipped) {
+          rows.push('<tr' + cls + '><td>' + test.index + '</td><td>' + escHtml(test.carName) +
+            '</td><td colspan="5" class="text-muted">Skipped</td></tr>');
+        } else if (isCurrent) {
+          rows.push('<tr' + cls + '><td>' + test.index + '</td><td>' + escHtml(test.carName) +
+            '</td><td>' + escHtml(test.conditionLabel) + '</td><td>' + test.trial +
+            '</td><td colspan="3" class="text-muted">Waiting...</td></tr>');
+        }
+        // Don't render future rows to keep table compact
+      }
+      if (rows.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Waiting for first run...</td></tr>';
+      } else {
+        tbody.innerHTML = rows.join('');
+        // Scroll to current row
+        var currentRow = tbody.querySelector('.pl-current');
+        if (currentRow) currentRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
+    }
+
+    // --- Handle Race Finish During Playlist ---
+    function plOnRaceFinished(data) {
+      if (!playlistMode.active || playlistMode.paused) return;
+      if (playlistMode.currentIndex >= playlistMode.tests.length) return;
+
+      var test = playlistMode.tests[playlistMode.currentIndex];
+      var speed_mps = data.speed_mps || (data.speed_mph ? data.speed_mph / MPS_TO_MPH : 0);
+      var mass_kg = test.totalWeight / 1000.0;
+
+      playlistMode.results[playlistMode.currentIndex] = {
+        time_s: data.time,
+        speed_mps: speed_mps,
+        speed_mph: data.speed_mph || (speed_mps * MPS_TO_MPH),
+        momentum: mass_kg * speed_mps,
+        ke: 0.5 * mass_kg * speed_mps * speed_mps,
+        timestamp: Date.now()
+      };
+
+      plSaveState();
+      plUpdateActiveUI();
+
+      // Check if all done
+      if (playlistMode.currentIndex >= playlistMode.tests.length - 1) {
+        // All tests complete!
+        plCompleteTesting();
+        return;
+      }
+
+      // Determine if next test has a different condition (weight change alert)
+      var nextIndex = playlistMode.currentIndex + 1;
+      var nextTest = playlistMode.tests[nextIndex];
+      var condChanged = (nextTest.conditionIndex !== test.conditionIndex);
+
+      // Wait for firmware auto-reset (5 seconds), then advance
+      setTimeout(function() {
+        playlistMode.currentIndex = nextIndex;
+        plSaveState();
+
+        // Condition change alert
+        if (condChanged) {
+          var alertDiv = document.getElementById('plConditionAlert');
+          var alertText = document.getElementById('plConditionAlertText');
+          alertText.textContent = 'New weight condition! ' + nextTest.conditionLabel +
+            '. Add ' + nextTest.addedWeight.toFixed(1) + 'g to each car.';
+          alertDiv.style.display = 'block';
+          announce('ATTENTION: New weight condition. ' + nextTest.conditionLabel +
+            '. Add ' + nextTest.addedWeight.toFixed(1) + ' grams to each car. ' +
+            'Starting with ' + nextTest.carName + '.');
+          // Hide alert after 8 seconds
+          setTimeout(function() { alertDiv.style.display = 'none'; }, 8000);
+        } else {
+          document.getElementById('plConditionAlert').style.display = 'none';
+          announce('Run ' + (nextIndex + 1) + ' of ' + playlistMode.tests.length + '. ' +
+            nextTest.carName + ', ' + nextTest.conditionLabel + '. Trial ' +
+            nextTest.trial + ' of ' + nextTest.totalTrials + '.');
+        }
+
+        plLoadCurrentTest();
+      }, 5500); // Slightly after the firmware 5s auto-reset
+    }
+
+    // --- Skip Run ---
+    function plSkipRun() {
+      if (!playlistMode.active) return;
+      playlistMode.results[playlistMode.currentIndex] = { skipped: true, timestamp: Date.now() };
+
+      if (playlistMode.currentIndex >= playlistMode.tests.length - 1) {
+        plCompleteTesting();
+        return;
+      }
+
+      var nextIndex = playlistMode.currentIndex + 1;
+      var nextTest = playlistMode.tests[nextIndex];
+      playlistMode.currentIndex = nextIndex;
+      plSaveState();
+      announce('Run skipped. Moving to run ' + (nextIndex + 1) + '. ' + nextTest.carName + '.');
+      plLoadCurrentTest();
+    }
+
+    // --- Pause/Resume ---
+    function plTogglePause() {
+      playlistMode.paused = !playlistMode.paused;
+      var btn = document.getElementById('plPauseBtn');
+      btn.textContent = playlistMode.paused ? 'RESUME' : 'PAUSE';
+      plSaveState();
+      if (playlistMode.paused) {
+        announce('Testing paused. Press Resume to continue.');
+      } else {
+        announce('Testing resumed. ' + (playlistMode.tests.length - playlistMode.currentIndex) + ' runs remaining.');
+        plLoadCurrentTest();
+      }
+    }
+
+    // --- Stop Testing ---
+    function plStopTesting() {
+      if (!confirm('Stop testing? Completed results will be kept.')) return;
+      playlistMode.active = false;
+      playlistMode.paused = false;
+      plSaveState();
+
+      // If we have any results, show completed phase
+      var hasResults = playlistMode.results.some(function(r) { return r && !r.skipped; });
+      if (hasResults) {
+        plBuildSummary();
+        plShowPhase('completed');
+        announce('Testing stopped. Results available for export.');
+      } else {
+        plShowPhase('setup');
+        announce('Testing stopped. No results collected.');
+      }
+    }
+
+    // --- Complete Testing ---
+    function plCompleteTesting() {
+      playlistMode.active = false;
+      playlistMode.paused = false;
+
+      // Final progress
+      var progressBar = document.getElementById('plProgressBar');
+      progressBar.style.width = '100%';
+      document.getElementById('plProgressText').textContent = '100%';
+
+      plSaveState();
+      plBuildSummary();
+      plShowPhase('completed');
+
+      var completedCount = playlistMode.results.filter(function(r) { return r && !r.skipped; }).length;
+      announce('All ' + completedCount + ' tests complete! Great work, scientist! Export your data below.');
+    }
+
+    // --- Build Summary Table ---
+    function plBuildSummary() {
+      var container = document.getElementById('plSummary');
+
+      // Group results by car, then by condition
+      var cars = {};
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        var test = playlistMode.tests[i];
+        var result = playlistMode.results[i];
+        if (!result || result.skipped) continue;
+        if (!cars[test.carName]) cars[test.carName] = { baseWeight: test.baseWeight, conditions: {} };
+        if (!cars[test.carName].conditions[test.conditionLabel]) {
+          cars[test.carName].conditions[test.conditionLabel] = {
+            addedWeight: test.addedWeight,
+            totalWeight: test.totalWeight,
+            trials: []
+          };
+        }
+        cars[test.carName].conditions[test.conditionLabel].trials.push(result);
+      }
+
+      var html = '';
+      var carNames = Object.keys(cars);
+      for (var ci = 0; ci < carNames.length; ci++) {
+        var carName = carNames[ci];
+        var carData = cars[carName];
+        var numTrials = playlistMode.config.trialsPerCondition;
+
+        html += '<h3 style="font-size:0.9rem; font-weight:700; color:var(--accent); margin-top:12px;">' +
+          escHtml(carName) + ' (' + carData.baseWeight + 'g base)</h3>';
+        html += '<table class="pl-summary-table"><thead><tr>' +
+          '<th>Condition</th><th>Added (g)</th><th>Total (g)</th>';
+        for (var t = 1; t <= numTrials; t++) html += '<th>T' + t + ' (s)</th>';
+        html += '<th>Avg Time (s)</th><th>Avg Speed (m/s)</th></tr></thead><tbody>';
+
+        var condLabels = Object.keys(carData.conditions);
+        for (var cdi = 0; cdi < condLabels.length; cdi++) {
+          var condLabel = condLabels[cdi];
+          var cond = carData.conditions[condLabel];
+          var times = cond.trials.map(function(r) { return r.time_s; });
+          var speeds = cond.trials.map(function(r) { return r.speed_mps; });
+          var avgTime = times.reduce(function(a, b) { return a + b; }, 0) / times.length;
+          var avgSpeed = speeds.reduce(function(a, b) { return a + b; }, 0) / speeds.length;
+
+          html += '<tr><td>' + escHtml(condLabel) + '</td>' +
+            '<td>' + cond.addedWeight.toFixed(1) + '</td>' +
+            '<td>' + cond.totalWeight.toFixed(1) + '</td>';
+          for (var ti = 0; ti < numTrials; ti++) {
+            html += '<td>' + (times[ti] !== undefined ? safeFixed(times[ti], 4) : '--') + '</td>';
+          }
+          html += '<td class="pl-avg">' + safeFixed(avgTime, 4) + '</td>' +
+            '<td class="pl-avg">' + safeFixed(avgSpeed, 3) + '</td></tr>';
+        }
+        html += '</tbody></table>';
+      }
+
+      container.innerHTML = html;
+    }
+
+    // --- CSV Export (Raw Data) ---
+    function plExportCSV() {
+      var csv = 'Run,Car,BaseWeight(g),AddedWeight(g),TotalWeight(g),Condition,Trial,Time(s),Speed(m/s),Speed(mph),Momentum(kg*m/s),KE(J)\n';
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        var test = playlistMode.tests[i];
+        var result = playlistMode.results[i];
+        if (!result || result.skipped) continue;
+        csv += test.index + ',' +
+          escCsvField(test.carName) + ',' +
+          test.baseWeight + ',' +
+          test.addedWeight.toFixed(1) + ',' +
+          test.totalWeight.toFixed(1) + ',' +
+          escCsvField(test.conditionLabel) + ',' +
+          test.trial + ',' +
+          safeFixed(result.time_s, 4) + ',' +
+          safeFixed(result.speed_mps, 3) + ',' +
+          safeFixed(result.speed_mph, 2) + ',' +
+          safeFixed(result.momentum, 4) + ',' +
+          safeFixed(result.ke, 4) + '\n';
+      }
+      plDownloadFile(csv, 'masstrap_sciencefair_' + Date.now() + '.csv', 'text/csv');
+    }
+
+    function escCsvField(str) {
+      if (str.indexOf(',') !== -1 || str.indexOf('"') !== -1) {
+        return '"' + str.replace(/"/g, '""') + '"';
+      }
+      return str;
+    }
+
+    // --- Summary Export ---
+    function plExportSummary() {
+      var trackLen = parseFloat(document.getElementById('trackLength').value) || 2.0;
+      var lines = [];
+      lines.push('M.A.S.S. TRAP SCIENCE FAIR DATA SUMMARY');
+      lines.push('Generated: ' + new Date().toLocaleString());
+      lines.push('');
+      lines.push('Independent Variable: Added Weight (grams)');
+      lines.push('Dependent Variable: Time (seconds) / Speed (m/s)');
+      lines.push('Controlled Variables: Track length (' + trackLen.toFixed(2) + 'm), Start height, Release method, Car model per condition group');
+      lines.push('');
+
+      // Build same structure as summary table
+      var cars = {};
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        var test = playlistMode.tests[i];
+        var result = playlistMode.results[i];
+        if (!result || result.skipped) continue;
+        if (!cars[test.carName]) cars[test.carName] = { baseWeight: test.baseWeight, conditions: {} };
+        if (!cars[test.carName].conditions[test.conditionLabel]) {
+          cars[test.carName].conditions[test.conditionLabel] = {
+            addedWeight: test.addedWeight,
+            totalWeight: test.totalWeight,
+            trials: []
+          };
+        }
+        cars[test.carName].conditions[test.conditionLabel].trials.push(result);
+      }
+
+      var numTrials = playlistMode.config.trialsPerCondition;
+      var carNames = Object.keys(cars);
+      for (var ci = 0; ci < carNames.length; ci++) {
+        var carName = carNames[ci];
+        var carData = cars[carName];
+        lines.push('Car: ' + carName + ' (' + carData.baseWeight + 'g base)');
+
+        // Header row
+        var hdr = 'Condition\tAdded(g)\tTotal(g)';
+        for (var t = 1; t <= numTrials; t++) hdr += '\tTrial ' + t + '(s)';
+        hdr += '\tAvg Time(s)\tAvg Speed(m/s)';
+        lines.push(hdr);
+
+        var condLabels = Object.keys(carData.conditions);
+        for (var cdi = 0; cdi < condLabels.length; cdi++) {
+          var condLabel = condLabels[cdi];
+          var cond = carData.conditions[condLabel];
+          var times = cond.trials.map(function(r) { return r.time_s; });
+          var speeds = cond.trials.map(function(r) { return r.speed_mps; });
+          var avgTime = times.reduce(function(a, b) { return a + b; }, 0) / times.length;
+          var avgSpeed = speeds.reduce(function(a, b) { return a + b; }, 0) / speeds.length;
+
+          var row = condLabel + '\t' + cond.addedWeight.toFixed(1) + '\t' + cond.totalWeight.toFixed(1);
+          for (var ti = 0; ti < numTrials; ti++) {
+            row += '\t' + (times[ti] !== undefined ? safeFixed(times[ti], 4) : '--');
+          }
+          row += '\t' + safeFixed(avgTime, 4) + '\t' + safeFixed(avgSpeed, 3);
+          lines.push(row);
+        }
+        lines.push('');
+      }
+
+      plDownloadFile(lines.join('\n'), 'masstrap_summary_' + Date.now() + '.txt', 'text/plain');
+    }
+
+    function plDownloadFile(content, filename, type) {
+      var blob = new Blob([content], { type: type });
+      var url = window.URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.click();
+      window.URL.revokeObjectURL(url);
+    }
+
+    // --- Clear & Start Over ---
+    function plClearAndRestart() {
+      if (!confirm('Clear all results and start over?')) return;
+      playlistMode.active = false;
+      playlistMode.paused = false;
+      playlistMode.tests = [];
+      playlistMode.currentIndex = 0;
+      playlistMode.results = [];
+      localStorage.removeItem('mass_playlist_state');
+      plShowPhase('setup');
+      plRenderCarSelector();
+      document.getElementById('plPreview').style.display = 'none';
+      document.getElementById('plStartBtn').disabled = true;
+      var badge = document.getElementById('playlistBadge');
+      badge.style.display = 'none';
+      announce('Playlist cleared. Ready to set up a new test plan.');
+    }
+
+    // ========================================================================
+    // EVIDENCE SYSTEM — Case Numbers, NFC Scan, Evidence Tags
+    // ========================================================================
+    var evidenceLog = JSON.parse(localStorage.getItem('mass_evidence_log') || '[]');
+    var evidenceCounter = parseInt(localStorage.getItem('mass_evidence_counter') || '0');
+
+    function evNextCaseNumber() {
+      evidenceCounter++;
+      localStorage.setItem('mass_evidence_counter', evidenceCounter);
+      var year = new Date().getFullYear().toString().slice(-2);
+      var seq = ('0000' + evidenceCounter).slice(-4);
+      return 'MASS' + year + '-' + seq;
+    }
+
+    function evGetCaseNumber() {
+      // Return current case number without incrementing (for display)
+      var year = new Date().getFullYear().toString().slice(-2);
+      var seq = ('0000' + (evidenceCounter + 1)).slice(-4);
+      return 'MASS' + year + '-' + seq;
+    }
+
+    // Record evidence entry when a race finishes
+    function evRecordRun(raceData, playlistTest) {
+      var caseNum = evNextCaseNumber();
+      var entry = {
+        caseNumber: caseNum,
+        timestamp: new Date().toISOString(),
+        car: raceData.car || (activeCar ? activeCar.name : 'Unknown'),
+        carId: activeCar ? activeCar.id : null,
+        weight: raceData.weight,
+        time_s: raceData.time,
+        speed_mps: raceData.speed_mps || (raceData.speed_mph ? raceData.speed_mph / MPS_TO_MPH : 0),
+        speed_mph: raceData.speed_mph || 0,
+        momentum: raceData.momentum || 0,
+        ke: raceData.ke || 0,
+        totalRuns: raceData.totalRuns,
+        photoUrl: null // Populated later when photo is linked
+      };
+      if (playlistTest) {
+        entry.condition = playlistTest.conditionLabel;
+        entry.addedWeight = playlistTest.addedWeight;
+        entry.baseWeight = playlistTest.baseWeight;
+        entry.trial = playlistTest.trial;
+      }
+      evidenceLog.push(entry);
+      // Keep last 500 entries
+      if (evidenceLog.length > 500) evidenceLog = evidenceLog.slice(-500);
+      localStorage.setItem('mass_evidence_log', JSON.stringify(evidenceLog));
+      return caseNum;
+    }
+
+    // NFC scan handler — reads URL params, selects car, arms track
+    function evHandleNfcScan() {
+      var params = new URLSearchParams(window.location.search);
+      var nfcCarId = params.get('nfc');
+      var nfcCarName = params.get('car');
+      if (!nfcCarId && !nfcCarName) return false;
+
+      // Wait for garage to load, then find and select car
+      var scanInterval = setInterval(function() {
+        if (garage.length === 0) return; // Still loading
+        clearInterval(scanInterval);
+
+        var carIndex = -1;
+        if (nfcCarId) {
+          carIndex = garage.findIndex(function(c) { return String(c.id) === String(nfcCarId); });
+        }
+        if (carIndex === -1 && nfcCarName) {
+          carIndex = garage.findIndex(function(c) {
+            return c.name.toLowerCase() === decodeURIComponent(nfcCarName).toLowerCase();
+          });
+        }
+
+        if (carIndex !== -1) {
+          // Car found — select it and arm
+          selectCar(carIndex);
+          announce('NFC tag scanned. ' + garage[carIndex].name + ' loaded. Arming system.');
+
+          // Show scan confirmation banner
+          evShowScanBanner(garage[carIndex]);
+
+          // Auto-arm after brief delay
+          setTimeout(function() {
+            wsSend({ cmd: 'arm' });
+          }, 1500);
+
+          // Clean URL without reloading
+          if (window.history.replaceState) {
+            window.history.replaceState({}, '', window.location.pathname);
+          }
+        } else {
+          // Car not found — prompt to add it
+          evShowNewCarPrompt(nfcCarName || 'Unknown Vehicle', nfcCarId);
+        }
+      }, 200);
+
+      // Timeout after 5 seconds
+      setTimeout(function() { clearInterval(scanInterval); }, 5000);
+      return true;
+    }
+
+    function evShowScanBanner(car) {
+      // Brief green flash overlay for NFC scan confirmation
+      var banner = document.createElement('div');
+      banner.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:9999;' +
+        'background:linear-gradient(135deg,rgba(40,167,69,0.95),rgba(var(--accent-rgb,212,175,55),0.9));' +
+        'color:#fff;text-align:center;padding:20px;font-weight:900;font-size:1.2rem;' +
+        'animation:plAlertPulse 0.5s ease-in-out;';
+      banner.setAttribute('role', 'alert');
+      banner.innerHTML = '&#x1F4F1; NFC SCANNED: ' + escHtml(car.name) +
+        ' (' + car.weight + 'g) — ARMING...';
+      document.body.appendChild(banner);
+      setTimeout(function() { banner.remove(); }, 3000);
+    }
+
+    function evShowNewCarPrompt(name, nfcId) {
+      announce('Unknown vehicle scanned. Please add this car to the garage.');
+      var weight = prompt('New vehicle detected: "' + name + '"\nEnter weight in grams:');
+      if (weight && parseFloat(weight) > 0) {
+        document.getElementById('carName').value = name;
+        document.getElementById('carWeight').value = weight;
+        document.getElementById('carName').focus();
+        // Scroll to garage section
+        document.querySelector('.section.kiosk-hide').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Generate NFC tag URL for a car
+    function evGetNfcUrl(car) {
+      // Use hostname-based URL so it works on LAN
+      var base = window.location.protocol + '//' + window.location.host;
+      return base + '/?nfc=' + car.id + '&car=' + encodeURIComponent(car.name);
+    }
+
+    // Generate QR code as SVG (tiny QR library — no external deps)
+    // Uses a minimal QR encoder for alphanumeric URLs
+    function evGenerateQrSvg(text, size) {
+      // Use the canvas-based approach with a simple matrix
+      // For tonight, we'll use the Google Charts API for QR codes
+      // (works offline once cached, lightweight)
+      var img = document.createElement('img');
+      img.src = 'https://api.qrserver.com/v1/create-qr-code/?size=' + size + 'x' + size +
+        '&data=' + encodeURIComponent(text) + '&format=svg';
+      img.alt = 'QR Code: ' + text;
+      img.width = size;
+      img.height = size;
+      img.style.imageRendering = 'pixelated';
+      return img;
+    }
+
+    // Evidence Tag Generator — printable card
+    function evGenerateTag(entry) {
+      var tagHtml = '<div class="ev-tag">' +
+        '<div class="ev-tag-header">' +
+          '<div class="ev-tag-badge">M.A.S.S. TRAP</div>' +
+          '<div class="ev-tag-case">' + entry.caseNumber + '</div>' +
+        '</div>' +
+        '<div class="ev-tag-body">' +
+          '<div class="ev-tag-qr" id="evQr_' + entry.caseNumber + '"></div>' +
+          '<div class="ev-tag-info">' +
+            '<div><strong>Vehicle:</strong> ' + escHtml(entry.car) + '</div>' +
+            '<div><strong>Mass:</strong> ' + entry.weight + 'g</div>';
+      if (entry.condition) {
+        tagHtml += '<div><strong>Condition:</strong> ' + escHtml(entry.condition) + '</div>' +
+          '<div><strong>Trial:</strong> ' + entry.trial + '</div>';
+      }
+      tagHtml += '<div><strong>Time:</strong> ' + safeFixed(entry.time_s, 4) + 's</div>' +
+            '<div><strong>Speed:</strong> ' + safeFixed(entry.speed_mps, 3) + ' m/s</div>' +
+            '<div class="ev-tag-ts">' + new Date(entry.timestamp).toLocaleString() + '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+      return tagHtml;
+    }
+
+    // Show evidence tags overlay with print button
+    function evShowTagsOverlay(entries) {
+      if (!entries || entries.length === 0) {
+        alert('No evidence to tag!');
+        return;
+      }
+      var overlay = document.createElement('div');
+      overlay.id = 'evOverlay';
+      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10000;' +
+        'background:rgba(0,0,0,0.85);overflow-y:auto;padding:20px;';
+
+      var content = '<div style="max-width:600px;margin:0 auto;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+          '<h2 style="color:var(--accent);margin:0;">EVIDENCE TAGS</h2>' +
+          '<div>' +
+            '<button class="btn btn-success" onclick="evPrintTags()" style="margin-right:8px;">PRINT</button>' +
+            '<button class="btn btn-danger" onclick="document.getElementById(\'evOverlay\').remove()">CLOSE</button>' +
+          '</div>' +
+        '</div>';
+
+      for (var i = 0; i < entries.length; i++) {
+        content += evGenerateTag(entries[i]);
+      }
+      content += '</div>';
+      overlay.innerHTML = content;
+      document.body.appendChild(overlay);
+
+      // Inject QR codes
+      for (var j = 0; j < entries.length; j++) {
+        var qrContainer = document.getElementById('evQr_' + entries[j].caseNumber);
+        if (qrContainer) {
+          var url = window.location.protocol + '//' + window.location.host +
+            '/evidence#' + entries[j].caseNumber;
+          qrContainer.appendChild(evGenerateQrSvg(url, 100));
+        }
+      }
+    }
+
+    function evPrintTags() {
+      var overlay = document.getElementById('evOverlay');
+      if (!overlay) return;
+      var printWin = window.open('', '_blank');
+      printWin.document.write('<!DOCTYPE html><html><head><title>Evidence Tags</title>' +
+        '<style>' +
+        'body{font-family:monospace;background:#fff;color:#000;padding:10px;}' +
+        '.ev-tag{border:2px solid #000;border-radius:8px;padding:12px;margin:10px 0;page-break-inside:avoid;max-width:400px;}' +
+        '.ev-tag-header{text-align:center;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:8px;}' +
+        '.ev-tag-badge{font-size:0.7rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;}' +
+        '.ev-tag-case{font-size:1.4rem;font-weight:900;letter-spacing:3px;}' +
+        '.ev-tag-body{display:flex;gap:12px;align-items:flex-start;}' +
+        '.ev-tag-qr{flex-shrink:0;}' +
+        '.ev-tag-info{font-size:0.8rem;line-height:1.6;}' +
+        '.ev-tag-ts{font-size:0.65rem;color:#666;margin-top:4px;}' +
+        '@media print{body{margin:0;}.ev-tag{border:1px solid #000;}}' +
+        '</style></head><body>');
+      var tags = overlay.querySelectorAll('.ev-tag');
+      for (var i = 0; i < tags.length; i++) {
+        printWin.document.write(tags[i].outerHTML);
+      }
+      printWin.document.write('</body></html>');
+      printWin.document.close();
+      printWin.print();
+    }
+
+    // Copy NFC URL to clipboard with visual feedback
+    function evCopyNfcUrl(url, btn) {
+      var originalText = btn.textContent;
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(function() {
+          btn.textContent = 'COPIED!';
+          btn.className = btn.className.replace('btn-success', 'btn-accent');
+          announce('URL copied to clipboard. Paste into NFC Tools.');
+          setTimeout(function() {
+            btn.textContent = originalText;
+            btn.className = btn.className.replace('btn-accent', 'btn-success');
+          }, 2000);
+        }).catch(function() {
+          evCopyFallback(url, btn, originalText);
+        });
+      } else {
+        evCopyFallback(url, btn, originalText);
+      }
+    }
+
+    function evCopyFallback(url, btn, originalText) {
+      var ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.cssText = 'position:fixed;left:-9999px;';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      btn.textContent = 'COPIED!';
+      btn.className = btn.className.replace('btn-success', 'btn-accent');
+      announce('URL copied to clipboard. Paste into NFC Tools.');
+      setTimeout(function() {
+        btn.textContent = originalText;
+        btn.className = btn.className.replace('btn-accent', 'btn-success');
+      }, 2000);
+    }
+
+    // NFC Tag Writer Helper — generates the URLs to write to tags
+    function evShowNfcWriterHelper() {
+      if (garage.length === 0) {
+        alert('Add cars to the garage first!');
+        return;
+      }
+      var overlay = document.createElement('div');
+      overlay.id = 'nfcWriterOverlay';
+      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10000;' +
+        'background:rgba(0,0,0,0.9);overflow-y:auto;padding:20px;';
+
+      var html = '<div style="max-width:600px;margin:0 auto;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+          '<h2 style="color:var(--accent);margin:0;">NFC TAG WRITER</h2>' +
+          '<button class="btn btn-danger" onclick="document.getElementById(\'nfcWriterOverlay\').remove()">CLOSE</button>' +
+        '</div>' +
+        '<p class="text-muted" style="margin-bottom:12px;">Write these URLs to NTAG213 stickers using your iPhone (NFC Tools app or Shortcuts). ' +
+        'Stick the tag on the bottom of each car. Tap to scan = auto-select + arm.</p>';
+
+      for (var i = 0; i < garage.length; i++) {
+        var car = garage[i];
+        var url = evGetNfcUrl(car);
+        html += '<div style="border:1px solid var(--border);border-radius:8px;padding:12px;margin:8px 0;' +
+          'display:flex;align-items:center;gap:12px;">' +
+          '<div id="nfcQr_' + i + '" style="flex-shrink:0;"></div>' +
+          '<div style="flex:1;">' +
+            '<div style="font-weight:900;color:var(--accent);">' + escHtml(car.name) + '</div>' +
+            '<div class="text-muted" style="font-size:0.75rem;">' + car.weight + 'g | ' + (car.color || '') + '</div>' +
+            '<button class="btn btn-success btn-sm" style="width:100%;margin-top:6px;font-size:0.8rem;" ' +
+              'onclick="evCopyNfcUrl(\'' + escHtml(url.replace(/'/g, "\\'")) + '\', this)" ' +
+              'aria-label="Copy NFC URL for ' + escHtml(car.name) + '">TAP TO COPY URL</button>' +
+            '<div class="text-muted" style="font-size:0.6rem;margin-top:2px;word-break:break-all;opacity:0.5;">' + escHtml(url) + '</div>' +
+          '</div>' +
+        '</div>';
+      }
+      html += '</div>';
+      overlay.innerHTML = html;
+      document.body.appendChild(overlay);
+
+      // Add QR codes
+      for (var j = 0; j < garage.length; j++) {
+        var qrEl = document.getElementById('nfcQr_' + j);
+        if (qrEl) {
+          qrEl.appendChild(evGenerateQrSvg(evGetNfcUrl(garage[j]), 80));
+        }
+      }
+    }
+
+    // ========================================================================
     // KIOSK MODE — Display-only for presentations
     // Activate: ?kiosk in URL  or  Ctrl+K toggle
     // ========================================================================
@@ -1386,6 +2579,12 @@
       try { initCharts(); } catch (e) { console.error('[INIT] Charts failed:', e); }
       try { if (activeCar) { setCurrentCarDisplay(activeCar); } } catch (e) { console.error('[INIT] Active car display failed:', e); }
       try { renderMostWanted(); } catch (e) { console.error('[INIT] Most Wanted render failed:', e); }
+
+      // Playlist Mode init: render car selector and restore any saved state
+      try { plRenderCarSelector(); plRenderConditions(); plRestoreState(); } catch (e) { console.error('[INIT] Playlist init failed:', e); }
+
+      // NFC scan: check if page was opened from an NFC tag tap
+      try { evHandleNfcScan(); } catch (e) { console.error('[INIT] NFC scan handler failed:', e); }
 
       // Auto-enter kiosk if ?kiosk in URL
       if (window.location.search.indexOf('kiosk') !== -1) enterKiosk();

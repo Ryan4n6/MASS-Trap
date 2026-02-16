@@ -128,8 +128,14 @@ var wsReconnectAttempts = 0;
 
 function connectWebSocket() {
   // Protocol-aware: use wss:// when loaded over HTTPS (e.g. Tailscale Funnel)
+  // When behind a reverse proxy (Tailscale Funnel, nginx, etc.), the WS port
+  // may differ from the ESP32's native :81. Use ?ws_port=N or auto-detect:
+  //   - Local/LAN: ws://hostname:81
+  //   - HTTPS proxy: wss://hostname:8443 (Funnel maps 8443→81)
   var proto = (location.protocol === 'https:') ? 'wss://' : 'ws://';
-  var wsUrl = proto + window.location.hostname + ':81';
+  var params = new URLSearchParams(window.location.search);
+  var wsPort = params.get('ws_port') || (location.protocol === 'https:' ? '8443' : '81');
+  var wsUrl = proto + window.location.hostname + ':' + wsPort;
 
   try {
     ws = new WebSocket(wsUrl);

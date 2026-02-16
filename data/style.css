@@ -41,7 +41,7 @@
 [data-theme="classic"] {
   --bg:           #FF4400;
   --bg-card:      #ffffff;
-  --bg-dark:      #cc3300;
+  --bg-dark:      #f0f0f0;
   --bg-input:     #ffffff;
   --border:       #007ACC;
   --accent:       #FFCC00;
@@ -576,6 +576,14 @@ body {
   border-radius: 5px;
   border: 2px solid rgba(0,0,0,0.3);
 }
+/* Classic: NUKE remaining --bg-dark (#cc3300) pumpkin from system pages */
+[data-theme="classic"] select option { background: white; color: #333; }
+[data-theme="classic"] .speed-bar-fill { background: #e9ecef; }
+[data-theme="classic"] .file-item { background: white; border: 1px solid #ddd; }
+[data-theme="classic"] .info-card { background: white; border: 2px solid var(--secondary); }
+[data-theme="classic"] .save-bar { background: #000; border-top: 3px solid var(--accent); }
+[data-theme="classic"] .lidar-bar-container { background: #e9ecef; }
+[data-theme="classic"] .console-status-bar { background: #000; color: #ccc; }
 
 /* Daytona: Asphalt texture with bold tire skid marks */
 [data-theme="daytona"] body {
