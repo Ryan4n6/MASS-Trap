@@ -19,6 +19,7 @@
 #include <NetworkClientSecure.h>
 #include <Update.h>
 #include <esp_mac.h>
+#include <Wire.h>
 
 WebServer server(80);
 WebSocketsServer webSocket(81);
@@ -626,6 +627,265 @@ static void handleApiVersion() {
 #else
   doc["board"] = "Unknown";
 #endif
+
+  String output;
+  serializeJson(doc, output);
+  server.send(200, "application/json", output);
+}
+
+// ============================================================================
+// HARDWARE DIAGNOSTICS — Remote CODE 3 Troubleshooting
+// ============================================================================
+// Comprehensive system health check for remote support. Reports pin states,
+// I2C bus scan, memory, radio, filesystem, and peripheral status.
+// Available in BOTH normal mode and setup mode — helps builders verify wiring
+// before and after configuration.
+static void handleApiDiagnostics() {
+  DynamicJsonDocument doc(4096);
+
+  // ---- SYSTEM INFO ----
+  JsonObject sys = doc.createNestedObject("system");
+  sys["firmware"] = FIRMWARE_VERSION;
+  sys["role"] = cfg.role;
+  sys["hostname"] = cfg.hostname;
+  sys["uptime_s"] = millis() / 1000;
+  sys["uptime_str"] = String(millis() / 3600000) + "h " +
+                      String((millis() / 60000) % 60) + "m " +
+                      String((millis() / 1000) % 60) + "s";
+#if CONFIG_IDF_TARGET_ESP32S3
+  sys["board"] = "ESP32-S3";
+#elif CONFIG_IDF_TARGET_ESP32
+  sys["board"] = "ESP32";
+#else
+  sys["board"] = "Unknown";
+#endif
+  sys["cpu_freq_mhz"] = ESP.getCpuFreqMHz();
+  sys["flash_size"] = ESP.getFlashChipSize();
+  sys["flash_speed"] = ESP.getFlashChipSpeed();
+  sys["sdk"] = ESP.getSdkVersion();
+
+  // ---- MEMORY ----
+  JsonObject mem = doc.createNestedObject("memory");
+  mem["free_heap"] = ESP.getFreeHeap();
+  mem["min_free_heap"] = ESP.getMinFreeHeap();
+  mem["max_alloc_heap"] = ESP.getMaxAllocHeap();
+  mem["total_heap"] = ESP.getHeapSize();
+  mem["heap_pct_free"] = (ESP.getHeapSize() > 0)
+    ? (int)(100.0 * ESP.getFreeHeap() / ESP.getHeapSize()) : 0;
+#ifdef BOARD_HAS_PSRAM
+  mem["psram_total"] = ESP.getPsramSize();
+  mem["psram_free"] = ESP.getFreePsram();
+  mem["psram_pct_free"] = (ESP.getPsramSize() > 0)
+    ? (int)(100.0 * ESP.getFreePsram() / ESP.getPsramSize()) : 0;
+#else
+  mem["psram_total"] = 0;
+  mem["psram_free"] = 0;
+#endif
+
+  // ---- FILESYSTEM ----
+  JsonObject fs = doc.createNestedObject("filesystem");
+  fs["total_bytes"] = LittleFS.totalBytes();
+  fs["used_bytes"] = LittleFS.usedBytes();
+  fs["free_bytes"] = LittleFS.totalBytes() - LittleFS.usedBytes();
+  fs["pct_used"] = (LittleFS.totalBytes() > 0)
+    ? (int)(100.0 * LittleFS.usedBytes() / LittleFS.totalBytes()) : 0;
+
+  // ---- WIFI ----
+  JsonObject wifi = doc.createNestedObject("wifi");
+  wifi["mode"] = (WiFi.getMode() == WIFI_AP) ? "AP" :
+                 (WiFi.getMode() == WIFI_STA) ? "STA" :
+                 (WiFi.getMode() == WIFI_AP_STA) ? "AP_STA" : "OFF";
+  wifi["sta_connected"] = (WiFi.status() == WL_CONNECTED);
+  wifi["sta_ip"] = WiFi.localIP().toString();
+  wifi["sta_ssid"] = cfg.wifi_ssid;
+  wifi["rssi"] = WiFi.RSSI();
+  wifi["signal_quality"] = constrain(2 * (WiFi.RSSI() + 100), 0, 100);  // -100=0%, -50=100%
+  wifi["channel"] = WiFi.channel();
+  wifi["mac_sta"] = WiFi.macAddress();
+  wifi["ap_ip"] = WiFi.softAPIP().toString();
+  wifi["ap_clients"] = WiFi.softAPgetStationNum();
+
+  // ---- ESP-NOW / PEERS ----
+  JsonObject radio = doc.createNestedObject("espnow");
+  radio["peer_connected"] = peerConnected;
+  radio["peer_count"] = peerCount;
+  radio["clock_offset_us"] = (double)clockOffset_us;  // Cast for JSON precision
+  JsonArray peerList = radio.createNestedArray("peers");
+  for (int i = 0; i < peerCount && i < MAX_PEERS; i++) {
+    JsonObject p = peerList.createNestedObject();
+    p["role"] = peers[i].role;
+    p["hostname"] = peers[i].hostname;
+    p["mac"] = formatMac(peers[i].mac);
+    p["paired"] = peers[i].paired;
+    unsigned long ago = millis() - peers[i].lastSeen;
+    p["last_seen_ms"] = ago;
+    p["status"] = (ago < PEER_ONLINE_THRESH_MS) ? "ONLINE" :
+                  (ago < PEER_STALE_THRESH_MS) ? "STALE" : "OFFLINE";
+  }
+
+  // ---- RACE STATE ----
+  JsonObject race = doc.createNestedObject("race");
+  const char* stateNames[] = {"IDLE", "ARMED", "RACING", "FINISHED"};
+  race["state"] = stateNames[(int)raceState];
+  race["dry_run"] = dryRunMode;
+  race["total_runs"] = totalRuns;
+  race["current_car"] = currentCar;
+  race["current_weight"] = currentWeight;
+
+  // ---- PIN CONFIGURATION ----
+  JsonObject pins = doc.createNestedObject("pins");
+
+  // IR Sensor (primary)
+  JsonObject irPin = pins.createNestedObject("ir_sensor");
+  irPin["gpio"] = cfg.sensor_pin;
+  irPin["configured"] = (cfg.sensor_pin > 0);
+  if (cfg.sensor_pin > 0) {
+    pinMode(cfg.sensor_pin, INPUT);
+    irPin["state"] = digitalRead(cfg.sensor_pin) ? "HIGH" : "LOW";
+    irPin["expected_idle"] = "HIGH (beam unbroken)";
+    irPin["ok"] = (digitalRead(cfg.sensor_pin) == HIGH);
+  }
+
+  // IR Sensor 2 (speed trap)
+  if (cfg.sensor_pin_2 > 0) {
+    JsonObject ir2Pin = pins.createNestedObject("ir_sensor_2");
+    ir2Pin["gpio"] = cfg.sensor_pin_2;
+    pinMode(cfg.sensor_pin_2, INPUT);
+    ir2Pin["state"] = digitalRead(cfg.sensor_pin_2) ? "HIGH" : "LOW";
+    ir2Pin["expected_idle"] = "HIGH (beam unbroken)";
+    ir2Pin["ok"] = (digitalRead(cfg.sensor_pin_2) == HIGH);
+  }
+
+  // LED pin
+  JsonObject ledPin = pins.createNestedObject("led");
+  ledPin["gpio"] = cfg.led_pin;
+  ledPin["configured"] = (cfg.led_pin > 0);
+
+  // Audio pins
+  if (cfg.audio_enabled) {
+    JsonObject audio = pins.createNestedObject("audio");
+    audio["enabled"] = true;
+    audio["bclk_gpio"] = cfg.i2s_bclk_pin;
+    audio["lrc_gpio"] = cfg.i2s_lrc_pin;
+    audio["dout_gpio"] = cfg.i2s_dout_pin;
+    audio["volume"] = cfg.audio_volume;
+    audio["playing"] = isPlaying();
+  }
+
+  // LiDAR pins
+  if (cfg.lidar_enabled) {
+    JsonObject lidar = pins.createNestedObject("lidar");
+    lidar["enabled"] = true;
+    lidar["rx_gpio"] = cfg.lidar_rx_pin;
+    lidar["tx_gpio"] = cfg.lidar_tx_pin;
+    lidar["threshold_mm"] = cfg.lidar_threshold_mm;
+    lidar["distance_mm"] = getDistanceMM();
+    const char* lidarStates[] = {"NO_CAR", "CAR_STAGED", "CAR_LAUNCHED"};
+    lidar["state"] = lidarStates[(int)getLidarState()];
+    lidar["ok"] = (getDistanceMM() > 0);  // 0 = no reading = possible wiring issue
+  }
+
+  // ---- I2C BUS SCAN ----
+  // Scans the default I2C bus (SDA/SCL from board defaults) for connected devices.
+  // This catches BNO055, OLED displays, BME280, or any other I2C peripheral.
+  JsonObject i2c = doc.createNestedObject("i2c");
+  Wire.begin();  // Initialize with default SDA/SCL for the board
+  JsonArray devices = i2c.createNestedArray("devices");
+  int deviceCount = 0;
+  for (uint8_t addr = 1; addr < 127; addr++) {
+    Wire.beginTransmission(addr);
+    uint8_t err = Wire.endTransmission();
+    if (err == 0) {
+      JsonObject dev = devices.createNestedObject();
+      char addrHex[8];
+      snprintf(addrHex, sizeof(addrHex), "0x%02X", addr);
+      dev["address"] = addrHex;
+      // Identify well-known addresses
+      const char* name = "Unknown";
+      if (addr == 0x28 || addr == 0x29) name = "BNO055 IMU";
+      else if (addr == 0x3C || addr == 0x3D) name = "SSD1306 OLED";
+      else if (addr == 0x76 || addr == 0x77) name = "BME280/BMP280";
+      else if (addr == 0x68 || addr == 0x69) name = "MPU6050/DS3231";
+      else if (addr == 0x48) name = "ADS1115 ADC";
+      else if (addr == 0x50) name = "AT24C EEPROM";
+      else if (addr == 0x27 || addr == 0x3F) name = "PCF8574 I/O Expander";
+      else if (addr == 0x20) name = "PCF8574A I/O Expander";
+      dev["device"] = name;
+      deviceCount++;
+    }
+  }
+  Wire.end();  // Release I2C bus
+  i2c["device_count"] = deviceCount;
+
+  // ---- WLED INTEGRATION ----
+  if (strlen(cfg.wled_host) > 0) {
+    JsonObject wled = doc.createNestedObject("wled");
+    wled["host"] = cfg.wled_host;
+    // Quick reachability check (50ms timeout — don't block long)
+    HTTPClient http;
+    http.begin("http://" + String(cfg.wled_host) + "/json/info");
+    http.setTimeout(500);
+    int code = http.GET();
+    wled["reachable"] = (code == 200);
+    wled["http_code"] = code;
+    http.end();
+  }
+
+  // ---- CONFIG SUMMARY ----
+  JsonObject config = doc.createNestedObject("config");
+  config["configured"] = cfg.configured;
+  config["version"] = cfg.version;
+  config["network_mode"] = cfg.network_mode;
+  config["track_length_m"] = cfg.track_length_m;
+  config["scale_factor"] = cfg.scale_factor;
+  config["units"] = cfg.units;
+  config["audio_enabled"] = cfg.audio_enabled;
+  config["lidar_enabled"] = cfg.lidar_enabled;
+  config["has_wled"] = (strlen(cfg.wled_host) > 0);
+  config["has_viewer_auth"] = (strlen(cfg.viewer_password) > 0);
+
+  // ---- VERDICT ----
+  // Quick pass/fail summary for the wiring wizard "Verify Connection" button
+  JsonObject verdict = doc.createNestedObject("verdict");
+  int issues = 0;
+  JsonArray problems = verdict.createNestedArray("issues");
+
+  // Check IR sensor
+  if (cfg.sensor_pin > 0) {
+    pinMode(cfg.sensor_pin, INPUT);
+    if (digitalRead(cfg.sensor_pin) == LOW) {
+      problems.add("IR sensor (GPIO " + String(cfg.sensor_pin) + ") reads LOW — beam blocked or disconnected");
+      issues++;
+    }
+  }
+
+  // Check memory health
+  if (ESP.getFreeHeap() < 50000) {
+    problems.add("Low heap memory: " + String(ESP.getFreeHeap()) + " bytes free");
+    issues++;
+  }
+
+  // Check filesystem
+  if (LittleFS.totalBytes() - LittleFS.usedBytes() < 100000) {
+    problems.add("Low filesystem space: " + String(LittleFS.totalBytes() - LittleFS.usedBytes()) + " bytes free");
+    issues++;
+  }
+
+  // Check WiFi signal
+  if (WiFi.status() == WL_CONNECTED && WiFi.RSSI() < -80) {
+    problems.add("Weak WiFi signal: " + String(WiFi.RSSI()) + " dBm");
+    issues++;
+  }
+
+  // Check LiDAR if enabled
+  if (cfg.lidar_enabled && getDistanceMM() == 0) {
+    problems.add("LiDAR enabled but no reading — check RX/TX wiring (GPIO " +
+                 String(cfg.lidar_rx_pin) + "/" + String(cfg.lidar_tx_pin) + ")");
+    issues++;
+  }
+
+  verdict["issue_count"] = issues;
+  verdict["status"] = (issues == 0) ? "ALL CLEAR" : "ISSUES DETECTED";
 
   String output;
   serializeJson(doc, output);
@@ -1345,6 +1605,7 @@ void initWebServer() {
   server.on("/api/info", HTTP_GET, handleApiInfo);
   server.on("/api/wifi-status", HTTP_GET, handleApiWifiStatus);
   server.on("/api/version", HTTP_GET, handleApiVersion);
+  server.on("/api/diagnostics", HTTP_GET, handleApiDiagnostics);
   server.on("/api/peers", HTTP_GET, handleApiPeers);
   server.on("/api/peers/forget", HTTP_POST, handleApiPeersForget);
   server.on("/api/garage", HTTP_GET, handleApiGarage);
@@ -1474,6 +1735,7 @@ void initSetupServer() {
   server.on("/api/mac", HTTP_GET, handleApiMac);
   server.on("/api/info", HTTP_GET, handleApiInfo);
   server.on("/api/wifi-status", HTTP_GET, handleApiWifiStatus);
+  server.on("/api/diagnostics", HTTP_GET, handleApiDiagnostics);
 
   // ---- Captive portal detection handlers ----
   // Explicit handlers for OS-level probe URLs ensure reliable detection.
