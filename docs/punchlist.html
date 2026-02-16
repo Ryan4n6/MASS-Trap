@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>M.A.S.S. Trap — Photo Punchlist</title>
+<style>
+:root{
+  --bg:#0a1628;--card:#111d33;--text:#e0e0e0;--gold:#d4af37;--green:#28a745;
+  --red:#dc3545;--orange:#ff6600;--blue:#4a9eff;--border:#1e3a5f;
+  --font:'SF Pro Text',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background:var(--bg);color:var(--text);
+  padding:0 0 100px 0;-webkit-tap-highlight-color:transparent;
+  -webkit-text-size-adjust:100%}
+
+/* === HEADER === */
+.header{position:sticky;top:0;z-index:100;background:var(--bg);
+  border-bottom:2px solid var(--gold);padding:12px 16px;
+  display:flex;align-items:center;justify-content:space-between}
+.header h1{font-size:1rem;color:var(--gold);letter-spacing:1px}
+.progress-pill{background:var(--card);border:1px solid var(--border);
+  border-radius:20px;padding:4px 12px;font-size:0.75rem;color:var(--text)}
+.progress-pill .done{color:var(--green);font-weight:700}
+.progress-pill .total{color:var(--gold)}
+
+/* === FILTERS === */
+.filters{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;
+  -webkit-overflow-scrolling:touch;scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.filter-btn{flex-shrink:0;padding:6px 14px;border-radius:20px;border:1px solid var(--border);
+  background:var(--card);color:var(--text);font-size:0.75rem;font-family:var(--font);
+  cursor:pointer;transition:all 0.2s}
+.filter-btn.active{background:var(--gold);color:#000;border-color:var(--gold);font-weight:600}
+
+/* === SECTION HEADERS === */
+.section-header{padding:14px 16px 6px;font-size:0.7rem;letter-spacing:2px;
+  color:var(--gold);text-transform:uppercase;font-weight:700;
+  position:sticky;top:52px;background:var(--bg);z-index:50}
+.section-count{float:right;color:var(--text);font-weight:400;opacity:0.5}
+
+/* === SHOT CARDS === */
+.shot{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;
+  border-bottom:1px solid rgba(255,255,255,0.05);transition:opacity 0.3s}
+.shot.completed{opacity:0.4}
+.shot.completed .shot-title{text-decoration:line-through}
+
+.shot-check{flex-shrink:0;width:28px;height:28px;border-radius:8px;
+  border:2px solid var(--border);background:var(--card);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  font-size:0.85rem;transition:all 0.2s;margin-top:2px}
+.shot-check.done{background:var(--green);border-color:var(--green);color:#fff}
+
+.shot-body{flex:1;min-width:0}
+.shot-title{font-size:0.85rem;font-weight:600;color:#fff;margin-bottom:2px}
+.shot-desc{font-size:0.75rem;color:var(--text);opacity:0.7;line-height:1.4}
+.shot-meta{display:flex;gap:8px;margin-top:4px;flex-wrap:wrap}
+.shot-tag{font-size:0.65rem;padding:2px 8px;border-radius:10px;
+  background:rgba(74,158,255,0.15);color:var(--blue)}
+.shot-tag.hw{background:rgba(255,102,0,0.15);color:var(--orange)}
+.shot-tag.screen{background:rgba(40,167,69,0.15);color:var(--green)}
+.shot-tag.priority{background:rgba(220,53,69,0.15);color:var(--red);font-weight:600}
+
+.shot-id{font-size:0.6rem;color:var(--gold);opacity:0.5;font-family:'SF Mono',monospace;
+  margin-top:3px}
+
+/* === URL INPUT === */
+.shot-url{margin-top:6px;display:flex;gap:6px}
+.shot-url input{flex:1;background:var(--card);border:1px solid var(--border);
+  border-radius:8px;padding:6px 10px;color:var(--text);font-size:0.75rem;
+  font-family:var(--font)}
+.shot-url input::placeholder{color:rgba(255,255,255,0.3)}
+.shot-url input:focus{outline:none;border-color:var(--gold)}
+.shot-url button{flex-shrink:0;background:var(--gold);color:#000;border:none;
+  border-radius:8px;padding:6px 12px;font-size:0.7rem;font-weight:600;
+  font-family:var(--font);cursor:pointer}
+
+/* === BOTTOM BAR === */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;
+  background:var(--card);border-top:1px solid var(--border);
+  padding:10px 16px;display:flex;gap:8px;z-index:200;
+  padding-bottom:max(10px, env(safe-area-inset-bottom))}
+.bottom-bar button{flex:1;padding:10px;border-radius:10px;border:none;
+  font-family:var(--font);font-size:0.8rem;font-weight:600;cursor:pointer}
+.btn-export{background:var(--gold);color:#000}
+.btn-reset{background:var(--card);color:var(--red);border:1px solid var(--red) !important}
+
+/* === PROGRESS BAR === */
+.progress-bar-wrap{padding:8px 16px}
+.progress-bar{height:4px;background:var(--card);border-radius:4px;overflow:hidden}
+.progress-bar-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));
+  transition:width 0.5s ease;border-radius:4px}
+
+/* === NAMING CONVENTION === */
+.convention{margin:12px 16px;padding:12px 14px;background:var(--card);
+  border:1px solid var(--border);border-radius:10px;font-size:0.75rem;line-height:1.6}
+.convention code{background:rgba(212,175,55,0.15);color:var(--gold);
+  padding:1px 6px;border-radius:4px;font-size:0.7rem}
+.convention h3{font-size:0.7rem;letter-spacing:1.5px;color:var(--gold);
+  text-transform:uppercase;margin-bottom:6px}
+
+/* hide completed toggle */
+.hide-done .shot.completed{display:none}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>PHOTO PUNCHLIST</h1>
+  <div class="progress-pill"><span class="done" id="doneCount">0</span> / <span class="total" id="totalCount">0</span></div>
+</div>
+
+<div class="progress-bar-wrap">
+  <div class="progress-bar"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+</div>
+
+<div class="filters" id="filters">
+  <button class="filter-btn active" onclick="setFilter('all')">All</button>
+  <button class="filter-btn" onclick="setFilter('pending')">Pending</button>
+  <button class="filter-btn" onclick="setFilter('readme')">README</button>
+  <button class="filter-btn" onclick="setFilter('wizard')">Wizard</button>
+  <button class="filter-btn" onclick="setFilter('guide')">Guides</button>
+  <button class="filter-btn" onclick="setFilter('hw')">Hardware</button>
+  <button class="filter-btn" onclick="setFilter('screen')">Screenshots</button>
+</div>
+
+<div class="convention">
+  <h3>Naming Convention</h3>
+  All photos follow: <code>mass-{section}-{id}.jpg</code><br>
+  ImgBB album: <strong>MASS-Trap-Docs</strong><br>
+  Example: <code>mass-readme-interceptor-theme.jpg</code><br>
+  Every URL in code uses <code>MASS_IMG_{ID}</code> placeholder &mdash; one <code>sed</code> pass swaps all.
+</div>
+
+<div id="shotList"></div>
+
+<div class="bottom-bar">
+  <button class="btn-export" onclick="exportJSON()">Export JSON</button>
+  <button class="btn-reset" onclick="resetAll()">Reset</button>
+</div>
+
+<script>
+var SHOTS = [
+  // ===== README SCREENSHOTS =====
+  {id:"readme-interceptor-theme",section:"readme",title:"Interceptor Theme (Default)",
+   desc:"Full dashboard in Interceptor theme — navy/gold. Show header, status banner, ARM/RESET buttons, physics cards. This is the hero image.",
+   tags:["screen","priority"],page:"README.md"},
+  {id:"readme-classic-theme",section:"readme",title:"Classic Theme (Hot Wheels Orange)",
+   desc:"Same dashboard view but in Classic theme — orange/white retro Hot Wheels feel.",
+   tags:["screen"],page:"README.md"},
+  {id:"readme-casefile-theme",section:"readme",title:"Case File Theme (Detective)",
+   desc:"Dashboard in Case File theme — dark manila/detective folder aesthetic.",
+   tags:["screen"],page:"README.md"},
+  {id:"readme-daytona-theme",section:"readme",title:"Daytona Theme (NASCAR)",
+   desc:"Dashboard in Daytona theme — racing stripes, speedway colors.",
+   tags:["screen"],page:"README.md"},
+  {id:"readme-cyber-theme",section:"readme",title:"Cyber Theme (Terminal Green)",
+   desc:"Dashboard in Cyber theme — green-on-black terminal hacker vibe.",
+   tags:["screen"],page:"README.md"},
+  {id:"readme-race-result",section:"readme",title:"Race Result Display",
+   desc:"Dashboard after a race finishes — show TIME, SPEED, SCALE SPEED, MOMENTUM, KE all populated with real data. Any theme.",
+   tags:["screen","priority"],page:"README.md"},
+  {id:"readme-leaderboard",section:"readme",title:"Leaderboard Overlay",
+   desc:"The Lead Sled leaderboard podium overlay after a new record. Shows ranking animation.",
+   tags:["screen"],page:"README.md"},
+  {id:"readme-garage",section:"readme",title:"Garage / Car Database",
+   desc:"Garage tab showing car entries with weights, notes, and edit buttons.",
+   tags:["screen"],page:"README.md"},
+  {id:"readme-config",section:"readme",title:"System Config Page",
+   desc:"Config page showing WiFi, pin assignments, peer discovery. Shows the tabbed interface.",
+   tags:["screen"],page:"README.md"},
+  {id:"readme-console",section:"readme",title:"Debug Console",
+   desc:"Console page showing timestamped serial log and file browser.",
+   tags:["screen"],page:"README.md"},
+  {id:"readme-mobile",section:"readme",title:"Mobile Dashboard View",
+   desc:"Dashboard on iPhone/mobile — showing the bottom thumb bar navigation and responsive layout.",
+   tags:["screen","priority"],page:"README.md"},
+  {id:"readme-kiosk",section:"readme",title:"Kiosk Mode (Science Fair Display)",
+   desc:"Dashboard in kiosk mode (?kiosk) — controls hidden, data-only presentation view.",
+   tags:["screen"],page:"README.md"},
+
+  // ===== HARDWARE PHOTOS =====
+  {id:"hw-finish-gate-assembled",section:"hw",title:"Finish Gate — Assembled Board",
+   desc:"Top-down photo of the finish gate ESP32 with all wires connected (current Dupont state). Label visible components.",
+   tags:["hw","priority"],page:"README.md, wizard.html"},
+  {id:"hw-start-gate-assembled",section:"hw",title:"Start Gate — Assembled Board",
+   desc:"Top-down photo of start gate ESP32 with IR sensor and LiDAR connected.",
+   tags:["hw"],page:"README.md, wizard.html"},
+  {id:"hw-speedtrap-assembled",section:"hw",title:"Speed Trap — Dual IR Setup",
+   desc:"Speed trap node showing both IR sensors ~10cm apart on the track.",
+   tags:["hw"],page:"README.md, wizard.html"},
+  {id:"hw-ir-sensor-closeup",section:"hw",title:"IR Break-Beam Sensor Closeup",
+   desc:"Clear closeup of the IR sensor — show the emitter and receiver, the beam path across the track.",
+   tags:["hw"],page:"wizard.html, parents-guide.html"},
+  {id:"hw-tf-luna-lidar",section:"hw",title:"TF-Luna LiDAR Module",
+   desc:"Closeup of the Benewake TF-Luna showing UART pins and lens. Include something for scale.",
+   tags:["hw"],page:"wizard.html"},
+  {id:"hw-max98357a-amp",section:"hw",title:"MAX98357A Audio Amplifier",
+   desc:"The I2S amp board showing pin labels (BCLK, LRC, DIN, VIN, GND). Include speaker if connected.",
+   tags:["hw"],page:"wizard.html"},
+  {id:"hw-esp32s3-bare",section:"hw",title:"ESP32-S3 N16R8 — Bare Board",
+   desc:"Clean shot of a bare ESP32-S3 DevKit board before any wires. Top-down, pin labels visible.",
+   tags:["hw","priority"],page:"wizard.html, store.html"},
+  {id:"hw-terminal-block-shield",section:"hw",title:"Meshnology Terminal Block Shield",
+   desc:"The terminal block shield before ESP32 is seated. Show the screw terminals clearly.",
+   tags:["hw"],page:"parents-guide.html"},
+  {id:"hw-terminal-block-seated",section:"hw",title:"ESP32 Seated in Terminal Block",
+   desc:"ESP32 fully seated in the terminal block shield. Show all 38 pins aligned.",
+   tags:["hw"],page:"parents-guide.html"},
+  {id:"hw-wled-strip",section:"hw",title:"WLED LED Strip",
+   desc:"BTF LED strip powered on with an effect running. Show the glow along the track.",
+   tags:["hw"],page:"README.md"},
+  {id:"hw-full-track-setup",section:"hw",title:"Full Track — Wide Shot",
+   desc:"The entire track setup from above — start gate at top, finish gate at bottom, LEDs along the side. The hero hardware shot.",
+   tags:["hw","priority"],page:"README.md, index.html"},
+  {id:"hw-track-start-gate",section:"hw",title:"Start Gate on Track",
+   desc:"Start gate mounted/positioned at the top of the track. Show the IR sensor crossing the lanes.",
+   tags:["hw"],page:"wizard.html"},
+  {id:"hw-track-finish-gate",section:"hw",title:"Finish Gate on Track",
+   desc:"Finish gate at the bottom of the track with IR sensor across the lanes.",
+   tags:["hw"],page:"wizard.html"},
+  {id:"hw-nfc-sticker-on-car",section:"hw",title:"NFC Sticker on Hot Wheels Car",
+   desc:"NTAG213 sticker applied to the bottom of a Hot Wheels car. Show how small it is.",
+   tags:["hw"],page:"README.md"},
+  {id:"hw-scale-weighing-car",section:"hw",title:"Milligram Scale Weighing Car",
+   desc:"Car on the precision scale showing weight to 3 decimal places (e.g., 38.025g).",
+   tags:["hw"],page:"README.md, science_fair_report.html"},
+  {id:"hw-tungsten-weights",section:"hw",title:"Tungsten Weights for Experiments",
+   desc:"The tungsten weights (14g, 7g, 3.5g) next to a Hot Wheels car for scale comparison.",
+   tags:["hw"],page:"store.html"},
+
+  // ===== BUILD WIZARD GUIDE =====
+  {id:"wizard-wiring-ir-finish",section:"wizard",title:"Wiring: IR Sensor to Finish Gate",
+   desc:"Step-by-step wire routing — IR signal to GPIO 4, VCC to 3V3/5V, GND to GND. Show actual wires.",
+   tags:["hw"],page:"wizard.html"},
+  {id:"wizard-wiring-lidar",section:"wizard",title:"Wiring: TF-Luna LiDAR",
+   desc:"LiDAR TX to ESP32 GPIO 39 (RX), RX to GPIO 38 (TX), VCC to 5V, GND to GND.",
+   tags:["hw"],page:"wizard.html"},
+  {id:"wizard-wiring-i2s-audio",section:"wizard",title:"Wiring: MAX98357A Audio",
+   desc:"BCLK to GPIO 15, LRC to GPIO 16, DIN to GPIO 17, VIN to 5V, GND to GND.",
+   tags:["hw"],page:"wizard.html"},
+  {id:"wizard-wiring-speedtrap",section:"wizard",title:"Wiring: Speed Trap Dual IR",
+   desc:"Both IR sensors wired — Sensor 1 to GPIO 4, Sensor 2 to GPIO 5. Show the ~10cm spacing.",
+   tags:["hw"],page:"wizard.html"},
+  {id:"wizard-tools-needed",section:"wizard",title:"Tools Laid Out",
+   desc:"All tools needed for a build: screwdriver, wire strippers, Dupont jumpers, USB cable. Clean flat-lay.",
+   tags:["hw"],page:"wizard.html, parents-guide.html"},
+
+  // ===== PARENT'S WIRING GUIDE =====
+  {id:"guide-before-dupont",section:"guide",title:"Before: Dupont Spaghetti",
+   desc:"The current messy Dupont wiring on a gate — this is the 'before' photo for the migration guide.",
+   tags:["hw","priority"],page:"parents-guide.html"},
+  {id:"guide-after-terminal",section:"guide",title:"After: Clean Terminal Blocks",
+   desc:"Same board after migration to terminal blocks — clean, organized, vibration-proof.",
+   tags:["hw","priority"],page:"parents-guide.html"},
+  {id:"guide-wire-stripping",section:"guide",title:"Stripping a Dupont Wire",
+   desc:"Closeup of stripping 5mm insulation off a Dupont jumper wire tip. Show the exposed copper.",
+   tags:["hw"],page:"parents-guide.html"},
+  {id:"guide-screw-terminal-insert",section:"guide",title:"Inserting Wire into Terminal",
+   desc:"Wire being inserted into a screw terminal. Show the screwdriver tightening.",
+   tags:["hw"],page:"parents-guide.html"},
+  {id:"guide-label-tape",section:"guide",title:"Wire Labels (Masking Tape)",
+   desc:"Wires with masking tape labels — 'IR SIG', 'GND', '3V3', etc. The prep step.",
+   tags:["hw"],page:"parents-guide.html"},
+  {id:"guide-shake-test",section:"guide",title:"The Shake Test",
+   desc:"Ben shaking the completed board (action shot!). This is Phase 5.",
+   tags:["hw"],page:"parents-guide.html"},
+
+  // ===== SCIENCE FAIR =====
+  {id:"sf-experiment-setup",section:"readme",title:"Science Fair: Track + Scale Setup",
+   desc:"The complete experiment layout — track, scale, Hot Wheels cars, tungsten weights, laptop showing dashboard.",
+   tags:["hw"],page:"judges.html, science_fair_report.html"},
+  {id:"sf-ben-operating",section:"readme",title:"Ben Operating the System",
+   desc:"Ben at the track — releasing a car, looking at the dashboard, being a scientist. The money shot for judges.",
+   tags:["hw","priority"],page:"judges.html, README.md"},
+  {id:"sf-evidence-tag-printed",section:"readme",title:"Printed Evidence Tag",
+   desc:"A printed evidence tag with QR code, case number, car info. Show it next to the actual car.",
+   tags:["hw"],page:"README.md"},
+  {id:"sf-data-table-screen",section:"readme",title:"Science Fair Data Table",
+   desc:"Screenshot of the CSV export or science_fair_report.html data table — real numbers, multiple trials.",
+   tags:["screen"],page:"judges.html, science_fair_report.html"},
+
+  // ===== GITHUB PAGES SITE =====
+  {id:"pages-landing",section:"readme",title:"GitHub Pages Landing Page",
+   desc:"Screenshot of ryan4n6.github.io/MASS-Trap/ — the hero section with stats and demo.",
+   tags:["screen"],page:"README.md"},
+  {id:"pages-demo-running",section:"readme",title:"Live Demo in Action",
+   desc:"The embedded dashboard demo mid-race — RACING state with timer counting up.",
+   tags:["screen"],page:"README.md, index.html"},
+  {id:"pages-store",section:"readme",title:"Parts Store Page",
+   desc:"The 3-tier parts store page on GitHub Pages.",
+   tags:["screen"],page:"store.html"},
+  {id:"pages-special-k",section:"readme",title:"The Special K Report",
+   desc:"Screenshot of about.html showing The Special K Report with builders and live device stats.",
+   tags:["screen"],page:"README.md"}
+];
+
+var state = {};
+var currentFilter = 'all';
+
+function loadState(){
+  try{var s = localStorage.getItem('mass_punchlist');
+    if(s) state = JSON.parse(s);
+  }catch(e){state = {};}
+}
+
+function saveState(){
+  localStorage.setItem('mass_punchlist', JSON.stringify(state));
+}
+
+function toggleShot(id){
+  if(state[id] && state[id].done){
+    state[id].done = false;
+    state[id].url = '';
+  }else{
+    if(!state[id]) state[id] = {};
+    state[id].done = true;
+    state[id].doneAt = new Date().toISOString();
+  }
+  saveState();
+  render();
+}
+
+function setUrl(id){
+  var input = document.getElementById('url-'+id);
+  if(!input) return;
+  if(!state[id]) state[id] = {};
+  state[id].url = input.value.trim();
+  saveState();
+  render();
+}
+
+function setFilter(f){
+  currentFilter = f;
+  var btns = document.querySelectorAll('.filter-btn');
+  for(var i=0;i<btns.length;i++){
+    btns[i].className = 'filter-btn' + (btns[i].textContent.toLowerCase().replace(/[^a-z]/g,'') === f || (f==='all' && i===0) || (f==='pending' && i===1) ? ' active' : '');
+  }
+  render();
+}
+
+function getFiltered(){
+  return SHOTS.filter(function(s){
+    if(currentFilter === 'all') return true;
+    if(currentFilter === 'pending') return !(state[s.id] && state[s.id].done);
+    if(currentFilter === 'hw') return s.tags.indexOf('hw') >= 0;
+    if(currentFilter === 'screen') return s.tags.indexOf('screen') >= 0;
+    return s.section === currentFilter || s.tags.indexOf(currentFilter) >= 0;
+  });
+}
+
+function render(){
+  var list = document.getElementById('shotList');
+  var filtered = getFiltered();
+  var html = '';
+  var lastSection = '';
+  var doneCount = 0;
+  var totalCount = SHOTS.length;
+
+  for(var i=0;i<SHOTS.length;i++){
+    if(state[SHOTS[i].id] && state[SHOTS[i].id].done) doneCount++;
+  }
+
+  // Group by section
+  var sections = {readme:'README & GitHub Pages', hw:'Hardware Photos', wizard:'Build Wizard', guide:"Parent's Wiring Guide", sf:'Science Fair'};
+  var sectionCounts = {};
+  var sectionDone = {};
+
+  for(var i=0;i<filtered.length;i++){
+    var s = filtered[i];
+    var sec = s.section;
+    if(!sectionCounts[sec]){sectionCounts[sec]=0; sectionDone[sec]=0;}
+    sectionCounts[sec]++;
+    if(state[s.id] && state[s.id].done) sectionDone[sec]++;
+  }
+
+  for(var i=0;i<filtered.length;i++){
+    var s = filtered[i];
+    var isDone = state[s.id] && state[s.id].done;
+    var url = (state[s.id] && state[s.id].url) || '';
+
+    if(s.section !== lastSection){
+      lastSection = s.section;
+      var secName = sections[s.section] || s.section.toUpperCase();
+      var sc = sectionCounts[s.section] || 0;
+      var sd = sectionDone[s.section] || 0;
+      html += '<div class="section-header">' + secName +
+        '<span class="section-count">' + sd + '/' + sc + '</span></div>';
+    }
+
+    html += '<div class="shot' + (isDone ? ' completed' : '') + '" data-section="' + s.section + '">';
+    html += '<div class="shot-check' + (isDone ? ' done' : '') + '" onclick="toggleShot(\'' + s.id + '\')">' + (isDone ? '&#10003;' : '') + '</div>';
+    html += '<div class="shot-body">';
+    html += '<div class="shot-title">' + s.title + '</div>';
+    html += '<div class="shot-desc">' + s.desc + '</div>';
+    html += '<div class="shot-meta">';
+    for(var t=0;t<s.tags.length;t++){
+      html += '<span class="shot-tag ' + s.tags[t] + '">' + s.tags[t] + '</span>';
+    }
+    html += '</div>';
+    html += '<div class="shot-id">MASS_IMG_' + s.id.toUpperCase().replace(/-/g,'_') + '</div>';
+    if(!isDone){
+      html += '<div class="shot-url">';
+      html += '<input type="url" id="url-' + s.id + '" placeholder="Paste ImgBB URL..." value="' + url + '">';
+      html += '<button onclick="setUrl(\'' + s.id + '\')">Save</button>';
+      html += '</div>';
+    }else if(url){
+      html += '<div class="shot-id" style="color:var(--green)">&#10003; ' + url.substring(0,40) + '...</div>';
+    }
+    html += '</div></div>';
+  }
+
+  list.innerHTML = html;
+  document.getElementById('doneCount').textContent = doneCount;
+  document.getElementById('totalCount').textContent = totalCount;
+  document.getElementById('progressFill').style.width = (totalCount > 0 ? Math.round(doneCount/totalCount*100) : 0) + '%';
+}
+
+function exportJSON(){
+  var out = {exported:new Date().toISOString(), shots:{}};
+  for(var i=0;i<SHOTS.length;i++){
+    var s = SHOTS[i];
+    var st = state[s.id] || {};
+    out.shots[s.id] = {
+      placeholder:'MASS_IMG_' + s.id.toUpperCase().replace(/-/g,'_'),
+      url: st.url || null,
+      done: st.done || false,
+      page: s.page
+    };
+  }
+  var blob = new Blob([JSON.stringify(out,null,2)], {type:'application/json'});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mass-punchlist-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+}
+
+function resetAll(){
+  if(confirm('Reset all progress? This cannot be undone.')){
+    state = {};
+    saveState();
+    render();
+  }
+}
+
+loadState();
+render();
+</script>
+</body>
+</html>
