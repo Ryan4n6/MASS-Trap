@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parts Store — M.A.S.S. Trap Build List</title>
+<meta name="description" content="Everything you need to build a M.A.S.S. Trap physics lab. Curated parts lists by budget tier with Amazon links.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#091B2F;--navy-light:#0d2847;--navy-mid:#112d4e;--navy-card:#0f2340;
+  --gold:#D4AF37;--gold-dim:rgba(212,175,55,0.25);--gold-glow:rgba(212,175,55,0.08);
+  --orange:#FF4500;--orange-dim:rgba(255,69,0,0.15);
+  --text:#E8E8E8;--text-muted:#8899AA;--text-dim:#556677;
+  --green:#28a745;--red:#dc3545;--cyan:#17a2b8;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"SF Mono",Monaco,"Cascadia Code","Fira Code",monospace;
+  --max-w:1100px;--radius:12px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--navy);color:var(--text);font-family:var(--font);line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--gold);text-decoration:none;transition:color 0.2s}
+a:hover{color:#e8c84a;text-decoration:underline}
+.container{max-width:var(--max-w);margin:0 auto;padding:0 20px}
+
+/* Header */
+.page-header{text-align:center;padding:60px 20px 40px;border-bottom:1px solid var(--gold-dim)}
+.page-header h1{font-size:2.2rem;color:var(--gold);letter-spacing:3px;margin-bottom:8px}
+.page-header p{color:var(--text-muted);font-size:1rem;max-width:600px;margin:0 auto}
+.back-link{display:inline-block;margin-bottom:20px;font-size:0.85rem;color:var(--text-muted)}
+.back-link:hover{color:var(--gold)}
+
+/* Tier nav */
+.tier-nav{display:flex;justify-content:center;gap:12px;padding:20px 0;border-bottom:1px solid var(--gold-dim);flex-wrap:wrap}
+.tier-nav a{display:inline-block;padding:8px 20px;border:1px solid var(--gold-dim);border-radius:8px;font-size:0.85rem;color:var(--text-muted);font-weight:600;transition:all 0.2s}
+.tier-nav a:hover,.tier-nav a.active{border-color:var(--gold);color:var(--gold);background:var(--gold-glow);text-decoration:none}
+
+/* Sections */
+.tier-section{padding:48px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.tier-title{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.tier-title h2{font-size:1.6rem;color:var(--gold);letter-spacing:1px}
+.tier-est{background:var(--gold);color:var(--navy);font-size:0.7rem;font-weight:800;padding:4px 12px;border-radius:12px;letter-spacing:1px}
+.tier-desc{color:var(--text-muted);font-size:0.92rem;margin-bottom:24px;max-width:700px}
+
+/* Parts table */
+.parts-table{width:100%;border-collapse:collapse;font-size:0.88rem}
+.parts-table th{text-align:left;padding:10px 12px;background:var(--navy-light);color:var(--gold);font-size:0.7rem;text-transform:uppercase;letter-spacing:1px;border-bottom:2px solid var(--gold-dim)}
+.parts-table td{padding:12px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:top}
+.parts-table tr:hover{background:rgba(212,175,55,0.03)}
+.part-name{color:var(--text);font-weight:600}
+.part-spec{color:var(--text-muted);font-size:0.8rem;margin-top:2px}
+.part-price{color:var(--gold);font-weight:700;font-family:var(--mono);white-space:nowrap}
+.part-note{color:var(--text-dim);font-size:0.78rem;font-style:italic}
+.part-link{display:inline-block;padding:4px 12px;background:var(--orange);color:white;border-radius:6px;font-size:0.75rem;font-weight:700;transition:background 0.2s}
+.part-link:hover{background:#ff5a1f;color:white;text-decoration:none}
+.part-essential{border-left:3px solid var(--gold)}
+.part-optional{border-left:3px solid var(--text-dim)}
+
+/* Legend */
+.legend{display:flex;gap:20px;margin-bottom:20px;font-size:0.78rem;color:var(--text-muted)}
+.legend-item{display:flex;align-items:center;gap:6px}
+.legend-dot{width:12px;height:4px;border-radius:2px}
+.legend-dot.essential{background:var(--gold)}
+.legend-dot.optional{background:var(--text-dim)}
+
+/* Tip bubbles */
+.tip-bubble{position:relative;background:var(--navy-card);border:1px solid var(--gold);border-radius:10px;padding:16px 20px;margin:24px 0;font-size:0.88rem;color:var(--text-muted);line-height:1.6}
+.tip-bubble::before{content:"";position:absolute;top:-8px;left:24px;width:16px;height:16px;background:var(--navy-card);border-left:1px solid var(--gold);border-top:1px solid var(--gold);transform:rotate(45deg)}
+.tip-label{display:inline-block;background:var(--gold);color:var(--navy);font-size:0.6rem;font-weight:800;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.tip-bubble strong{color:var(--text)}
+.tip-bubble em{color:var(--cyan);font-style:normal}
+
+/* Totals */
+.tier-total{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;background:var(--navy-light);border:1px solid var(--gold-dim);border-radius:8px;margin-top:20px}
+.tier-total-label{color:var(--text-muted);font-size:0.85rem;font-weight:600}
+.tier-total-price{color:var(--gold);font-size:1.4rem;font-weight:900;font-family:var(--mono)}
+
+/* Footer */
+.affiliate-notice{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:16px 20px;font-size:0.78rem;color:var(--text-dim);text-align:center;margin:40px 0}
+.site-footer{padding:32px 0;text-align:center;border-top:1px solid var(--gold-dim)}
+.site-footer a{color:var(--text-muted);font-size:0.85rem;margin:0 12px}
+.site-footer a:hover{color:var(--gold)}
+.footer-copy{color:var(--text-dim);font-size:0.75rem;margin-top:12px}
+
+/* Responsive */
+@media(max-width:768px){
+  .parts-table{font-size:0.8rem}
+  .parts-table th,.parts-table td{padding:8px}
+  .page-header h1{font-size:1.6rem}
+  .tier-title h2{font-size:1.3rem}
+}
+@media(max-width:500px){
+  .parts-table{display:block;overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+<!-- Header -->
+<div class="page-header">
+  <a href="index.html" class="back-link">&larr; Back to M.A.S.S. Trap</a>
+  <h1>PARTS STORE</h1>
+  <p>Every component Ryan actually used, tested, and recommends. Organized by budget tier.</p>
+</div>
+
+<!-- Tier Nav -->
+<div class="tier-nav">
+  <a href="#starter">Starter Track (~$25)</a>
+  <a href="#science-fair" class="active">Science Fair (~$60)</a>
+  <a href="#full-send">Full Send (~$120)</a>
+  <a href="#accessories">Accessories</a>
+  <a href="#transparency">The Real Numbers</a>
+</div>
+
+<!-- ==================== TIER 1: STARTER ==================== -->
+<div class="tier-section" id="starter">
+  <div class="tier-title">
+    <h2>Starter Track</h2>
+    <span class="tier-est">~$25</span>
+  </div>
+  <p class="tier-desc">
+    The bare minimum to get a working speed trap. One ESP32, two IR sensors, a breadboard, and a Hot Wheels track.
+    You'll have a full web dashboard with speed, time, and CSV data export.
+  </p>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot essential"></div> Required</div>
+    <div class="legend-item"><div class="legend-dot optional"></div> Optional / You May Have</div>
+  </div>
+
+  <table class="parts-table">
+    <thead>
+      <tr>
+        <th>Component</th>
+        <th>Specs</th>
+        <th>Est. Price</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="part-essential">
+        <td>
+          <div class="part-name">ESP32-S3-WROOM-1 N16R8</div>
+          <div class="part-spec">16MB Flash / 8MB PSRAM &bull; Dual-core 240MHz &bull; WiFi + BLE</div>
+        </td>
+        <td><div class="part-note">Must be S3 variant with 16MB flash for OTA dual-partition. The N16R8 is the exact module used. Ryan paid $5.61/ea on AliExpress (Aug 2023). Amazon is ~$7 but ships faster.</div></td>
+        <td><div class="part-price">~$7</div></td>
+        <td><a href="https://www.amazon.com/dp/B0BMQ8F7FN?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-essential">
+        <td>
+          <div class="part-name">IR Break-Beam Sensors (pair)</div>
+          <div class="part-spec">5mm IR emitter + receiver &bull; 3.3V compatible &bull; Digital output</div>
+        </td>
+        <td><div class="part-note">Need 2 pairs: one for start line, one for finish. Look for "IR obstacle avoidance sensor" or "photo interrupter".</div></td>
+        <td><div class="part-price">~$4</div></td>
+        <td><a href="https://www.amazon.com/dp/B0FP9HP6LG?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-essential">
+        <td>
+          <div class="part-name">Breadboard + Jumper Wires</div>
+          <div class="part-spec">830-point breadboard &bull; M/M + M/F jumper wire kit</div>
+        </td>
+        <td><div class="part-note">No soldering required for basic build. Breadboard mounts right next to the track.</div></td>
+        <td><div class="part-price">~$5</div></td>
+        <td><a href="https://www.amazon.com/dp/B0BTT31CBC?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">USB-C Cable + Power</div>
+          <div class="part-spec">USB-C data cable &bull; 5V 1A minimum</div>
+        </td>
+        <td><div class="part-note">Any phone charger works. Need data cable for first flash (not charge-only). After first flash, updates go over WiFi.</div></td>
+        <td><div class="part-price">~$3</div></td>
+        <td><a href="https://www.amazon.com/dp/B07PFHB3R4?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">Hot Wheels Track + Car</div>
+          <div class="part-spec">Any straight track section &bull; Any 1:64 scale car</div>
+        </td>
+        <td><div class="part-note">You probably already have these. Any brand works. Longer track = more measurable speed difference between conditions.</div></td>
+        <td><div class="part-price">~$6</div></td>
+        <td><a href="https://www.amazon.com/dp/B0FPWYQ3B1?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="tier-total">
+    <div class="tier-total-label">Estimated Total (Starter)</div>
+    <div class="tier-total-price">~$25</div>
+  </div>
+
+  <div class="tip-bubble">
+    <div class="tip-label">Ryan Says</div>
+    The ESP32-S3 N16R8 is the sweet spot. The 16MB flash gives you dual OTA partitions (update without bricking)
+    and 9.9MB for LittleFS storage. The 8MB PSRAM is overkill for this project but means you'll never run out of memory.
+    <strong>Don't buy the S2 or the basic ESP32 &mdash; the S3 dual-core is what makes microsecond timing work.</strong>
+  </div>
+</div>
+
+<!-- ==================== TIER 2: SCIENCE FAIR ==================== -->
+<div class="tier-section" id="science-fair">
+  <div class="tier-title">
+    <h2>Science Fair Ready</h2>
+    <span class="tier-est">~$60 &bull; RECOMMENDED</span>
+  </div>
+  <p class="tier-desc">
+    This is what Ben used for his 5th grade ***REMOVED*** Science Fair project. Everything you need for a proper
+    physics experiment with evidence chain of custody, guided testing, and auto-generated reports.
+  </p>
+
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot essential"></div> Required</div>
+    <div class="legend-item"><div class="legend-dot optional"></div> Optional Upgrade</div>
+  </div>
+
+  <table class="parts-table">
+    <thead>
+      <tr>
+        <th>Component</th>
+        <th>Specs / Notes</th>
+        <th>Est. Price</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="part-essential">
+        <td>
+          <div class="part-name">Everything in Starter Tier</div>
+          <div class="part-spec">ESP32-S3 + IR sensors + breadboard + wires + track</div>
+        </td>
+        <td><div class="part-note">See Starter tier above for details.</div></td>
+        <td><div class="part-price">~$25</div></td>
+        <td></td>
+      </tr>
+      <tr class="part-essential">
+        <td>
+          <div class="part-name">Digital Milligram Scale</div>
+          <div class="part-spec">&plusmn;0.001g precision &bull; Range: 0-100g &bull; Calibration weight included</div>
+        </td>
+        <td><div class="part-note">Essential for measuring car mass accurately. We found two "identical" Hot Wheels trucks differ by 6.5g (20%!). Science fair judges love milligram precision.</div></td>
+        <td><div class="part-price">~$12</div></td>
+        <td><a href="https://www.amazon.com/dp/B08XKB9S8R?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-essential">
+        <td>
+          <div class="part-name">Tungsten Weight Set</div>
+          <div class="part-spec">Assorted cubes/cylinders &bull; ~3.5g, ~7g, ~14g pieces</div>
+        </td>
+        <td><div class="part-note">Tungsten is 19.3 g/cm&sup3; &mdash; almost as dense as gold. Tiny cubes add significant mass. Perfect for "does mass affect speed?" experiments.</div></td>
+        <td><div class="part-price">~$10</div></td>
+        <td><a href="https://www.amazon.com/dp/B0DPG2SS51?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-essential">
+        <td>
+          <div class="part-name">NTAG213 NFC Stickers (20 pack)</div>
+          <div class="part-spec">13.56MHz &bull; 144 bytes &bull; 0.025g each &bull; iPhone/Android compatible</div>
+        </td>
+        <td><div class="part-note">Apply to car underside. Phone scan auto-selects car in dashboard + arms track. Each sticker weighs 0.025g &mdash; we weighed them on the milligram scale because that's how we roll.</div></td>
+        <td><div class="part-price">~$5</div></td>
+        <td><a href="https://www.amazon.com/dp/B0DQV8NJ5Z?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">MAX98357A I2S Amplifier</div>
+          <div class="part-spec">3W Class D &bull; I2S digital input &bull; No DAC needed</div>
+        </td>
+        <td><div class="part-note">Gives the track a voice. Announces race results, calls out car names, alerts on condition changes. Kids love it.</div></td>
+        <td><div class="part-price">~$4</div></td>
+        <td><a href="https://www.amazon.com/dp/B08GK6L4LY?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">Small Speaker (3W, 4 ohm)</div>
+          <div class="part-spec">40mm or 50mm driver &bull; Wired to MAX98357A output</div>
+        </td>
+        <td><div class="part-note">Any small speaker works. Hot glue it to the track housing. Pair with the MAX98357A above.</div></td>
+        <td><div class="part-price">~$3</div></td>
+        <td><a href="https://www.amazon.com/dp/B0BTP67F81?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="tier-total">
+    <div class="tier-total-label">Estimated Total (Science Fair)</div>
+    <div class="tier-total-price">~$59</div>
+  </div>
+
+  <div class="tip-bubble">
+    <div class="tip-label">Did You Know?</div>
+    Two "identical" Hot Wheels Ford F-150 trucks from the same package weighed <strong>38.000g and 31.521g</strong> on the milligram scale.
+    That's a <em>6.479g difference (20.5%)</em> between "the same" car.
+    <strong>This is why you weigh everything.</strong> Manufacturing variance is a real variable &mdash; and discovering it is a science fair goldmine.
+  </div>
+</div>
+
+<!-- ==================== TIER 3: FULL SEND ==================== -->
+<div class="tier-section" id="full-send">
+  <div class="tier-title">
+    <h2>Full Send</h2>
+    <span class="tier-est">~$120</span>
+  </div>
+  <p class="tier-desc">
+    The "it's 3am and I'm still adding features" build. Three ESP32 devices on a mesh network.
+    LiDAR auto-arming. Mid-track speed measurement. 1000 LED strip synchronized to race state.
+    This is the build Ryan runs.
+  </p>
+
+  <table class="parts-table">
+    <thead>
+      <tr>
+        <th>Component</th>
+        <th>Specs / Notes</th>
+        <th>Est. Price</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="part-essential">
+        <td>
+          <div class="part-name">Everything in Science Fair Tier</div>
+          <div class="part-spec">Finish gate ESP32 + sensors + scale + NFC + weights + audio</div>
+        </td>
+        <td><div class="part-note">See Science Fair tier above.</div></td>
+        <td><div class="part-price">~$59</div></td>
+        <td></td>
+      </tr>
+      <tr class="part-essential">
+        <td>
+          <div class="part-name">2nd ESP32-S3 (Start Gate)</div>
+          <div class="part-spec">Same N16R8 module &bull; Dedicated start detection + LiDAR</div>
+        </td>
+        <td><div class="part-note">Auto-discovers the finish gate via ESP-NOW. Clock syncs to microsecond accuracy. Place at the top of the track.</div></td>
+        <td><div class="part-price">~$7</div></td>
+        <td><a href="https://www.amazon.com/dp/B0BMQ8F7FN?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-essential">
+        <td>
+          <div class="part-name">TF-Luna LiDAR Sensor</div>
+          <div class="part-spec">0.2-8m range &bull; UART interface &bull; 100Hz sample rate</div>
+        </td>
+        <td><div class="part-note">Detects car at start position, auto-arms the track. No button pressing needed &mdash; just place the car and release. Game changer for science fair demo mode.</div></td>
+        <td><div class="part-price">~$12</div></td>
+        <td><a href="https://www.amazon.com/dp/B09PZ559ZB?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">3rd ESP32-S3 (Speed Trap)</div>
+          <div class="part-spec">Same N16R8 module &bull; Dual IR sensors at mid-track</div>
+        </td>
+        <td><div class="part-note">Measures velocity at a specific track position using two IR sensors at known distance. Sends data to finish gate wirelessly.</div></td>
+        <td><div class="part-price">~$7</div></td>
+        <td><a href="https://www.amazon.com/dp/B0BMQ8F7FN?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">BTF-LIGHTING COB LED Strip (WS2811)</div>
+          <div class="part-spec">864 LEDs/m COB &bull; 24V individually addressable &bull; IP66</div>
+        </td>
+        <td><div class="part-note">Mount along the track. WLED firmware drives race state animations. Armed = breathing blue. Racing = chase. Finish = celebration. Pure theater.</div></td>
+        <td><div class="part-price">~$25</div></td>
+        <td><a href="https://www.amazon.com/dp/B0DCVN3Y65?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">BTF-LIGHTING WLED Controller (SP803E)</div>
+          <div class="part-spec">ESP32-based &bull; Pre-loaded WLED firmware &bull; Controls LED strip</div>
+        </td>
+        <td><div class="part-note">Dedicated WLED controller. Plug and play &mdash; already has WLED installed. M.A.S.S. Trap sends race state commands via HTTP API.</div></td>
+        <td><div class="part-price">~$12</div></td>
+        <td><a href="https://www.amazon.com/dp/B0FB38FDCS?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">24V 5A Power Supply (LED strip)</div>
+          <div class="part-spec">24V 5A 120W &bull; ETL Listed &bull; Barrel jack</div>
+        </td>
+        <td><div class="part-note">USB can't power 800+ LEDs. Need a dedicated supply. The BTF-LIGHTING 24V supply matches their strips perfectly.</div></td>
+        <td><div class="part-price">~$10</div></td>
+        <td><a href="https://www.amazon.com/dp/B09T6QX737?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="tier-total">
+    <div class="tier-total-label">Estimated Total (Full Send)</div>
+    <div class="tier-total-price">~$120</div>
+  </div>
+
+  <div class="tip-bubble">
+    <div class="tip-label">Ryan Says</div>
+    The LiDAR is the single best upgrade after the basic build. It turns the track from "press a button to arm"
+    into "put the car down and let go." For science fair presentations, this means <strong>hands-free operation</strong> &mdash;
+    the track runs itself while you explain the science. Judges lose their minds.
+  </div>
+</div>
+
+<!-- ==================== ACCESSORIES ==================== -->
+<div class="tier-section" id="accessories">
+  <div class="tier-title">
+    <h2>Accessories &amp; Nice-to-Haves</h2>
+  </div>
+  <p class="tier-desc">
+    Things that aren't required but make the build better, easier, or more impressive.
+  </p>
+
+  <table class="parts-table">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Why You'd Want It</th>
+        <th>Est. Price</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">Label Printer (Brother P-Touch)</div>
+          <div class="part-spec">PT-D210 or similar &bull; For evidence tag labels</div>
+        </td>
+        <td><div class="part-note">Print forensic evidence tags with case numbers. Not required &mdash; the system generates printable HTML tags &mdash; but a label printer looks more official.</div></td>
+        <td><div class="part-price">~$30</div></td>
+        <td><a href="https://www.amazon.com/s?k=brother+p-touch+label+printer&tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">3D Printed Sensor Housing</div>
+          <div class="part-spec">STL files on GitHub &bull; Clips onto Hot Wheels track</div>
+        </td>
+        <td><div class="part-note">Coming soon. Sensor mounts that snap onto standard Hot Wheels orange track. Designed in Fusion 360.</div></td>
+        <td><div class="part-price">Free (STL)</div></td>
+        <td></td>
+      </tr>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">Drag Tree Start Lights</div>
+          <div class="part-spec">Amazon B0B58K7YZY &bull; LED Christmas tree + servo controller</div>
+        </td>
+        <td><div class="part-note">Full drag strip experience. Countdown lights + servo-controlled launch gate. Makes the science fair booth a showstopper. (Integration in progress.)</div></td>
+        <td><div class="part-price">~$7</div></td>
+        <td><a href="https://www.amazon.com/dp/B0B58K7YZY?tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">Portable Battery Pack</div>
+          <div class="part-spec">USB-C PD &bull; 10000mAh+ &bull; Powers ESP32 for hours</div>
+        </td>
+        <td><div class="part-note">Run the whole setup without wall power. Essential for science fair booths, classroom demos, and backyard testing.</div></td>
+        <td><div class="part-price">~$15</div></td>
+        <td><a href="https://www.amazon.com/s?k=usb+c+pd+power+bank+10000mah&tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+      <tr class="part-optional">
+        <td>
+          <div class="part-name">Phone Tripod / Mount</div>
+          <div class="part-spec">Flexible mini tripod &bull; Phone holder clip</div>
+        </td>
+        <td><div class="part-note">For photographing scale readings and test setup. The evidence system links photos to case numbers automatically.</div></td>
+        <td><div class="part-price">~$8</div></td>
+        <td><a href="https://www.amazon.com/s?k=phone+tripod+mini+flexible&tag=ryanmassfelle-20" class="part-link" target="_blank">Amazon</a></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- ==================== COST TRANSPARENCY ==================== -->
+<div class="tier-section" id="transparency">
+  <div class="tier-title">
+    <h2>The Real Numbers</h2>
+    <span class="tier-est" style="background:var(--orange)">BRUTAL TRANSPARENCY</span>
+  </div>
+  <p class="tier-desc">
+    You deserve to know exactly what this project cost. No hand-waving. No rounding down. The receipts are real.
+  </p>
+
+  <table class="parts-table">
+    <thead>
+      <tr>
+        <th>Category</th>
+        <th>What It Covers</th>
+        <th>Spent</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="part-essential">
+        <td><div class="part-name">Core Electronics</div></td>
+        <td><div class="part-note">ESP32-S3 N16R8 boards (15&times; from AliExpress, Aug 2023, $5.61 each), IR sensors, TF-Luna LiDAR, breakout boards, power supplies, wiring, connectors, soldering supplies</div></td>
+        <td><div class="part-price">~$250</div></td>
+      </tr>
+      <tr class="part-essential">
+        <td><div class="part-name">Sensors &amp; Instruments</div></td>
+        <td><div class="part-note">MLX90614 IR temp (x2), BMP280 barometric (x5), ADXL345 accel (x4), BNO055 IMU, WT901 9-axis IMU, PN532 NFC reader, milligram scale, calibration weights</div></td>
+        <td><div class="part-price">~$200</div></td>
+      </tr>
+      <tr class="part-essential">
+        <td><div class="part-name">LED &amp; WLED System</div></td>
+        <td><div class="part-note">BTF-LIGHTING WLED controllers (x2), COB LED strip (864 LED/m), 24V power supply, RF remote</div></td>
+        <td><div class="part-price">~$100</div></td>
+      </tr>
+      <tr class="part-essential">
+        <td><div class="part-name">Track &amp; Hardware</div></td>
+        <td><div class="part-note">Hot Wheels tracks (40ft+), starting gates, clamps, mounting hardware, 3D printer filament, heat-set inserts, drill/tap set</div></td>
+        <td><div class="part-price">~$150</div></td>
+      </tr>
+      <tr class="part-essential">
+        <td><div class="part-name">Test Vehicles &amp; Weights</div></td>
+        <td><div class="part-note">Hot Wheels cars (F-150, VW, Street Wiener, etc.), tungsten weights, wheel weights, derby weight tape, Real Riders wheel sets</div></td>
+        <td><div class="part-price">~$60</div></td>
+      </tr>
+      <tr class="part-essential">
+        <td><div class="part-name">Displays &amp; Future Prototypes</div></td>
+        <td><div class="part-note">7" HDMI touch screens, ESP32-P4 dev board, Waveshare display board, XIAO ESP32-S3 Sense, HDMI cables</div></td>
+        <td><div class="part-price">~$250</div></td>
+      </tr>
+      <tr class="part-essential">
+        <td><div class="part-name">Tools &amp; Consumables</div></td>
+        <td><div class="part-note">Dupont crimper, solder flux, IPA, compressed air, forensic rulers, NFC stickers, microSD cards, antennas</div></td>
+        <td><div class="part-price">~$90</div></td>
+      </tr>
+      <tr class="part-optional">
+        <td><div class="part-name">Overkill / R&amp;D / "Because I Could"</div></td>
+        <td><div class="part-note">Laser line projector, traffic light modules, footbridge model, Edison bulb filaments, bearing balls... things that seemed essential at 3am</div></td>
+        <td><div class="part-price">~$100</div></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="tier-total" style="border-color:var(--orange)">
+    <div class="tier-total-label">Total Project Spend (Hardware Only)</div>
+    <div class="tier-total-price" style="color:var(--orange)">~$1,200</div>
+  </div>
+
+  <div class="tip-bubble" style="border-color:var(--orange)">
+    <div class="tip-label" style="background:var(--orange)">The Uncomfortable Truth</div>
+    Yes, I spent roughly <strong>$1,200</strong> on a Hot Wheels speedometer. In my defense: my 10-year-old
+    is using it for his science fair, the system now has <em>21,500+ lines of code</em>, and I've learned
+    more about embedded systems in 3 weeks than in a year of tutorials.
+    <br><br>
+    <strong>You don't need to spend $1,200.</strong> The Starter build is ~$25. The Science Fair build is ~$60.
+    I spent what I spent because I have a problem, and that problem involves buying sensors at 2am.
+    <br><br>
+    <strong>The origin story:</strong> The first purchase was <em>15&times; ESP32-S3 N16R8 boards from AliExpress
+    on August 17, 2023</em> &mdash; <strong>$5.61 each</strong>, $93.07 total from the AITEXM ROBOT store.
+    Those boards sat in a drawer for two and a half years waiting for me to figure out what to do with them.
+    The brain of this entire system costs less than a combo meal.
+    <br><br>
+    Affiliate earnings so far: <strong>$0.00</strong>. This page went live today.
+    If every link on this page earned me the maximum 4% commission, and 100 people built a Starter kit,
+    that's roughly <em>$100</em> &mdash; enough to cover one of my sensor shopping sprees.
+    I'm not getting rich here. I'm a working forensic examiner who stays up too late soldering things.
+  </div>
+</div>
+
+<!-- Affiliate Notice -->
+<div class="affiliate-notice">
+  <strong>Affiliate Disclosure:</strong> Links on this page use Amazon Associates affiliate tags
+  (tag: <code style="color:var(--text-muted);font-family:var(--mono);font-size:0.75rem">ryanmassfelle-20</code>).
+  When you buy through these links, a small percentage supports the M.A.S.S. Trap project at no extra cost to you.
+  We only link to products we've personally bought, tested, and used in our builds.
+  No sponsorships. No paid placements. Just stuff that actually works.
+  <br><br>
+  <strong>Last updated:</strong> February 16, 2026 &bull;
+  <strong>Total affiliate earnings to date:</strong> $0.00 &bull;
+  <strong>Total project spend:</strong> ~$1,200
+</div>
+
+<!-- Footer -->
+<footer class="site-footer">
+  <div>
+    <a href="index.html">&larr; Home</a>
+    <a href="https://github.com/Ryan4n6/MASS-Trap" target="_blank">GitHub</a>
+    <a href="https://github.com/Ryan4n6/MASS-Trap/releases" target="_blank">Firmware</a>
+  </div>
+  <div class="footer-copy">
+    M.A.S.S. Trap &copy; 2026 Ryan Massfeller. Open source under the MIT License.
+  </div>
+</footer>
+
+</div>
+</body>
+</html>

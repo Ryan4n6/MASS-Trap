@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<title>The Kristina Report™ — M.A.S.S. Trap</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--navy:#091B2F;--navy-light:#0d2847;--navy-mid:#112d4e;--gold:#D4AF37;--gold-dim:rgba(212,175,55,0.3);--orange:#FF4500;--text:#E8E8E8;--text-muted:#8899AA;--green:#28a745;--red:#dc3545;--cyan:#17a2b8;--font-main:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--font-data:"SF Mono",Monaco,"Cascadia Code",monospace}
+body{background:var(--navy);color:var(--text);font-family:var(--font-main);line-height:1.6;min-height:100vh}
+.container{max-width:900px;margin:0 auto;padding:20px 16px 60px}
+a{color:var(--gold);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Hero */
+.hero{text-align:center;padding:40px 20px 30px;border-bottom:2px solid var(--gold-dim);margin-bottom:30px}
+.hero-badge{display:inline-block;background:var(--gold);color:var(--navy);font-size:0.7rem;font-weight:700;padding:3px 12px;border-radius:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.hero h1{font-size:2rem;color:var(--gold);margin-bottom:4px;letter-spacing:2px}
+.hero h2{font-size:1rem;color:var(--text-muted);font-weight:400;margin-bottom:8px}
+.hero .subtitle{font-style:italic;color:var(--text-muted);font-size:0.9rem}
+@media(max-width:600px){.hero h1{font-size:1.4rem}.hero{padding:24px 12px 20px}}
+
+/* Section */
+.section{margin-bottom:28px}
+.section-title{font-size:1.1rem;color:var(--gold);border-bottom:1px solid var(--gold-dim);padding-bottom:6px;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.section-title span{font-size:1.2rem}
+
+/* Bio */
+.bio{background:var(--navy-light);border:1px solid var(--gold-dim);border-radius:10px;padding:20px;line-height:1.8;color:var(--text-muted);font-size:0.92rem}
+.bio strong{color:var(--text)}
+.bio em{color:var(--gold)}
+
+/* Stat Cards */
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
+.stat-card{background:var(--navy-light);border:1px solid var(--gold-dim);border-radius:10px;padding:16px 12px;text-align:center;transition:border-color 0.2s}
+.stat-card:hover{border-color:var(--gold)}
+.stat-value{font-size:1.8rem;font-weight:700;color:var(--gold);font-family:var(--font-data);line-height:1.2}
+.stat-label{font-size:0.7rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+@media(max-width:480px){.stats-grid{grid-template-columns:repeat(2,1fr)}.stat-value{font-size:1.4rem}}
+
+/* Features */
+.feature-list{list-style:none}
+.feature-item{padding:8px 12px;border-bottom:1px solid rgba(255,255,255,0.05);display:flex;align-items:flex-start;gap:10px;font-size:0.9rem}
+.feature-item:last-child{border-bottom:none}
+.feature-icon{font-size:1.1rem;flex-shrink:0;margin-top:1px}
+.feature-name{color:var(--text);font-weight:600}
+.feature-desc{color:var(--text-muted)}
+
+/* Live Status */
+.live-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px}
+.live-card{background:var(--navy-light);border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:12px;font-size:0.85rem}
+.live-card .label{color:var(--text-muted);font-size:0.7rem;text-transform:uppercase;letter-spacing:0.5px}
+.live-card .value{color:var(--text);font-family:var(--font-data);font-size:1rem;margin-top:2px}
+.live-card .value.online{color:var(--green)}
+.live-card .value.offline{color:var(--red)}
+.live-pulse{display:inline-block;width:8px;height:8px;background:var(--green);border-radius:50%;margin-right:6px;animation:pulse 2s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+
+/* Builders */
+.builders{background:var(--navy-light);border:1px solid var(--gold-dim);border-radius:10px;padding:24px;text-align:center}
+.builder-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px;margin-bottom:20px}
+.builder{padding:12px}
+.builder-name{font-size:1rem;font-weight:700;color:var(--gold)}
+.builder-role{font-size:0.78rem;color:var(--text-muted);margin-top:2px}
+.dedication{font-style:italic;color:var(--text-muted);font-size:0.88rem;line-height:1.7;max-width:640px;margin:0 auto;border-top:1px solid var(--gold-dim);padding-top:16px}
+
+/* Announcer */
+.announcer{background:linear-gradient(135deg,var(--navy-light),var(--navy-mid));border:2px solid var(--gold);border-radius:12px;padding:20px 24px;text-align:center;font-size:1rem;color:var(--cyan);font-style:italic;line-height:1.6;position:relative}
+.announcer::before{content:"⚾";font-size:1.4rem;display:block;margin-bottom:8px;font-style:normal}
+
+/* Timeline */
+.timeline{font-size:0.82rem}
+.timeline-item{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);display:flex;gap:12px}
+.timeline-item:last-child{border-bottom:none}
+.timeline-date{color:var(--text-muted);font-family:var(--font-data);white-space:nowrap;min-width:90px;flex-shrink:0}
+.timeline-msg{color:var(--text)}
+.timeline-toggle{background:none;border:1px solid var(--gold-dim);color:var(--text-muted);padding:6px 14px;border-radius:6px;font-size:0.8rem;cursor:pointer;margin-top:8px}
+.timeline-toggle:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Roster */
+.roster-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px}
+.roster-item{display:flex;justify-content:space-between;padding:6px 12px;background:var(--navy-light);border-radius:6px;font-size:0.85rem}
+.roster-item .lang{color:var(--text-muted)}
+.roster-item .count{color:var(--text);font-family:var(--font-data);font-weight:600}
+
+/* Footer */
+.footer{text-align:center;padding:30px 20px;border-top:1px solid var(--gold-dim);margin-top:30px;color:var(--text-muted);font-size:0.8rem}
+.footer .tagline{color:var(--gold);font-style:italic;margin-bottom:8px;font-size:0.9rem}
+
+/* Update notice */
+.update-notice{background:rgba(220,53,69,0.1);border:1px solid rgba(220,53,69,0.3);border-radius:8px;padding:12px 16px;margin-bottom:20px;display:none;text-align:center}
+.update-notice a{color:var(--red);font-weight:700}
+
+/* Print */
+@media print{body{background:#fff;color:#000}.hero h1,.section-title{color:#333}.stat-card,.bio,.builders,.announcer{border-color:#ccc;background:#f9f9f9}.stat-value,.builder-name{color:#333}.live-card{display:none}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- Update Notice (hidden unless update detected) -->
+<div class="update-notice" id="updateNotice">
+  A firmware update is available: <a href="https://github.com/Ryan4n6/MASS-Trap/releases/latest" target="_blank" id="updateLink">Download</a>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <div class="hero-badge">Est. 2026</div>
+  <h1>THE KRISTINA REPORT&trade;</h1>
+  <h2>M.A.S.S. Trap &mdash; Motion Analysis &amp; Speed System</h2>
+  <p class="subtitle">&ldquo;Are you guys even getting anything done?&rdquo;</p>
+</div>
+
+<!-- Project Bio -->
+<div class="section">
+  <div class="section-title"><span>📖</span> About This Project</div>
+  <div class="bio">
+    <strong>M.A.S.S. Trap</strong> is a <em>forensic-grade physics laboratory</em> disguised as a Hot Wheels track speedometer.
+    Built on a <strong>$7 ESP32 microcontroller</strong>, it measures race timing with <em>microsecond precision</em>,
+    calculates velocity, momentum, and kinetic energy, and serves a full web dashboard over WiFi.
+    <br><br>
+    It was built for <strong>Ben Massfeller's</strong> 5th grade ***REMOVED*** Science Fair 2026 project &mdash;
+    an investigation into how mass affects the speed of 1:64 scale vehicles on an inclined track.
+    Every race is logged. Every result has a chain of custody. Every data point is court-admissible.
+    <br><br>
+    The software on this device would cost <strong id="softwareValue">$3,000+</strong> to commission professionally.
+    It runs on hardware that costs less than lunch.
+  </div>
+</div>
+
+<!-- The Scoreboard -->
+<div class="section">
+  <div class="section-title"><span>📊</span> The Scoreboard</div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-value" id="statLines">--</div><div class="stat-label">Lines of Code</div></div>
+    <div class="stat-card"><div class="stat-value" id="statCommits">--</div><div class="stat-label">At-Bats (Commits)</div></div>
+    <div class="stat-card"><div class="stat-value" id="statAge">--</div><div class="stat-label">Days in Season</div></div>
+    <div class="stat-card"><div class="stat-value" id="statLateNight">--%</div><div class="stat-label">After Hours</div></div>
+    <div class="stat-card"><div class="stat-value" id="statStreak">--</div><div class="stat-label">Day Streak</div></div>
+    <div class="stat-card"><div class="stat-value" id="statFiles">--</div><div class="stat-label">Files in Play</div></div>
+  </div>
+</div>
+
+<!-- Feature Inventory -->
+<div class="section">
+  <div class="section-title"><span>🏗️</span> What We Built</div>
+  <ul class="feature-list" id="featureList"></ul>
+</div>
+
+<!-- The Roster -->
+<div class="section">
+  <div class="section-title"><span>🏟️</span> The Roster</div>
+  <div class="roster-grid" id="rosterGrid"></div>
+</div>
+
+<!-- Device Status (Live) -->
+<div class="section">
+  <div class="section-title"><span>📡</span> Live Device Status</div>
+  <div class="live-grid" id="liveGrid">
+    <div class="live-card"><div class="label">Status</div><div class="value" id="liveStatus">Connecting...</div></div>
+    <div class="live-card"><div class="label">Firmware</div><div class="value" id="liveFirmware">--</div></div>
+    <div class="live-card"><div class="label">Uptime</div><div class="value" id="liveUptime">--</div></div>
+    <div class="live-card"><div class="label">Free Memory</div><div class="value" id="liveHeap">--</div></div>
+    <div class="live-card"><div class="label">WiFi Signal</div><div class="value" id="liveRssi">--</div></div>
+    <div class="live-card"><div class="label">Connected Brothers</div><div class="value" id="livePeers">--</div></div>
+  </div>
+</div>
+
+<!-- Race Activity (Live) -->
+<div class="section">
+  <div class="section-title"><span>🏎️</span> Race Activity</div>
+  <div class="live-grid" id="raceGrid">
+    <div class="live-card"><div class="label">Total Races</div><div class="value" id="racesTotal">--</div></div>
+    <div class="live-card"><div class="label">Cars in Garage</div><div class="value" id="garageCount">--</div></div>
+    <div class="live-card"><div class="label">Fastest Time</div><div class="value" id="fastestTime">--</div></div>
+    <div class="live-card"><div class="label">Top Speed</div><div class="value" id="topSpeed">--</div></div>
+  </div>
+</div>
+
+<!-- Pair Programming -->
+<div class="section">
+  <div class="section-title"><span>🤖</span> Pair Programming</div>
+  <div class="stats-grid">
+    <div class="stat-card"><div class="stat-value" id="claudeSessions">--</div><div class="stat-label">Sessions</div></div>
+    <div class="stat-card"><div class="stat-value" id="claudeMB">--</div><div class="stat-label">MB of Dialogue</div></div>
+    <div class="stat-card"><div class="stat-value" id="claudePages">--</div><div class="stat-label">Pages (~250 words ea.)</div></div>
+    <div class="stat-card"><div class="stat-value" id="claudeHours">--</div><div class="stat-label">Est. Hours</div></div>
+  </div>
+</div>
+
+<!-- Announcer's Booth -->
+<div class="section">
+  <div class="section-title"><span>⚾</span> Announcer&rsquo;s Booth</div>
+  <div class="announcer" id="announcerBooth">Loading...</div>
+</div>
+
+<!-- Commit Timeline -->
+<div class="section">
+  <div class="section-title"><span>📅</span> Commit Timeline</div>
+  <div class="timeline" id="commitTimeline"></div>
+  <button class="timeline-toggle" id="timelineToggle" style="display:none" onclick="toggleTimeline()">Show All</button>
+</div>
+
+<!-- The Builders -->
+<div class="section">
+  <div class="section-title"><span>🔨</span> The Builders</div>
+  <div class="builders">
+    <div class="builder-grid">
+      <div class="builder">
+        <div class="builder-name">Ryan Massfeller</div>
+        <div class="builder-role">Creator &bull; Firmware Engineer &bull; 3am Architect</div>
+      </div>
+      <div class="builder">
+        <div class="builder-name">Claude</div>
+        <div class="builder-role">AI Pair Programmer &bull; Co-author &bull; Anthropic</div>
+      </div>
+      <div class="builder">
+        <div class="builder-name">Ben Massfeller</div>
+        <div class="builder-role">Chief Test Pilot &bull; Science Fair Scientist &bull; Age 10</div>
+      </div>
+      <div class="builder">
+        <div class="builder-name">Sam Massfeller</div>
+        <div class="builder-role">V1 Creator &bull; Hardware Builder &bull; Original Vibe Coder</div>
+      </div>
+    </div>
+    <div class="dedication">
+      This project was built at kitchen tables and workbenches between the hours of
+      midnight and sunrise. A dad, his two sons, and an AI &mdash; proving that the best
+      tools in the world are worthless without the people willing to stay up all night using them.
+      <br><br>
+      <span id="convoHoursNote">Built with love, caffeine, and approximately -- hours of conversation.</span>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <div class="tagline">The Kristina Report&trade; &mdash; because the scoreboard doesn&rsquo;t lie.</div>
+  <div><a href="/dashboard.html">&larr; Back to Dashboard</a></div>
+  <div style="margin-top:8px" id="generatedAt">Generated: --</div>
+</div>
+
+</div>
+
+<script>
+// ---- Baked-in Stats (generated 2026-02-16 00:08:27) ----
+var STATS = {
+  totalLines: 21544,
+  totalCommits: 30,
+  totalFiles: 42,
+  totalInsertions: 25608,
+  totalDeletions: 4357,
+  totalTouched: 29965,
+  projectAgeDays: 5,
+  firstCommitDate: "2026-02-10",
+  latestCommitDate: "2026-02-15",
+  daysSinceLast: 0,
+  commitsPerDay: 6.0,
+  linesPerDay: 5121,
+  lateNight: 17,
+  latePct: 56,
+  streak: 0,
+  cppLines: 8633,
+  htmlLines: 8448,
+  jsLines: 651,
+  cssLines: 2443,
+  cppFuncs: 116,
+  jsFuncs: 288,
+  apiEndpoints: 56,
+  dashKB: 132.5,
+  claudeSessions: 4,
+  claudeTotalMB: 164,
+  claudePages: 85983,
+  convoHours: 716,
+  softwareValue: 3231,
+  generated: "2026-02-16T05:08:27Z",
+  generatedHuman: "February 16, 2026 at 12:08 AM"
+};
+
+var FEATURES = [
+  {name:"Playlist Mode",desc:"Guided science fair testing — tells Ben which car to run next",status:"done"},
+  {name:"Evidence System",desc:"Every race gets a case number, QR code, and printable label",status:"done"},
+  {name:"Photo Upload",desc:"Tap the camera on any evidence tag, photo links to the run automatically",status:"done"},
+  {name:"NFC Tags",desc:"Scan a sticker on the car — auto-selects car and arms the track",status:"done"},
+  {name:"Science Fair Report",desc:"One button generates a full forensic report with data and analysis",status:"done"},
+  {name:"Label Printing",desc:"Evidence tags print on 7 different label printer models",status:"done"},
+  {name:"5 Visual Themes",desc:"Classic, Case File, Cyber, Minimalist, and Dark themes",status:"done"},
+  {name:"Browser Firmware Update",desc:"Update device firmware from any web browser — no cables needed",status:"done"},
+  {name:"Audio Announcer",desc:"Track calls out race results, car names, and speed records",status:"done"},
+  {name:"LiDAR Auto-Arm",desc:"TF-Luna laser sensor detects car at start gate, arms automatically",status:"done"},
+  {name:"Speed Trap",desc:"Third sensor measures mid-track velocity with dual IR beams",status:"done"},
+  {name:"Live Leaderboard",desc:"Most Wanted list ranks all cars by speed with criminal verdicts",status:"done"},
+  {name:"Kiosk Mode",desc:"Display-only presentation mode for science fair booth",status:"done"},
+  {name:"The Kristina Report",desc:"Click version badge on any page to see this — you are here",status:"done"},
+  {name:"Logo and Badge",desc:"Judge Dredd shield design for the project identity",status:"wip"},
+];
+
+var COMMITS = [
+  {date:"2026-02-15",msg:"Add Science Fair Playlist Mode, Evidence System, and NFC integration"},
+  {date:"2026-02-14",msg:"Enhance all 5 themes with 3D depth + fix Classic theme to match V1"},
+  {date:"2026-02-14",msg:"Merge feature/web-firmware-update: browser-based OTA system"},
+  {date:"2026-02-14",msg:"Make auth gate overlay fully opaque (no bleed-through)"},
+  {date:"2026-02-14",msg:"Route version badge to firmware update page instead of GitHub"},
+  {date:"2026-02-14",msg:"Fix semver comparison failing on pre-release suffixes (e.g. v2.5.1-rc1)"},
+  {date:"2026-02-14",msg:"Add browser-based firmware update system (GitHub-direct + manual fallback)"},
+  {date:"2026-02-13",msg:"Hardening sprint: WS resilience, data validation, auth, dry-run, NVS backup"},
+  {date:"2026-02-13",msg:"v2.5.0: Thread-safe timing, theme engine, modular web UI, kiosk mode"},
+  {date:"2026-02-11",msg:"Auto-generated role-based hostnames + emoji AP SSIDs"},
+  {date:"2026-02-11",msg:"Update README and CHANGELOG for repo restructure + PlatformIO"},
+  {date:"2026-02-11",msg:"Flatten repo: move sources to root, clean up build config"},
+  {date:"2026-02-11",msg:"Most Wanted leaderboard + criminal verdict overlay"},
+  {date:"2026-02-11",msg:"Brother\'s Six: zero-config auto-discovery + board validation + PlatformIO"},
+  {date:"2026-02-11",msg:"Reorganize: HotWheels_RaceGate → MASS_Trap/"},
+  {date:"2026-02-11",msg:"Fix OTA config loss + restyle start gate & console pages"},
+  {date:"2026-02-11",msg:"Fix OTA boot bug + config page redesign"},
+  {date:"2026-02-11",msg:"v2.4.0: The M.A.S.S. Trap — full rebrand, TF-Luna LiDAR, audio, speed trap"},
+  {date:"2026-02-11",msg:"v2.3.0: Science fair features, API auth, LED visualizer, WLED improvements"},
+  {date:"2026-02-11",msg:"v2.2.0: Embed web UI in firmware, security cleanup, bug fixes"},
+];
+
+var ANNOUNCER_STATS = [
+  "That's 5121 lines of code per day — more output than a court stenographer on espresso.",
+  "At 6.0 commits/day, this repo ships faster than Amazon Prime.",
+  "56% of commits happened between 10pm and 6am. Sleep is for projects that don't have deadlines.",
+  "The dashboard is now 132.5KB. That's bigger than the original Doom executable.",
+  "116 C++ functions and 288 JavaScript functions. That's 404 functions working harder than a substitute teacher on a Friday.",
+  "This firmware has 56 API endpoints. The Twitter API launched with 20.",
+  "29965 total lines touched in 5 days. That's a novel every 0 days.",
+  "The ESP32 running this costs $7. The software on it would cost $3231+ to commission.",
+  "Current streak: 0 consecutive day(s) with commits. The man does not take days off.",
+  "42 files in the repo. Each one handcrafted. No boilerplate. No frameworks. Pure violence.",
+  "4 pair programming sessions totaling ~164MB of dialogue. That's roughly 85983 pages — longer than War and Peace. Five times over.",
+  "If these 21544 lines were printed single-spaced, the stack would be 646.3mm tall. Taller than a Hot Wheels car.",
+];
+
+// ---- Populate Page ----
+function init() {
+  // Scoreboard
+  document.getElementById('statLines').textContent = STATS.totalLines.toLocaleString();
+  document.getElementById('statCommits').textContent = STATS.totalCommits;
+  document.getElementById('statAge').textContent = STATS.projectAgeDays;
+  document.getElementById('statLateNight').textContent = STATS.latePct + '%';
+  document.getElementById('statStreak').textContent = STATS.streak;
+  document.getElementById('statFiles').textContent = STATS.totalFiles;
+  document.getElementById('softwareValue').textContent = '$' + STATS.softwareValue.toLocaleString() + '+';
+
+  // Pair Programming
+  document.getElementById('claudeSessions').textContent = STATS.claudeSessions;
+  document.getElementById('claudeMB').textContent = STATS.claudeTotalMB;
+  document.getElementById('claudePages').textContent = STATS.claudePages.toLocaleString();
+  document.getElementById('claudeHours').textContent = '~' + STATS.convoHours;
+  document.getElementById('convoHoursNote').textContent =
+    'Built with love, caffeine, and approximately ' + STATS.convoHours + ' hours of conversation.';
+
+  // Features
+  var fl = document.getElementById('featureList');
+  var fhtml = '';
+  for (var i = 0; i < FEATURES.length; i++) {
+    var f = FEATURES[i];
+    var icon = f.status === 'done' ? '✅' : '🔧';
+    fhtml += '<li class="feature-item"><span class="feature-icon">' + icon + '</span><div><span class="feature-name">' + f.name + '</span> <span class="feature-desc">&mdash; ' + f.desc + '</span></div></li>';
+  }
+  fl.innerHTML = fhtml;
+
+  // Roster
+  var rg = document.getElementById('rosterGrid');
+  var roster = [
+    {lang: 'C++ (firmware)', count: STATS.cppLines.toLocaleString() + ' lines'},
+    {lang: 'HTML (dashboard)', count: STATS.htmlLines.toLocaleString() + ' lines'},
+    {lang: 'JavaScript', count: STATS.jsLines.toLocaleString() + ' lines'},
+    {lang: 'CSS (5 themes)', count: STATS.cssLines.toLocaleString() + ' lines'},
+    {lang: 'C++ functions', count: STATS.cppFuncs},
+    {lang: 'JS functions', count: STATS.jsFuncs},
+    {lang: 'API endpoints', count: STATS.apiEndpoints},
+    {lang: 'Lines written', count: '+' + STATS.totalInsertions.toLocaleString()},
+    {lang: 'Lines revised', count: '-' + STATS.totalDeletions.toLocaleString()}
+  ];
+  var rhtml = '';
+  for (var r = 0; r < roster.length; r++) {
+    rhtml += '<div class="roster-item"><span class="lang">' + roster[r].lang + '</span><span class="count">' + roster[r].count + '</span></div>';
+  }
+  rg.innerHTML = rhtml;
+
+  // Timeline
+  var tl = document.getElementById('commitTimeline');
+  var thtml = '';
+  var showInitial = 8;
+  for (var t = 0; t < COMMITS.length; t++) {
+    var hidden = t >= showInitial ? ' style="display:none" class="timeline-item timeline-extra"' : ' class="timeline-item"';
+    thtml += '<div' + hidden + '><span class="timeline-date">' + COMMITS[t].date + '</span><span class="timeline-msg">' + COMMITS[t].msg + '</span></div>';
+  }
+  tl.innerHTML = thtml;
+  if (COMMITS.length > showInitial) {
+    document.getElementById('timelineToggle').style.display = 'inline-block';
+  }
+
+  // Announcer
+  var idx = Math.floor(Math.random() * ANNOUNCER_STATS.length);
+  document.getElementById('announcerBooth').innerHTML = '⚾<br>&ldquo;' + ANNOUNCER_STATS[idx] + '&rdquo;';
+
+  // Generated timestamp
+  document.getElementById('generatedAt').textContent = 'Stats generated: ' + STATS.generatedHuman;
+
+  // Fetch live data
+  fetchLiveData();
+}
+
+function toggleTimeline() {
+  var extras = document.querySelectorAll('.timeline-extra');
+  var btn = document.getElementById('timelineToggle');
+  var showing = extras.length > 0 && extras[0].style.display !== 'none';
+  for (var i = 0; i < extras.length; i++) {
+    extras[i].style.display = showing ? 'none' : 'flex';
+  }
+  btn.textContent = showing ? 'Show All' : 'Show Less';
+}
+
+function fetchLiveData() {
+  // Device info
+  fetch('/api/info').then(function(r){return r.json()}).then(function(d) {
+    document.getElementById('liveStatus').innerHTML = '<span class="live-pulse"></span>Online';
+    document.getElementById('liveStatus').className = 'value online';
+    document.getElementById('liveFirmware').textContent = 'v' + (d.firmware || d.version || '--');
+    if (d.uptime_seconds) {
+      var h = Math.floor(d.uptime_seconds / 3600);
+      var m = Math.floor((d.uptime_seconds % 3600) / 60);
+      document.getElementById('liveUptime').textContent = h + 'h ' + m + 'm';
+    }
+    if (d.heap_free) {
+      document.getElementById('liveHeap').textContent = Math.round(d.heap_free / 1024) + ' KB';
+    }
+    if (d.wifi_rssi) {
+      var rssi = d.wifi_rssi;
+      var quality = rssi > -50 ? 'Excellent' : rssi > -60 ? 'Good' : rssi > -70 ? 'Fair' : 'Weak';
+      document.getElementById('liveRssi').textContent = rssi + ' dBm (' + quality + ')';
+    }
+    if (typeof d.peer_count !== 'undefined') {
+      document.getElementById('livePeers').textContent = d.peer_count;
+    }
+
+    // Check for firmware update
+    checkUpdate(d.firmware || d.version);
+  }).catch(function() {
+    document.getElementById('liveStatus').textContent = 'Offline';
+    document.getElementById('liveStatus').className = 'value offline';
+  });
+
+  // Race history
+  fetch('/api/history').then(function(r){return r.json()}).then(function(h) {
+    var races = h.races || h.history || [];
+    document.getElementById('racesTotal').textContent = races.length;
+    if (races.length > 0) {
+      var fastest = Infinity, topSpd = 0;
+      for (var i = 0; i < races.length; i++) {
+        if (races[i].time && races[i].time < fastest) fastest = races[i].time;
+        if (races[i].speed && races[i].speed > topSpd) topSpd = races[i].speed;
+      }
+      document.getElementById('fastestTime').textContent = fastest < Infinity ? fastest.toFixed(3) + 's' : '--';
+      document.getElementById('topSpeed').textContent = topSpd > 0 ? topSpd.toFixed(2) + ' m/s' : '--';
+    }
+  }).catch(function(){});
+
+  // Garage
+  fetch('/api/garage').then(function(r){return r.json()}).then(function(g) {
+    var cars = g.cars || g.garage || [];
+    document.getElementById('garageCount').textContent = cars.length;
+  }).catch(function(){});
+}
+
+function checkUpdate(currentFw) {
+  if (!currentFw) return;
+  fetch('https://api.github.com/repos/Ryan4n6/MASS-Trap/releases/latest')
+    .then(function(r){return r.json()})
+    .then(function(rel) {
+      if (rel.tag_name) {
+        var latest = rel.tag_name.replace(/^v/,'').replace(/-.*$/,'');
+        var current = currentFw.replace(/-.*$/,'');
+        if (latest !== current) {
+          var notice = document.getElementById('updateNotice');
+          var link = document.getElementById('updateLink');
+          link.textContent = 'v' + latest + ' available — Download';
+          link.href = rel.html_url || 'https://github.com/Ryan4n6/MASS-Trap/releases/latest';
+          notice.style.display = 'block';
+        }
+      }
+    }).catch(function(){});
+}
+
+// Go
+init();
+</script>
+</body>
+</html>

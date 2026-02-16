@@ -39,15 +39,73 @@
     .pl-summary-table th{background:rgba(var(--accent-rgb,212,175,55),0.1);font-weight:700;color:var(--accent);}
     .pl-summary-table .pl-avg{font-weight:900;color:var(--secondary);}
     #plSetup input[type="text"],#plSetup input[type="number"]{background:var(--card-bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:6px 8px;}
-    /* ===== Evidence Tag Styles ===== */
-    .ev-tag{border:2px solid var(--accent);border-radius:8px;padding:12px;margin:10px 0;background:var(--card-bg);}
-    .ev-tag-header{text-align:center;border-bottom:2px solid var(--accent);padding-bottom:8px;margin-bottom:8px;}
-    .ev-tag-badge{font-size:0.7rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);}
-    .ev-tag-case{font-size:1.4rem;font-weight:900;letter-spacing:3px;color:var(--accent);}
-    .ev-tag-body{display:flex;gap:12px;align-items:flex-start;}
-    .ev-tag-qr{flex-shrink:0;background:#fff;padding:4px;border-radius:4px;}
-    .ev-tag-info{font-size:0.85rem;line-height:1.7;}
-    .ev-tag-ts{font-size:0.7rem;color:var(--text-muted);margin-top:4px;}
+    /* ===== 6-Phase Stepper Bar ===== */
+    .pl-stepper{display:flex;gap:0;margin:12px 0 8px;overflow-x:auto;}
+    .pl-step{flex:1;text-align:center;padding:6px 4px;font-size:0.6rem;font-weight:700;letter-spacing:0.5px;text-transform:uppercase;border-bottom:3px solid var(--border);color:var(--text-muted);transition:all 0.3s;cursor:pointer;white-space:nowrap;min-width:0;}
+    .pl-step:hover{color:var(--text);border-bottom-color:var(--text-muted);}
+    .pl-step.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:900;}
+    .pl-step.done{color:var(--success,#28a745);border-bottom-color:var(--success,#28a745);}
+    .pl-step .pl-step-num{display:block;font-size:0.9rem;font-weight:900;margin-bottom:2px;}
+    .pl-phase{display:none;animation:plFadeIn 0.3s ease;}
+    .pl-phase.active{display:block;}
+    @keyframes plFadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+    .pl-nav-buttons{display:flex;gap:8px;margin-top:12px;}
+    .pl-nav-buttons .btn{flex:1;}
+    /* ===== Template Cards ===== */
+    .pl-templates{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin:8px 0;}
+    .pl-template-card{border:2px solid var(--border);border-radius:8px;padding:10px;text-align:center;cursor:pointer;transition:all 0.2s;}
+    .pl-template-card:hover{border-color:var(--accent);background:rgba(var(--accent-rgb,212,175,55),0.05);}
+    .pl-template-card.selected{border-color:var(--accent);background:rgba(var(--accent-rgb,212,175,55),0.15);box-shadow:0 0 0 2px var(--accent);}
+    .pl-template-card .pl-tpl-icon{font-size:1.5em;display:block;margin-bottom:4px;}
+    .pl-template-card .pl-tpl-name{font-weight:900;font-size:0.85rem;color:var(--accent);}
+    .pl-template-card .pl-tpl-desc{font-size:0.7rem;color:var(--text-muted);margin-top:4px;}
+    /* ===== Variable Definitions ===== */
+    .pl-var-row{display:flex;gap:6px;align-items:center;margin:4px 0;}
+    .pl-var-row label{font-size:0.8rem;font-weight:700;min-width:80px;color:var(--accent);}
+    .pl-var-row input{flex:1;background:var(--card-bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:6px 8px;font-size:0.8rem;}
+    /* ===== Intake Checklist ===== */
+    .pl-intake-row{display:flex;align-items:center;gap:8px;padding:8px;border:1px solid var(--border);border-radius:6px;margin:4px 0;font-size:0.85rem;}
+    .pl-intake-row .pl-intake-status{font-size:1.1em;flex-shrink:0;}
+    .pl-intake-row .pl-intake-info{flex:1;}
+    .pl-intake-row .pl-intake-info .pl-intake-name{font-weight:700;}
+    .pl-intake-row .pl-intake-info .pl-intake-detail{font-size:0.75rem;color:var(--text-muted);}
+    /* ===== Case Assignment Table ===== */
+    .pl-case-table{width:100%;font-size:0.75rem;border-collapse:collapse;}
+    .pl-case-table th,.pl-case-table td{padding:4px 6px;border-bottom:1px solid var(--border);text-align:left;}
+    .pl-case-table th{font-weight:700;color:var(--accent);font-size:0.7rem;text-transform:uppercase;}
+    .pl-case-table tr.pl-photo-target{background:rgba(var(--accent-rgb,212,175,55),0.15);cursor:pointer;}
+    .pl-case-table tr:hover{background:rgba(var(--accent-rgb,212,175,55),0.05);}
+    /* ===== Readiness Checklist ===== */
+    .pl-ready-item{display:flex;align-items:center;gap:8px;padding:6px 0;font-size:0.85rem;}
+    .pl-ready-item .pl-ready-icon{font-size:1.2em;flex-shrink:0;}
+    .pl-ready-item.warn .pl-ready-icon{color:var(--warning,#ffc107);}
+    .pl-ready-item.ok .pl-ready-icon{color:var(--success,#28a745);}
+    /* ===== Sanity Check Alert ===== */
+    .pl-sanity-alert{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;background:#fff3cd;color:#856404;border:2px solid #ffc107;border-radius:12px;padding:16px 24px;text-align:center;max-width:400px;box-shadow:0 4px 20px rgba(0,0,0,0.3);animation:plSanityBounce 0.5s ease;}
+    @keyframes plSanityBounce{0%{transform:translateX(-50%) scale(0.8);opacity:0;}50%{transform:translateX(-50%) scale(1.05);}100%{transform:translateX(-50%) scale(1);opacity:1;}}
+    .pl-sanity-alert h3{margin:0 0 8px;font-size:1.1rem;color:#856404;}
+    .pl-sanity-alert p{margin:0 0 12px;font-size:0.9rem;}
+    .pl-sanity-alert .pl-sanity-btns{display:flex;gap:8px;justify-content:center;}
+    .pl-sanity-alert .pl-sanity-btns button{padding:8px 20px;border:none;border-radius:6px;font-weight:900;font-size:0.9rem;cursor:pointer;}
+    /* ===== Directions Panel ===== */
+    .pl-directions{background:rgba(var(--secondary-rgb,74,144,217),0.1);border:1px solid var(--secondary);border-radius:8px;padding:12px;margin:8px 0;font-size:0.85rem;line-height:1.6;}
+    .pl-directions h4{margin:0 0 8px;color:var(--secondary);font-size:0.9rem;}
+    .pl-directions ol{margin:0;padding-left:20px;}
+    .pl-directions li{margin:4px 0;}
+    /* ===== Evidence Tag Styles (screen preview) ===== */
+    .ev-tag{border:2px solid var(--accent);border-radius:6px;padding:8px 10px;margin:8px 0;background:var(--card-bg);max-width:320px;}
+    .ev-tag-header{display:flex;justify-content:space-between;align-items:center;border-bottom:1.5px solid var(--accent);padding-bottom:5px;margin-bottom:6px;}
+    .ev-tag-badge{font-size:0.55rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-muted);}
+    .ev-tag-case{font-size:1rem;font-weight:900;letter-spacing:2px;color:var(--accent);}
+    .ev-tag-body{display:flex;gap:8px;align-items:flex-start;}
+    .ev-tag-qr{flex-shrink:0;background:#fff;padding:3px;border-radius:3px;}
+    .ev-tag-info{font-size:0.7rem;line-height:1.5;}
+    .ev-tag-info div{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:180px;}
+    .ev-tag-ts{font-size:0.55rem;color:var(--text-muted);margin-top:2px;}
+    /* Label size config bar */
+    .ev-label-config{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;font-size:0.8rem;}
+    .ev-label-config select,.ev-label-config input{background:var(--card-bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px 6px;font-size:0.8rem;}
+    .ev-label-config input[type="number"]{width:60px;}
   </style>
 </head>
 <body>
@@ -104,6 +162,12 @@
       <button id="btnReset" class="btn btn-accent" onclick="resetRace()">RESET</button>
       <button id="btnSync" class="btn btn-primary" onclick="syncClock()">SYNC CLOCK</button>
     </div>
+    <!-- Pre-Race Setup Photo (hidden in kiosk mode) -->
+    <div class="kiosk-hide" id="setupPhotoBar" style="margin-top:6px;">
+      <button class="btn btn-outline btn-sm" onclick="evCaptureSetupPhoto()" style="width:100%;" id="btnSetupPhoto">
+        &#x1F4F7; SETUP PHOTO <span id="setupPhotoCount" style="display:none;" class="playlist-badge"></span>
+      </button>
+    </div>
 
     <!-- Dry-Run Controls (hidden in kiosk mode) -->
     <div class="kiosk-hide" style="margin-top:8px;">
@@ -118,33 +182,61 @@
         <span id="playlistBadge" class="playlist-badge" style="display:none;"></span>
       </summary>
 
-      <!-- ===== SETUP PHASE ===== -->
-      <div id="plSetup">
-        <!-- Car Selector -->
-        <div style="margin:12px 0;">
-          <h3 style="font-size:0.9rem; font-weight:700; margin-bottom:8px; color:var(--accent);">SELECT TEST VEHICLES</h3>
-          <div id="plCarSelector" class="pl-car-selector" role="group" aria-label="Select cars to include in test playlist">
-            <p class="text-muted">Add cars to the garage first</p>
+      <!-- ===== 6-PHASE STEPPER BAR ===== -->
+      <div id="plStepper" class="pl-stepper" role="tablist" aria-label="Experiment phases">
+        <div class="pl-step active" data-phase="1" onclick="plGoToPhase(1)" role="tab" aria-selected="true"><span class="pl-step-num">1</span>Setup</div>
+        <div class="pl-step" data-phase="2" onclick="plGoToPhase(2)" role="tab"><span class="pl-step-num">2</span>Intake</div>
+        <div class="pl-step" data-phase="3" onclick="plGoToPhase(3)" role="tab"><span class="pl-step-num">3</span>Evidence</div>
+        <div class="pl-step" data-phase="4" onclick="plGoToPhase(4)" role="tab"><span class="pl-step-num">4</span>Pre-Flight</div>
+        <div class="pl-step" data-phase="5" onclick="plGoToPhase(5)" role="tab"><span class="pl-step-num">5</span>Collect</div>
+        <div class="pl-step" data-phase="6" onclick="plGoToPhase(6)" role="tab"><span class="pl-step-num">6</span>Results</div>
+      </div>
+
+      <!-- ===== PHASE 1: EXPERIMENT SETUP ===== -->
+      <div id="plPhase1" class="pl-phase active" role="tabpanel">
+        <h3 style="font-size:1rem;font-weight:900;color:var(--accent);margin:8px 0;">EXPERIMENT SETUP</h3>
+        <p class="text-muted" style="font-size:0.8rem;">Choose a template or define your own experiment. The system will guide you through the forensic evidence chain.</p>
+
+        <!-- Template Selector -->
+        <div class="pl-templates" id="plTemplates">
+          <div class="pl-template-card" onclick="plSelectTemplate('mass_vs_speed')">
+            <span class="pl-tpl-icon" aria-hidden="true">&#x2696;</span>
+            <div class="pl-tpl-name">Mass vs Speed</div>
+            <div class="pl-tpl-desc">Does adding weight make a car faster?</div>
           </div>
-          <button class="btn btn-outline btn-sm" onclick="plSelectAllCars()" style="margin-top:4px;">Select All</button>
+          <div class="pl-template-card" onclick="plSelectTemplate('car_vs_car')">
+            <span class="pl-tpl-icon" aria-hidden="true">&#x1F3CE;</span>
+            <div class="pl-tpl-name">Car vs Car</div>
+            <div class="pl-tpl-desc">Which car model is fastest?</div>
+          </div>
+          <div class="pl-template-card" onclick="plSelectTemplate('custom')">
+            <span class="pl-tpl-icon" aria-hidden="true">&#x1F527;</span>
+            <div class="pl-tpl-name">Custom</div>
+            <div class="pl-tpl-desc">Define your own variables</div>
+          </div>
+        </div>
+
+        <!-- Variable Definitions -->
+        <div style="margin:12px 0;">
+          <h4 style="font-size:0.85rem;font-weight:700;color:var(--secondary);margin-bottom:6px;">VARIABLES</h4>
+          <div class="pl-var-row"><label>Independent:</label><input type="text" id="plVarIV" placeholder="What you change (e.g., added weight)" aria-label="Independent variable"></div>
+          <div class="pl-var-row"><label>Dependent:</label><input type="text" id="plVarDV" placeholder="What you measure (e.g., speed)" aria-label="Dependent variable"></div>
+          <div class="pl-var-row"><label>Controlled:</label><input type="text" id="plVarCV" placeholder="What stays the same (e.g., track, height)" aria-label="Controlled variables"></div>
         </div>
 
         <!-- Weight Conditions -->
         <div style="margin:12px 0;">
-          <h3 style="font-size:0.9rem; font-weight:700; margin-bottom:8px; color:var(--accent);">WEIGHT CONDITIONS</h3>
-          <p class="text-muted" style="font-size:0.8rem; margin-bottom:6px;">
-            Define each weight condition. Enter exact scale readings for precise calculations.
-          </p>
+          <h4 style="font-size:0.85rem;font-weight:700;color:var(--accent);margin-bottom:6px;">WEIGHT CONDITIONS</h4>
+          <p class="text-muted" style="font-size:0.75rem;margin-bottom:6px;">Define each weight condition. Baseline (no added weight) is automatic.</p>
           <div id="plConditions">
-            <!-- Baseline always present -->
             <div class="pl-condition-row" data-index="0">
               <input type="text" value="No added weight" class="pl-cond-label" aria-label="Condition label" readonly>
-              <input type="number" value="0" class="pl-cond-weight" step="0.1" min="0" aria-label="Added weight in grams" readonly>
+              <input type="number" value="0" class="pl-cond-weight" step="0.001" min="0" aria-label="Added weight" readonly>
               <span class="pl-cond-unit">g</span>
               <span style="width:30px;"></span>
             </div>
           </div>
-          <div class="grid grid-3" style="margin-top:6px; gap:6px;">
+          <div class="grid grid-3" style="margin-top:6px;gap:6px;">
             <input type="text" id="plNewCondLabel" placeholder="e.g. +14g tungsten" aria-label="New condition label">
             <input type="number" id="plNewCondWeight" placeholder="e.g. 14.2" step="0.001" min="0.001" aria-label="Added weight in grams">
             <button class="btn btn-accent btn-sm" onclick="plAddCondition()">ADD CONDITION</button>
@@ -153,27 +245,116 @@
 
         <!-- Trials Per Condition -->
         <div style="margin:12px 0;">
-          <label for="plTrials" style="font-size:0.9rem; font-weight:700; color:var(--accent);">TRIALS PER CONDITION</label>
-          <input type="number" id="plTrials" value="3" min="2" max="10" style="width:80px; margin-left:8px;">
+          <label for="plTrials" style="font-size:0.85rem;font-weight:700;color:var(--accent);">TRIALS PER CONDITION</label>
+          <input type="number" id="plTrials" value="3" min="2" max="10" style="width:80px;margin-left:8px;">
         </div>
 
-        <!-- Test Plan Preview -->
-        <div id="plPreview" style="display:none; margin:12px 0;">
-          <h3 style="font-size:0.9rem; font-weight:700; margin-bottom:8px; color:var(--secondary);">TEST PLAN PREVIEW</h3>
-          <div id="plPreviewTable" style="max-height:300px; overflow-y:auto; font-size:0.8rem;"></div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="grid grid-2" style="margin-top:12px;">
-          <button class="btn btn-primary" onclick="plGeneratePlan()">GENERATE TEST PLAN</button>
-          <button class="btn btn-success" id="plStartBtn" onclick="plStartTesting()" disabled>START TESTING</button>
+        <div class="pl-nav-buttons">
+          <button class="btn btn-success" id="plPhase1Next" onclick="plGoToPhase(2)">NEXT: VEHICLE INTAKE &#x27A1;</button>
         </div>
       </div>
 
-      <!-- ===== ACTIVE PHASE ===== -->
-      <div id="plActive" style="display:none;">
+      <!-- ===== PHASE 2: VEHICLE INTAKE ===== -->
+      <div id="plPhase2" class="pl-phase" role="tabpanel">
+        <h3 style="font-size:1rem;font-weight:900;color:var(--accent);margin:8px 0;">VEHICLE INTAKE</h3>
+        <p class="text-muted" style="font-size:0.8rem;">Select and verify your test vehicles. Check NFC tag status and verify weights.</p>
+
+        <div style="margin:12px 0;">
+          <div id="plCarSelector" class="pl-car-selector" role="group" aria-label="Select cars to include in test">
+            <p class="text-muted">Add cars to the garage first</p>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="plSelectAllCars()" style="margin-top:4px;">Select All</button>
+        </div>
+
+        <!-- Intake verification list -->
+        <div id="plIntakeList" style="margin:12px 0;"></div>
+
+        <div class="pl-nav-buttons">
+          <button class="btn btn-outline" onclick="plGoToPhase(1)">&#x2B05; BACK</button>
+          <button class="btn btn-success" id="plPhase2Next" onclick="plPhase2Advance()">GENERATE MATRIX &amp; ASSIGN CASES &#x27A1;</button>
+        </div>
+      </div>
+
+      <!-- ===== PHASE 3: EVIDENCE PREP ===== -->
+      <div id="plPhase3" class="pl-phase" role="tabpanel">
+        <h3 style="font-size:1rem;font-weight:900;color:var(--accent);margin:8px 0;">&#x1F3F7; EVIDENCE PREP</h3>
+        <p class="text-muted" style="font-size:0.8rem;">Case numbers assigned. Print your evidence tags and photograph your setup <strong>BEFORE</strong> any testing begins.</p>
+
+        <!-- Case Assignment Table -->
+        <div style="overflow-x:auto;margin:8px 0;">
+          <table class="pl-case-table" id="plCaseTable">
+            <thead><tr><th>#</th><th>Case Number</th><th>Car</th><th>Condition</th><th>Trial</th><th>Photo</th></tr></thead>
+            <tbody id="plCaseTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-2" style="margin:8px 0;">
+          <button class="btn btn-primary" onclick="plPrintPreTags()" style="font-weight:700;">&#x1F5A8; PRINT EVIDENCE TAGS</button>
+          <button class="btn btn-success" onclick="plCaptureEvidencePhoto()" style="font-weight:700;" id="plPhase3PhotoBtn">&#x1F4F7; CAPTURE SETUP PHOTO</button>
+        </div>
+
+        <!-- Photo Checklist -->
+        <div class="pl-directions" style="margin:8px 0;">
+          <h4>&#x1F4F7; Photo Checklist (advisory)</h4>
+          <ol>
+            <li>Photograph scale readings for each vehicle</li>
+            <li>Photograph the test setup and track</li>
+            <li>Photograph weight additions for each condition</li>
+            <li>Photograph printed evidence tags laid out</li>
+          </ol>
+        </div>
+
+        <div class="pl-nav-buttons">
+          <button class="btn btn-outline" onclick="plGoToPhase(2)">&#x2B05; BACK</button>
+          <button class="btn btn-success" onclick="plPhase3Advance()">NEXT: PRE-FLIGHT CHECK &#x27A1;</button>
+        </div>
+      </div>
+
+      <!-- ===== PHASE 4: PRE-FLIGHT CHECK ===== -->
+      <div id="plPhase4" class="pl-phase" role="tabpanel">
+        <h3 style="font-size:1rem;font-weight:900;color:var(--accent);margin:8px 0;">&#x2705; PRE-FLIGHT CHECK</h3>
+        <p class="text-muted" style="font-size:0.8rem;">Review your test plan. Once data collection begins, case numbers are locked.</p>
+
+        <!-- Full test plan table -->
+        <div style="overflow-x:auto;margin:8px 0;max-height:250px;">
+          <table class="pl-results-table" id="plPlanTable">
+            <thead><tr><th>#</th><th>Case</th><th>Car</th><th>Condition</th><th>Trial</th><th>Weight (g)</th></tr></thead>
+            <tbody id="plPlanTableBody"></tbody>
+          </table>
+        </div>
+
+        <!-- Directions for Ben -->
+        <div class="pl-directions" id="plDirections">
+          <h4>&#x1F4CB; Directions for the Forensicator</h4>
+          <ol>
+            <li>Place the correct car at the top of the track</li>
+            <li>Make sure the start gate sensor is clear</li>
+            <li>Release the car when you hear "System Armed"</li>
+            <li>Catch the car at the bottom &mdash; do NOT let it roll back through the sensor</li>
+            <li>Wait for the system to announce the next run</li>
+          </ol>
+        </div>
+
+        <!-- Readiness Checklist -->
+        <div style="margin:12px 0;">
+          <h4 style="font-size:0.85rem;font-weight:700;color:var(--secondary);margin-bottom:6px;">READINESS CHECKLIST</h4>
+          <div id="plReadinessChecks"></div>
+        </div>
+
+        <div class="pl-nav-buttons">
+          <button class="btn btn-outline" onclick="plGoToPhase(3)">&#x2B05; BACK</button>
+          <button class="btn btn-success" onclick="plBeginDataCollection()" style="font-size:1.1rem;font-weight:900;padding:14px;">&#x1F7E2; BEGIN DATA COLLECTION</button>
+        </div>
+      </div>
+
+      <!-- ===== PHASE 5: DATA COLLECTION ===== -->
+      <div id="plPhase5" class="pl-phase" role="tabpanel">
+        <h3 style="font-size:1rem;font-weight:900;color:var(--accent);margin:8px 0;">DATA COLLECTION</h3>
+
         <!-- Big instruction banner -->
         <div id="plBanner" class="pl-banner" role="status" aria-live="assertive">
+          <div id="plCaseLabel" style="font-size:0.75rem;font-weight:900;color:var(--secondary);letter-spacing:1.5px;margin-bottom:2px;"></div>
           <div id="plRunLabel" class="pl-run-label">Run 1 of 1</div>
           <div id="plInstruction" class="pl-instruction">Loading...</div>
           <div id="plTrialLabel" class="pl-trial-label">Trial 1 of 3</div>
@@ -185,7 +366,7 @@
           <span id="plProgressText" class="pl-progress-text">0%</span>
         </div>
 
-        <!-- Condition change alert (hidden until needed) -->
+        <!-- Condition change alert -->
         <div id="plConditionAlert" class="pl-condition-alert" style="display:none;" role="alert">
           <strong>ATTENTION:</strong> <span id="plConditionAlertText"></span>
         </div>
@@ -198,19 +379,17 @@
         </div>
 
         <!-- Live results table -->
-        <div style="margin-top:12px; overflow-x:auto;">
+        <div style="margin-top:8px;overflow-x:auto;">
           <table class="pl-results-table">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Car</th>
-                <th scope="col">Condition</th>
-                <th scope="col">Trial</th>
-                <th scope="col">Time (s)</th>
-                <th scope="col">Speed (m/s)</th>
-                <th scope="col">Weight (g)</th>
-              </tr>
-            </thead>
+            <thead><tr>
+              <th scope="col">#</th>
+              <th scope="col">Case</th>
+              <th scope="col">Car</th>
+              <th scope="col">Condition</th>
+              <th scope="col">Trial</th>
+              <th scope="col">Time (s)</th>
+              <th scope="col">Speed (m/s)</th>
+            </tr></thead>
             <tbody id="plResultsBody">
               <tr><td colspan="7" class="text-center text-muted">Waiting for first run...</td></tr>
             </tbody>
@@ -218,15 +397,15 @@
         </div>
       </div>
 
-      <!-- ===== COMPLETED PHASE ===== -->
-      <div id="plCompleted" style="display:none;">
+      <!-- ===== PHASE 6: RESULTS & REPORT ===== -->
+      <div id="plPhase6" class="pl-phase" role="tabpanel">
         <div class="pl-complete-banner" role="status">
           <span style="font-size:1.5em;" aria-hidden="true">&#x1F3C6;</span>
           ALL TESTS COMPLETE!
         </div>
 
-        <!-- Summary table with averages -->
-        <div id="plSummary" style="margin:12px 0; overflow-x:auto;"></div>
+        <!-- Summary table -->
+        <div id="plSummary" style="margin:12px 0;overflow-x:auto;"></div>
 
         <!-- Export buttons -->
         <div class="grid grid-3" style="margin-top:12px;">
@@ -234,7 +413,16 @@
           <button class="btn btn-success" onclick="plExportSummary()">EXPORT SUMMARY</button>
           <button class="btn btn-danger" onclick="plClearAndRestart()">CLEAR &amp; START OVER</button>
         </div>
+        <div class="grid grid-2" style="margin-top:8px;">
+          <button class="btn" onclick="plReprintWithResults()" style="background:var(--secondary);color:#fff;font-weight:700;">&#x1F5A8; REPRINT TAGS (WITH RESULTS)</button>
+          <button class="btn" onclick="plGenerateReport()" style="background:var(--accent);color:#fff;font-weight:700;">&#128220; SCIENCE FAIR REPORT</button>
+        </div>
+        <!-- Past Reports -->
+        <div style="margin-top:8px;">
+          <button class="btn btn-outline" onclick="plShowPastReports()" style="width:100%;">&#x1F4CB; PAST REPORTS</button>
+        </div>
       </div>
+
     </details>
 
     <!-- System Status Panel (shown in dry-run, collapsible otherwise) -->
@@ -1468,7 +1656,7 @@
     }
 
     // ========================================================================
-    // PLAYLIST MODE — Science Fair Guided Testing
+    // PLAYLIST MODE — 6-Phase Forensic Lab Manager
     // ========================================================================
     var playlistMode = {
       active: false,
@@ -1476,38 +1664,21 @@
       tests: [],
       currentIndex: 0,
       results: [],
+      currentPhase: 1,
+      highestPhase: 1,
+      sanityPending: false,
       config: {
         trialsPerCondition: 3,
         conditions: [{ label: 'No added weight', addedWeight: 0 }],
-        selectedCarIds: []
+        selectedCarIds: [],
+        variables: { iv: '', dv: '', cv: '' },
+        experimentTemplate: '',
+        maxSavedReports: 10
       }
     };
+    var plPhotoTargetCase = null; // Which case number is the current photo target (Phase 3)
 
-    // --- Restore from localStorage on load ---
-    function plRestoreState() {
-      try {
-        var savedConfig = JSON.parse(localStorage.getItem('mass_playlist_config') || 'null');
-        if (savedConfig) {
-          playlistMode.config = savedConfig;
-          plRenderConditions();
-        }
-        var savedState = JSON.parse(localStorage.getItem('mass_playlist_state') || 'null');
-        if (savedState && savedState.active) {
-          playlistMode.active = savedState.active;
-          playlistMode.paused = savedState.paused || false;
-          playlistMode.tests = savedState.tests;
-          playlistMode.currentIndex = savedState.currentIndex;
-          playlistMode.results = savedState.results;
-          // Resume active UI
-          plShowPhase('active');
-          plUpdateActiveUI();
-          if (playlistMode.paused) {
-            document.getElementById('plPauseBtn').textContent = 'RESUME';
-          }
-        }
-      } catch (e) { console.error('[PLAYLIST] Restore failed:', e); }
-    }
-
+    // --- Persistence ---
     function plSaveConfig() {
       localStorage.setItem('mass_playlist_config', JSON.stringify(playlistMode.config));
     }
@@ -1518,13 +1689,244 @@
         paused: playlistMode.paused,
         tests: playlistMode.tests,
         currentIndex: playlistMode.currentIndex,
-        results: playlistMode.results
+        results: playlistMode.results,
+        currentPhase: playlistMode.currentPhase,
+        highestPhase: playlistMode.highestPhase,
+        savedAt: Date.now()
       }));
+      // Fire-and-forget save to ESP32
+      plSaveToESP();
     }
 
-    // --- Car Selector ---
+    function plSaveToESP() {
+      try {
+        var payload = JSON.stringify({
+          active: playlistMode.active,
+          paused: playlistMode.paused,
+          tests: playlistMode.tests,
+          currentIndex: playlistMode.currentIndex,
+          results: playlistMode.results,
+          currentPhase: playlistMode.currentPhase,
+          highestPhase: playlistMode.highestPhase,
+          config: playlistMode.config,
+          savedAt: Date.now()
+        });
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/files?path=/experiment.json', true);
+        xhr.setRequestHeader('X-API-Key', 'admin');
+        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+        xhr.send(payload);
+      } catch (e) { console.error('[PLAYLIST] ESP save failed:', e); }
+    }
+
+    function plLoadFromESP(callback) {
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', '/api/files?path=/experiment.json', true);
+        xhr.setRequestHeader('X-API-Key', 'admin');
+        xhr.onload = function() {
+          if (xhr.status === 200) {
+            try { callback(JSON.parse(xhr.responseText)); } catch (e) { callback(null); }
+          } else { callback(null); }
+        };
+        xhr.onerror = function() { callback(null); };
+        xhr.send();
+      } catch (e) { callback(null); }
+    }
+
+    function plRestoreState() {
+      try {
+        var savedConfig = JSON.parse(localStorage.getItem('mass_playlist_config') || 'null');
+        if (savedConfig) {
+          // Merge with defaults for new fields
+          playlistMode.config.trialsPerCondition = savedConfig.trialsPerCondition || 3;
+          playlistMode.config.conditions = savedConfig.conditions || [{ label: 'No added weight', addedWeight: 0 }];
+          playlistMode.config.selectedCarIds = savedConfig.selectedCarIds || [];
+          playlistMode.config.variables = savedConfig.variables || { iv: '', dv: '', cv: '' };
+          playlistMode.config.experimentTemplate = savedConfig.experimentTemplate || '';
+          playlistMode.config.maxSavedReports = savedConfig.maxSavedReports || 10;
+          plRenderConditions();
+          plRestoreVariableInputs();
+          plRestoreTemplateSelection();
+        }
+        var savedState = JSON.parse(localStorage.getItem('mass_playlist_state') || 'null');
+        // Also try ESP32 recovery
+        plLoadFromESP(function(espState) {
+          var best = savedState;
+          if (espState && (!best || (espState.savedAt || 0) > (best.savedAt || 0))) {
+            best = espState;
+          }
+          if (best && best.currentPhase) {
+            playlistMode.active = best.active || false;
+            playlistMode.paused = best.paused || false;
+            playlistMode.tests = best.tests || [];
+            playlistMode.currentIndex = best.currentIndex || 0;
+            playlistMode.results = best.results || [];
+            playlistMode.currentPhase = best.currentPhase || 1;
+            playlistMode.highestPhase = best.highestPhase || best.currentPhase || 1;
+            if (best.config) {
+              playlistMode.config = best.config;
+              plRenderConditions();
+              plRestoreVariableInputs();
+              plRestoreTemplateSelection();
+            }
+            // Restore to saved phase
+            plGoToPhase(playlistMode.currentPhase, true);
+            if (playlistMode.active && playlistMode.currentPhase === 5) {
+              plUpdateActiveUI();
+              if (playlistMode.paused) {
+                var btn = document.getElementById('plPauseBtn');
+                if (btn) btn.textContent = 'RESUME';
+              }
+            }
+          }
+        });
+      } catch (e) { console.error('[PLAYLIST] Restore failed:', e); }
+    }
+
+    function plRestoreVariableInputs() {
+      var v = playlistMode.config.variables || {};
+      var iv = document.getElementById('plVarIV');
+      var dv = document.getElementById('plVarDV');
+      var cv = document.getElementById('plVarCV');
+      if (iv && v.iv) iv.value = v.iv;
+      if (dv && v.dv) dv.value = v.dv;
+      if (cv && v.cv) cv.value = v.cv;
+    }
+
+    function plRestoreTemplateSelection() {
+      var tpl = playlistMode.config.experimentTemplate;
+      if (!tpl) return;
+      var cards = document.querySelectorAll('.pl-template-card');
+      for (var i = 0; i < cards.length; i++) {
+        cards[i].classList.remove('selected');
+      }
+      var card = document.querySelector('.pl-template-card[onclick*="' + tpl + '"]');
+      if (card) card.classList.add('selected');
+    }
+
+    // ===== 6-PHASE NAVIGATION =====
+    function plGoToPhase(phase, isRestore) {
+      phase = parseInt(phase);
+      if (phase < 1 || phase > 6) return;
+
+      // Validation gates (skip during restore)
+      if (!isRestore) {
+        if (phase >= 2 && !plValidatePhase1()) { announce('Complete experiment setup first.'); return; }
+        if (phase >= 3 && playlistMode.config.selectedCarIds.length === 0) { announce('Select at least one car.'); return; }
+        if (phase >= 3 && playlistMode.tests.length === 0) { announce('Generate test matrix first.'); return; }
+        if (phase >= 5 && !playlistMode.active) {
+          // Can only enter phase 5 via BEGIN DATA COLLECTION button
+          if (phase === 5) { announce('Use the Begin Data Collection button.'); return; }
+        }
+      }
+
+      // Save variables from Phase 1 inputs before leaving
+      if (playlistMode.currentPhase === 1) {
+        plSaveVariablesFromInputs();
+      }
+
+      playlistMode.currentPhase = phase;
+      if (phase > playlistMode.highestPhase) playlistMode.highestPhase = phase;
+
+      // Update stepper
+      var steps = document.querySelectorAll('.pl-step');
+      for (var i = 0; i < steps.length; i++) {
+        var stepNum = parseInt(steps[i].getAttribute('data-phase'));
+        steps[i].classList.remove('active', 'done');
+        if (stepNum === phase) steps[i].classList.add('active');
+        else if (stepNum < phase) steps[i].classList.add('done');
+      }
+
+      // Show/hide phase panels
+      for (var p = 1; p <= 6; p++) {
+        var panel = document.getElementById('plPhase' + p);
+        if (panel) {
+          panel.classList.remove('active');
+          if (p === phase) panel.classList.add('active');
+        }
+      }
+
+      // Phase-specific setup
+      if (phase === 2) plRenderIntakeList();
+      if (phase === 3) plRenderCaseTable();
+      if (phase === 4) { plRenderPlanTable(); plRenderReadinessChecks(); }
+      if (phase === 5) plUpdateActiveUI();
+      if (phase === 6) plBuildSummary();
+
+      if (!isRestore) plSaveState();
+
+      // Open the details element
+      var details = document.getElementById('playlistSection');
+      if (details) details.open = true;
+    }
+
+    function plValidatePhase1() {
+      var v = playlistMode.config.variables || {};
+      if (!v.iv && !v.dv) return false;
+      if (playlistMode.config.conditions.length < 2) return false;
+      return true;
+    }
+
+    function plSaveVariablesFromInputs() {
+      var iv = document.getElementById('plVarIV');
+      var dv = document.getElementById('plVarDV');
+      var cv = document.getElementById('plVarCV');
+      playlistMode.config.variables = {
+        iv: iv ? iv.value.trim() : '',
+        dv: dv ? dv.value.trim() : '',
+        cv: cv ? cv.value.trim() : ''
+      };
+      plSaveConfig();
+    }
+
+    // ===== PHASE 1: EXPERIMENT TEMPLATES =====
+    function plSelectTemplate(templateId) {
+      // Deselect all
+      var cards = document.querySelectorAll('.pl-template-card');
+      for (var i = 0; i < cards.length; i++) cards[i].classList.remove('selected');
+      // Select this one
+      var clicked = event ? event.currentTarget : null;
+      if (clicked) clicked.classList.add('selected');
+
+      playlistMode.config.experimentTemplate = templateId;
+
+      if (templateId === 'mass_vs_speed') {
+        document.getElementById('plVarIV').value = 'Added weight (grams of tungsten)';
+        document.getElementById('plVarDV').value = 'Speed (m/s) and Time (seconds)';
+        document.getElementById('plVarCV').value = 'Track (6.01m), start height, release method, car model per condition, NFC tag mass (0.025g)';
+        // Pre-add conditions if none exist
+        if (playlistMode.config.conditions.length < 2) {
+          playlistMode.config.conditions = [
+            { label: 'No added weight', addedWeight: 0 },
+            { label: '+3.5g tungsten', addedWeight: 3.5 },
+            { label: '+7g tungsten', addedWeight: 7.0 },
+            { label: '+14g tungsten', addedWeight: 14.0 }
+          ];
+          plRenderConditions();
+        }
+      } else if (templateId === 'car_vs_car') {
+        document.getElementById('plVarIV').value = 'Car model';
+        document.getElementById('plVarDV').value = 'Time (seconds)';
+        document.getElementById('plVarCV').value = 'Track (6.01m), start height, release method, weight (matched)';
+        if (playlistMode.config.conditions.length > 1) {
+          // Reset to baseline only for car-vs-car
+        }
+      } else {
+        document.getElementById('plVarIV').value = '';
+        document.getElementById('plVarDV').value = '';
+        document.getElementById('plVarCV').value = '';
+      }
+
+      plSaveVariablesFromInputs();
+      plSaveConfig();
+      announce('Template selected: ' + templateId.replace(/_/g, ' ') + '. Variables auto-filled.');
+    }
+
+    // ===== PHASE 1: CAR SELECTOR =====
     function plRenderCarSelector() {
       var container = document.getElementById('plCarSelector');
+      if (!container) return;
       if (garage.length === 0) {
         container.innerHTML = '<p class="text-muted">Add cars to the garage first</p>';
         return;
@@ -1545,12 +1947,8 @@
       } else if (!checkbox.checked && idx !== -1) {
         playlistMode.config.selectedCarIds.splice(idx, 1);
       }
-      // Update visual state
       checkbox.parentElement.classList.toggle('checked', checkbox.checked);
       plSaveConfig();
-      // Hide preview when selection changes
-      document.getElementById('plPreview').style.display = 'none';
-      document.getElementById('plStartBtn').disabled = true;
     }
 
     function plSelectAllCars() {
@@ -1559,16 +1957,17 @@
       plRenderCarSelector();
     }
 
-    // --- Weight Conditions ---
+    // ===== PHASE 1: WEIGHT CONDITIONS =====
     function plRenderConditions() {
       var container = document.getElementById('plConditions');
+      if (!container) return;
       container.innerHTML = playlistMode.config.conditions.map(function(cond, i) {
         var isBaseline = (i === 0);
         return '<div class="pl-condition-row" data-index="' + i + '">' +
           '<input type="text" value="' + escHtml(cond.label) + '" class="pl-cond-label"' +
             (isBaseline ? ' readonly' : ' onchange="plUpdateCondLabel(' + i + ', this.value)"') +
             ' aria-label="Condition ' + (i + 1) + ' label">' +
-          '<input type="number" value="' + cond.addedWeight + '" class="pl-cond-weight" step="0.1" min="0"' +
+          '<input type="number" value="' + cond.addedWeight + '" class="pl-cond-weight" step="0.001" min="0"' +
             (isBaseline ? ' readonly' : ' onchange="plUpdateCondWeight(' + i + ', this.value)"') +
             ' aria-label="Condition ' + (i + 1) + ' weight">' +
           '<span class="pl-cond-unit">g</span>' +
@@ -1576,8 +1975,8 @@
             '<button class="pl-cond-remove" onclick="plRemoveCondition(' + i + ')" aria-label="Remove condition ' + escHtml(cond.label) + '">X</button>') +
         '</div>';
       }).join('');
-      // Sync trials input
-      document.getElementById('plTrials').value = playlistMode.config.trialsPerCondition;
+      var trialsInput = document.getElementById('plTrials');
+      if (trialsInput) trialsInput.value = playlistMode.config.trialsPerCondition;
     }
 
     function plAddCondition() {
@@ -1590,18 +1989,13 @@
       document.getElementById('plNewCondWeight').value = '';
       plRenderConditions();
       plSaveConfig();
-      // Hide preview when conditions change
-      document.getElementById('plPreview').style.display = 'none';
-      document.getElementById('plStartBtn').disabled = true;
     }
 
     function plRemoveCondition(index) {
-      if (index === 0) return; // Can't remove baseline
+      if (index === 0) return;
       playlistMode.config.conditions.splice(index, 1);
       plRenderConditions();
       plSaveConfig();
-      document.getElementById('plPreview').style.display = 'none';
-      document.getElementById('plStartBtn').disabled = true;
     }
 
     function plUpdateCondLabel(index, value) {
@@ -1617,9 +2011,64 @@
       }
     }
 
-    // --- Test Matrix Generator (Locard's Principle) ---
-    // Order: for each condition (ascending weight) → for each trial → for each car
-    // This spreads trials apart and cycles cars within each trial round
+    // ===== PHASE 2: VEHICLE INTAKE =====
+    function plRenderIntakeList() {
+      var container = document.getElementById('plIntakeList');
+      if (!container) return;
+      var selected = garage.filter(function(c) {
+        return playlistMode.config.selectedCarIds.indexOf(c.id) !== -1;
+      });
+      if (selected.length === 0) {
+        container.innerHTML = '<p class="text-muted">No cars selected. Go back and select test vehicles.</p>';
+        return;
+      }
+      var html = '<h4 style="font-size:0.85rem;font-weight:700;color:var(--secondary);margin-bottom:6px;">VEHICLE VERIFICATION</h4>';
+      for (var i = 0; i < selected.length; i++) {
+        var car = selected[i];
+        var hasNfc = car.nfcId || false;
+        html += '<div class="pl-intake-row">' +
+          '<div class="pl-intake-status">' + (hasNfc ? '&#x2705;' : '&#x26A0;&#xFE0F;') + '</div>' +
+          '<div class="pl-intake-info">' +
+            '<div class="pl-intake-name">' + escHtml(car.name) + '</div>' +
+            '<div class="pl-intake-detail">' + car.weight + 'g | ' +
+              (hasNfc ? 'NFC tagged' : 'No NFC tag') + '</div>' +
+          '</div>' +
+          (!hasNfc ? '<button class="btn btn-outline btn-sm" onclick="evShowNfcWriterHelper()" style="font-size:0.7rem;">Assign NFC</button>' : '') +
+        '</div>';
+      }
+      container.innerHTML = html;
+    }
+
+    // ===== PHASE 2 → 3: GENERATE MATRIX & ASSIGN CASE NUMBERS =====
+    function plPhase2Advance() {
+      if (playlistMode.config.selectedCarIds.length === 0) {
+        alert('Select at least one car!');
+        return;
+      }
+      // Generate test matrix
+      var tests = plGenerateMatrix();
+      playlistMode.tests = tests;
+
+      // Assign case numbers to EVERY test BEFORE any racing
+      plAssignCaseNumbers();
+
+      // Create pre-evidence entries
+      plCreatePreEvidenceEntries();
+
+      plSaveState();
+      plSaveConfig();
+
+      // Update badge
+      var badge = document.getElementById('playlistBadge');
+      if (badge) {
+        badge.textContent = tests.length + ' runs';
+        badge.style.display = 'inline';
+      }
+
+      announce(tests.length + ' runs generated. ' + tests.length + ' case numbers assigned. Moving to Evidence Prep.');
+      plGoToPhase(3);
+    }
+
     function plGenerateMatrix() {
       var selectedCars = garage.filter(function(c) {
         return playlistMode.config.selectedCarIds.indexOf(c.id) !== -1;
@@ -1642,11 +2091,12 @@
               carName: car.name,
               baseWeight: car.weight,
               addedWeight: conditions[ci].addedWeight,
-              totalWeight: Math.round((car.weight + conditions[ci].addedWeight) * 10) / 10,
+              totalWeight: Math.round((car.weight + conditions[ci].addedWeight) * 1000) / 1000,
               conditionLabel: conditions[ci].label,
               conditionIndex: ci,
               trial: ti + 1,
-              totalTrials: trials
+              totalTrials: trials,
+              caseNumber: null // Assigned in plAssignCaseNumbers
             });
           }
         }
@@ -1654,65 +2104,259 @@
       return tests;
     }
 
-    function plGeneratePlan() {
-      // Validate
-      if (playlistMode.config.selectedCarIds.length === 0) {
-        alert('Select at least one car from the garage!');
-        return;
+    function plAssignCaseNumbers() {
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        playlistMode.tests[i].caseNumber = evNextCaseNumber();
       }
-      if (playlistMode.config.conditions.length < 2) {
-        alert('Add at least one weight condition beyond the baseline!');
-        return;
+    }
+
+    function plCreatePreEvidenceEntries() {
+      // Create PARTIAL evidence entries for each test — filled in with race data later
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        var test = playlistMode.tests[i];
+        var entry = {
+          caseNumber: test.caseNumber,
+          timestamp: new Date().toISOString(),
+          car: test.carName,
+          carId: test.carId,
+          weight: test.totalWeight,
+          time_s: null,
+          speed_mps: null,
+          speed_mph: null,
+          momentum: null,
+          ke: null,
+          totalRuns: null,
+          photoUrl: null,
+          photoThumb: null,
+          photoDeleteUrl: null,
+          setupPhotos: [],
+          condition: test.conditionLabel,
+          addedWeight: test.addedWeight,
+          baseWeight: test.baseWeight,
+          trial: test.trial,
+          status: 'pending' // Will become 'completed' after racing
+        };
+        evidenceLog.push(entry);
       }
+      // Keep last 500
+      if (evidenceLog.length > 500) evidenceLog = evidenceLog.slice(-500);
+      localStorage.setItem('mass_evidence_log', JSON.stringify(evidenceLog));
+    }
 
-      var tests = plGenerateMatrix();
-      playlistMode.tests = tests;
+    // ===== PHASE 3: EVIDENCE PREP =====
+    function plRenderCaseTable() {
+      var tbody = document.getElementById('plCaseTableBody');
+      if (!tbody) return;
+      var html = '';
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        var test = playlistMode.tests[i];
+        // Check if this case has a photo
+        var hasPhoto = false;
+        for (var e = 0; e < evidenceLog.length; e++) {
+          if (evidenceLog[e].caseNumber === test.caseNumber && evidenceLog[e].setupPhotos && evidenceLog[e].setupPhotos.length > 0) {
+            hasPhoto = true;
+            break;
+          }
+        }
+        var isTarget = (plPhotoTargetCase === test.caseNumber);
+        html += '<tr class="' + (isTarget ? 'pl-photo-target' : '') + '" ' +
+          'onclick="plSelectPhotoTarget(\'' + test.caseNumber + '\')" ' +
+          'title="Click to set as photo target">' +
+          '<td>' + test.index + '</td>' +
+          '<td style="font-weight:700;color:var(--accent);font-size:0.8rem;letter-spacing:1px;">' + test.caseNumber + '</td>' +
+          '<td>' + escHtml(test.carName) + '</td>' +
+          '<td>' + escHtml(test.conditionLabel) + '</td>' +
+          '<td>' + test.trial + '/' + test.totalTrials + '</td>' +
+          '<td>' + (hasPhoto ? '&#x2705;' : '&#x2B1C;') + '</td>' +
+        '</tr>';
+      }
+      tbody.innerHTML = html;
+    }
 
-      // Render preview
-      var preview = document.getElementById('plPreview');
-      var table = document.getElementById('plPreviewTable');
-      var html = '<table class="pl-results-table">' +
-        '<thead><tr><th>#</th><th>Car</th><th>Condition</th><th>Added (g)</th><th>Total (g)</th><th>Trial</th></tr></thead><tbody>';
+    function plSelectPhotoTarget(caseNumber) {
+      plPhotoTargetCase = caseNumber;
+      plRenderCaseTable();
+      announce('Photo target set to ' + caseNumber + '. Next photo will link to this case.');
+    }
+
+    function plCaptureEvidencePhoto() {
+      // Determine target case: explicit selection or next un-photo'd case
+      var targetCase = plPhotoTargetCase;
+      if (!targetCase) {
+        // Auto-assign: find next case without a photo
+        for (var i = 0; i < playlistMode.tests.length; i++) {
+          var cn = playlistMode.tests[i].caseNumber;
+          var hasPhoto = false;
+          for (var e = 0; e < evidenceLog.length; e++) {
+            if (evidenceLog[e].caseNumber === cn && evidenceLog[e].setupPhotos && evidenceLog[e].setupPhotos.length > 0) {
+              hasPhoto = true;
+              break;
+            }
+          }
+          if (!hasPhoto) { targetCase = cn; break; }
+        }
+      }
+      if (!targetCase && playlistMode.tests.length > 0) {
+        targetCase = playlistMode.tests[0].caseNumber; // Fallback to first
+      }
+      if (!targetCase) { alert('No test cases to photograph.'); return; }
+
+      var input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'environment';
+      input.onchange = function() {
+        if (!input.files || !input.files[0]) return;
+        var file = input.files[0];
+        if (file.size > 32 * 1024 * 1024) { alert('Photo too large (max 32MB)'); return; }
+
+        var btn = document.getElementById('plPhase3PhotoBtn');
+        if (btn) { btn.textContent = 'UPLOADING...'; btn.disabled = true; }
+
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+          var base64 = ev.target.result.split(',')[1];
+          var formData = new FormData();
+          formData.append('image', base64);
+          formData.append('name', targetCase + '_setup_' + Date.now());
+
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', 'https://api.imgbb.com/1/upload?key=' + IMGBB_API_KEY, true);
+          xhr.onload = function() {
+            if (xhr.status === 200) {
+              try {
+                var resp = JSON.parse(xhr.responseText);
+                if (resp.data && resp.data.url) {
+                  evLinkPhoto(targetCase, resp.data.url, resp.data.thumb ? resp.data.thumb.url : resp.data.url, resp.data.delete_url || '');
+                  if (btn) { btn.innerHTML = '&#x2705; PHOTO LINKED TO ' + targetCase; btn.disabled = false; }
+                  announce('Setup photo linked to ' + targetCase);
+                  plRenderCaseTable(); // Refresh checkmarks
+                  // Auto-advance target to next un-photo'd case
+                  plPhotoTargetCase = null;
+                  setTimeout(function() {
+                    if (btn) btn.innerHTML = '&#x1F4F7; CAPTURE SETUP PHOTO';
+                  }, 3000);
+                } else { if (btn) { btn.textContent = 'UPLOAD FAILED'; btn.disabled = false; } }
+              } catch(err) { if (btn) { btn.textContent = 'ERROR'; btn.disabled = false; } }
+            } else { if (btn) { btn.textContent = 'HTTP ' + xhr.status; btn.disabled = false; } }
+            setTimeout(function() { if (btn) btn.innerHTML = '&#x1F4F7; CAPTURE SETUP PHOTO'; }, 3000);
+          };
+          xhr.onerror = function() {
+            if (btn) { btn.textContent = 'OFFLINE'; btn.disabled = false; }
+            setTimeout(function() { if (btn) btn.innerHTML = '&#x1F4F7; CAPTURE SETUP PHOTO'; }, 3000);
+          };
+          xhr.send(formData);
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    }
+
+    function plPrintPreTags() {
+      // Print PARTIAL evidence tags (no race data yet — just case#, car, weight, QR)
+      var entries = [];
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        var test = playlistMode.tests[i];
+        // Find the evidence entry for this case
+        for (var e = 0; e < evidenceLog.length; e++) {
+          if (evidenceLog[e].caseNumber === test.caseNumber) {
+            entries.push(evidenceLog[e]);
+            break;
+          }
+        }
+      }
+      if (entries.length === 0) { alert('No evidence entries to print.'); return; }
+      evShowTagsOverlay(entries);
+    }
+
+    function plPhase3Advance() {
+      // Check if any photos were taken (advisory, not blocking)
+      var photoCount = 0;
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        var cn = playlistMode.tests[i].caseNumber;
+        for (var e = 0; e < evidenceLog.length; e++) {
+          if (evidenceLog[e].caseNumber === cn && evidenceLog[e].setupPhotos && evidenceLog[e].setupPhotos.length > 0) {
+            photoCount++;
+            break;
+          }
+        }
+      }
+      if (photoCount === 0) {
+        if (!confirm('No setup photos captured. Continue without evidence photos?')) return;
+      }
+      plGoToPhase(4);
+    }
+
+    // ===== PHASE 4: PRE-FLIGHT CHECK =====
+    function plRenderPlanTable() {
+      var tbody = document.getElementById('plPlanTableBody');
+      if (!tbody) return;
+      var html = '';
       var lastCondIdx = -1;
-      for (var i = 0; i < tests.length; i++) {
-        var t = tests[i];
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        var t = playlistMode.tests[i];
         var condChange = (t.conditionIndex !== lastCondIdx);
         lastCondIdx = t.conditionIndex;
         html += '<tr' + (condChange && i > 0 ? ' style="border-top:2px solid var(--accent);"' : '') + '>' +
           '<td>' + t.index + '</td>' +
+          '<td style="font-weight:700;font-size:0.75rem;">' + t.caseNumber + '</td>' +
           '<td>' + escHtml(t.carName) + '</td>' +
           '<td>' + escHtml(t.conditionLabel) + '</td>' +
-          '<td>' + t.addedWeight.toFixed(1) + '</td>' +
-          '<td>' + t.totalWeight.toFixed(1) + '</td>' +
-          '<td>' + t.trial + ' of ' + t.totalTrials + '</td></tr>';
+          '<td>' + t.trial + '/' + t.totalTrials + '</td>' +
+          '<td>' + t.totalWeight.toFixed(1) + '</td></tr>';
       }
-      html += '</tbody></table>';
-      table.innerHTML = html;
-      preview.style.display = 'block';
-      document.getElementById('plStartBtn').disabled = false;
-
-      // Update badge
-      var badge = document.getElementById('playlistBadge');
-      badge.textContent = tests.length + ' runs';
-      badge.style.display = 'inline';
-
-      announce('Test plan generated. ' + tests.length + ' total runs across ' +
-        playlistMode.config.conditions.length + ' conditions.');
+      tbody.innerHTML = html;
     }
 
-    // --- Phase Switching ---
-    function plShowPhase(phase) {
-      document.getElementById('plSetup').style.display = phase === 'setup' ? 'block' : 'none';
-      document.getElementById('plActive').style.display = phase === 'active' ? 'block' : 'none';
-      document.getElementById('plCompleted').style.display = phase === 'completed' ? 'block' : 'none';
+    function plRenderReadinessChecks() {
+      var container = document.getElementById('plReadinessChecks');
+      if (!container) return;
+      var checks = [];
+
+      // WebSocket
+      var wsOk = (typeof wsConnected !== 'undefined' && wsConnected);
+      checks.push({ ok: wsOk, text: 'WebSocket connected to ESP32' });
+
+      // Garage
+      checks.push({ ok: garage.length > 0, text: 'Garage loaded (' + garage.length + ' cars)' });
+
+      // Track length
+      var trackEl = document.getElementById('trackLength');
+      var trackLen = trackEl ? parseFloat(trackEl.value) : 0;
+      checks.push({ ok: trackLen > 0, text: 'Track length: ' + (trackLen || '???') + 'm' });
+
+      // Evidence tags
+      var tagsPrinted = false; // We can't reliably track this, just show advisory
+      checks.push({ ok: tagsPrinted, text: 'Evidence tags printed (check your printer)' });
+
+      // Setup photos
+      var photoCount = 0;
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        var cn = playlistMode.tests[i].caseNumber;
+        for (var e = 0; e < evidenceLog.length; e++) {
+          if (evidenceLog[e].caseNumber === cn && evidenceLog[e].setupPhotos && evidenceLog[e].setupPhotos.length > 0) {
+            photoCount++;
+            break;
+          }
+        }
+      }
+      checks.push({ ok: photoCount > 0, text: photoCount + ' setup photos taken' });
+
+      // Test count
+      checks.push({ ok: true, text: playlistMode.tests.length + ' test runs planned' });
+
+      var html = '';
+      for (var c = 0; c < checks.length; c++) {
+        html += '<div class="pl-ready-item ' + (checks[c].ok ? 'ok' : 'warn') + '">' +
+          '<span class="pl-ready-icon">' + (checks[c].ok ? '&#x2705;' : '&#x26A0;&#xFE0F;') + '</span>' +
+          '<span>' + checks[c].text + '</span></div>';
+      }
+      container.innerHTML = html;
     }
 
-    // --- Start Testing ---
-    function plStartTesting() {
-      if (playlistMode.tests.length === 0) {
-        alert('Generate a test plan first!');
-        return;
-      }
+    function plBeginDataCollection() {
+      if (playlistMode.tests.length === 0) { alert('No test plan!'); return; }
+
       playlistMode.active = true;
       playlistMode.paused = false;
       playlistMode.currentIndex = 0;
@@ -1721,30 +2365,23 @@
         playlistMode.results[i] = null;
       }
 
-      plShowPhase('active');
+      plGoToPhase(5);
       plSaveState();
-
-      // Open the details element if closed
-      var details = document.getElementById('playlistSection');
-      if (details) details.open = true;
-
-      // Load first test
       plLoadCurrentTest();
 
       var firstTest = playlistMode.tests[0];
-      announce('Science fair testing started. ' + playlistMode.tests.length + ' runs total. ' +
-        'First up: ' + firstTest.carName + ', ' + firstTest.conditionLabel + ', trial 1.');
+      announce('Data collection started! ' + playlistMode.tests.length + ' runs total. ' +
+        'First up: ' + firstTest.carName + ', ' + firstTest.conditionLabel + ', trial 1. ' +
+        'Case number ' + firstTest.caseNumber + '. Release when armed.');
     }
 
-    // --- Load Current Test into System ---
+    // ===== PHASE 5: DATA COLLECTION =====
     function plLoadCurrentTest() {
       var test = playlistMode.tests[playlistMode.currentIndex];
       if (!test) return;
 
-      // Send setCar to firmware with total weight
       wsSend({ cmd: 'setCar', name: test.carName, weight: test.totalWeight });
 
-      // Update activeCar locally for banner display
       var carIndex = garage.findIndex(function(c) { return c.id === test.carId; });
       if (carIndex !== -1) {
         activeCar = garage[carIndex];
@@ -1752,18 +2389,15 @@
         setCurrentCarDisplay({ name: test.carName, weight: test.totalWeight });
       }
 
-      // Update active phase UI
       plUpdateActiveUI();
 
-      // Auto-arm after a short delay
       setTimeout(function() {
-        if (playlistMode.active && !playlistMode.paused) {
+        if (playlistMode.active && !playlistMode.paused && !playlistMode.sanityPending) {
           wsSend({ cmd: 'arm' });
         }
       }, 1000);
     }
 
-    // --- Update Active Phase UI ---
     function plUpdateActiveUI() {
       var test = playlistMode.tests[playlistMode.currentIndex];
       if (!test) return;
@@ -1771,7 +2405,9 @@
       var total = playlistMode.tests.length;
       var current = playlistMode.currentIndex + 1;
 
-      // Banner
+      // Banner with case number
+      var caseLabel = document.getElementById('plCaseLabel');
+      if (caseLabel) caseLabel.textContent = test.caseNumber;
       document.getElementById('plRunLabel').textContent = 'Run ' + current + ' of ' + total;
       document.getElementById('plInstruction').textContent =
         test.carName + ' \u2014 ' + test.conditionLabel;
@@ -1782,23 +2418,26 @@
       // Progress bar
       var pct = Math.round((playlistMode.currentIndex / total) * 100);
       var progressBar = document.getElementById('plProgressBar');
-      var progressContainer = progressBar.parentElement;
-      progressBar.style.width = pct + '%';
-      document.getElementById('plProgressText').textContent = pct + '%';
-      progressContainer.setAttribute('aria-valuenow', pct);
+      if (progressBar) {
+        var progressContainer = progressBar.parentElement;
+        progressBar.style.width = pct + '%';
+        document.getElementById('plProgressText').textContent = pct + '%';
+        progressContainer.setAttribute('aria-valuenow', pct);
+      }
 
       // Badge
       var badge = document.getElementById('playlistBadge');
-      badge.textContent = current + '/' + total;
-      badge.style.display = 'inline';
+      if (badge) {
+        badge.textContent = current + '/' + total;
+        badge.style.display = 'inline';
+      }
 
-      // Results table
       plRenderResultsTable();
     }
 
-    // --- Results Table ---
     function plRenderResultsTable() {
       var tbody = document.getElementById('plResultsBody');
+      if (!tbody) return;
       var rows = [];
       for (var i = 0; i < playlistMode.tests.length; i++) {
         var test = playlistMode.tests[i];
@@ -1810,33 +2449,101 @@
         if (result && !result.skipped) {
           rows.push('<tr' + cls + '>' +
             '<td>' + test.index + '</td>' +
+            '<td style="font-size:0.7rem;">' + test.caseNumber + '</td>' +
             '<td>' + escHtml(test.carName) + '</td>' +
             '<td>' + escHtml(test.conditionLabel) + '</td>' +
             '<td>' + test.trial + '</td>' +
             '<td class="font-data">' + safeFixed(result.time_s, 4) + '</td>' +
-            '<td>' + safeFixed(result.speed_mps, 3) + '</td>' +
-            '<td>' + test.totalWeight.toFixed(1) + '</td></tr>');
+            '<td>' + safeFixed(result.speed_mps, 3) + '</td></tr>');
         } else if (result && result.skipped) {
-          rows.push('<tr' + cls + '><td>' + test.index + '</td><td>' + escHtml(test.carName) +
-            '</td><td colspan="5" class="text-muted">Skipped</td></tr>');
+          rows.push('<tr' + cls + '><td>' + test.index + '</td><td>' + test.caseNumber +
+            '</td><td>' + escHtml(test.carName) + '</td><td colspan="4" class="text-muted">Skipped</td></tr>');
         } else if (isCurrent) {
-          rows.push('<tr' + cls + '><td>' + test.index + '</td><td>' + escHtml(test.carName) +
-            '</td><td>' + escHtml(test.conditionLabel) + '</td><td>' + test.trial +
-            '</td><td colspan="3" class="text-muted">Waiting...</td></tr>');
+          rows.push('<tr' + cls + '><td>' + test.index + '</td><td style="font-size:0.7rem;">' + test.caseNumber +
+            '</td><td>' + escHtml(test.carName) + '</td><td>' + escHtml(test.conditionLabel) +
+            '</td><td>' + test.trial + '</td><td colspan="2" class="text-muted">Waiting...</td></tr>');
         }
-        // Don't render future rows to keep table compact
       }
       if (rows.length === 0) {
         tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">Waiting for first run...</td></tr>';
       } else {
         tbody.innerHTML = rows.join('');
-        // Scroll to current row
         var currentRow = tbody.querySelector('.pl-current');
         if (currentRow) currentRow.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       }
     }
 
-    // --- Handle Race Finish During Playlist ---
+    // ===== SANITY CHECK SYSTEM =====
+    var plRecentTimes = []; // Last 3 times for identical-time detection
+
+    function plSanityCheck(data) {
+      var time = data.time;
+      var speed_mps = data.speed_mps || (data.speed_mph ? data.speed_mph / MPS_TO_MPH : 0);
+      var warnings = [];
+
+      if (time < 0.1) warnings.push({ severity: 'hard', msg: 'Sensor glitch? Time is ' + safeFixed(time, 4) + 's (under 0.1s).' });
+      else if (time < 0.4) warnings.push({ severity: 'warn', msg: 'Unusually fast! ' + safeFixed(time, 4) + 's (over 15 m/s).' });
+      if (time > 15) warnings.push({ severity: 'warn', msg: 'Car may have stalled. Time is ' + safeFixed(time, 2) + 's.' });
+      if (speed_mps === 0 && time > 0) warnings.push({ severity: 'hard', msg: 'Sensor did not trigger. Speed is 0.' });
+
+      // Check for 3 identical times
+      plRecentTimes.push(Math.round(time * 10000));
+      if (plRecentTimes.length > 3) plRecentTimes.shift();
+      if (plRecentTimes.length === 3 && plRecentTimes[0] === plRecentTimes[1] && plRecentTimes[1] === plRecentTimes[2]) {
+        warnings.push({ severity: 'warn', msg: 'Possible malfunction: 3 identical times in a row.' });
+      }
+
+      return warnings;
+    }
+
+    function plShowSanityAlert(warnings, data, callback) {
+      playlistMode.sanityPending = true;
+
+      // Remove any existing alert
+      var existing = document.getElementById('plSanityAlert');
+      if (existing) existing.remove();
+
+      var alert = document.createElement('div');
+      alert.id = 'plSanityAlert';
+      alert.className = 'pl-sanity-alert';
+      alert.setAttribute('role', 'alertdialog');
+      alert.innerHTML = '<h3>&#x26A0;&#xFE0F; SANITY CHECK</h3>' +
+        '<p>' + warnings.map(function(w) { return w.msg; }).join('<br>') + '</p>' +
+        '<div class="pl-sanity-btns">' +
+          '<button onclick="plSanityResolve(true)" style="background:#28a745;color:#fff;">KEEP RESULT</button>' +
+          '<button onclick="plSanityResolve(false)" style="background:#dc3545;color:#fff;">DISCARD &amp; RETRY</button>' +
+        '</div>';
+      document.body.appendChild(alert);
+
+      announce('Warning. ' + warnings[0].msg + ' Keep this result or retry?');
+
+      // Store callback
+      window._plSanityCallback = callback;
+      window._plSanityData = data;
+    }
+
+    function plSanityResolve(keep) {
+      playlistMode.sanityPending = false;
+      var alert = document.getElementById('plSanityAlert');
+      if (alert) alert.remove();
+
+      if (keep) {
+        // Accept the result
+        if (window._plSanityCallback) window._plSanityCallback(window._plSanityData, true);
+      } else {
+        // Discard — re-arm for retry
+        announce('Result discarded. Re-arming for retry.');
+        setTimeout(function() {
+          if (playlistMode.active && !playlistMode.paused) {
+            wsSend({ cmd: 'arm' });
+          }
+        }, 1000);
+      }
+      window._plSanityCallback = null;
+      window._plSanityData = null;
+    }
+
+    // ===== PHASE 5: RACE FINISH HANDLER =====
     function plOnRaceFinished(data) {
       if (!playlistMode.active || playlistMode.paused) return;
       if (playlistMode.currentIndex >= playlistMode.tests.length) return;
@@ -1845,6 +2552,19 @@
       var speed_mps = data.speed_mps || (data.speed_mph ? data.speed_mph / MPS_TO_MPH : 0);
       var mass_kg = test.totalWeight / 1000.0;
 
+      // Sanity check
+      var warnings = plSanityCheck(data);
+      if (warnings.length > 0) {
+        plShowSanityAlert(warnings, data, function(acceptedData, accepted) {
+          if (accepted) plRecordAndAdvance(acceptedData, test, speed_mps, mass_kg);
+        });
+        return;
+      }
+
+      plRecordAndAdvance(data, test, speed_mps, mass_kg);
+    }
+
+    function plRecordAndAdvance(data, test, speed_mps, mass_kg) {
       playlistMode.results[playlistMode.currentIndex] = {
         time_s: data.time,
         speed_mps: speed_mps,
@@ -1859,45 +2579,43 @@
 
       // Check if all done
       if (playlistMode.currentIndex >= playlistMode.tests.length - 1) {
-        // All tests complete!
         plCompleteTesting();
         return;
       }
 
-      // Determine if next test has a different condition (weight change alert)
       var nextIndex = playlistMode.currentIndex + 1;
       var nextTest = playlistMode.tests[nextIndex];
       var condChanged = (nextTest.conditionIndex !== test.conditionIndex);
 
-      // Wait for firmware auto-reset (5 seconds), then advance
       setTimeout(function() {
         playlistMode.currentIndex = nextIndex;
         plSaveState();
 
-        // Condition change alert
         if (condChanged) {
           var alertDiv = document.getElementById('plConditionAlert');
           var alertText = document.getElementById('plConditionAlertText');
-          alertText.textContent = 'New weight condition! ' + nextTest.conditionLabel +
-            '. Add ' + nextTest.addedWeight.toFixed(1) + 'g to each car.';
-          alertDiv.style.display = 'block';
+          if (alertDiv && alertText) {
+            alertText.textContent = 'New weight condition! ' + nextTest.conditionLabel +
+              '. Add ' + nextTest.addedWeight.toFixed(1) + 'g to each car.';
+            alertDiv.style.display = 'block';
+            setTimeout(function() { alertDiv.style.display = 'none'; }, 8000);
+          }
           announce('ATTENTION: New weight condition. ' + nextTest.conditionLabel +
             '. Add ' + nextTest.addedWeight.toFixed(1) + ' grams to each car. ' +
-            'Starting with ' + nextTest.carName + '.');
-          // Hide alert after 8 seconds
-          setTimeout(function() { alertDiv.style.display = 'none'; }, 8000);
+            'Starting with ' + nextTest.carName + '. Case ' + nextTest.caseNumber + '.');
         } else {
-          document.getElementById('plConditionAlert').style.display = 'none';
+          var alertDiv2 = document.getElementById('plConditionAlert');
+          if (alertDiv2) alertDiv2.style.display = 'none';
           announce('Run ' + (nextIndex + 1) + ' of ' + playlistMode.tests.length + '. ' +
             nextTest.carName + ', ' + nextTest.conditionLabel + '. Trial ' +
-            nextTest.trial + ' of ' + nextTest.totalTrials + '.');
+            nextTest.trial + '. Case ' + nextTest.caseNumber + '.');
         }
 
         plLoadCurrentTest();
-      }, 5500); // Slightly after the firmware 5s auto-reset
+      }, 5500);
     }
 
-    // --- Skip Run ---
+    // ===== PHASE 5: CONTROLS =====
     function plSkipRun() {
       if (!playlistMode.active) return;
       playlistMode.results[playlistMode.currentIndex] = { skipped: true, timestamp: Date.now() };
@@ -1911,15 +2629,14 @@
       var nextTest = playlistMode.tests[nextIndex];
       playlistMode.currentIndex = nextIndex;
       plSaveState();
-      announce('Run skipped. Moving to run ' + (nextIndex + 1) + '. ' + nextTest.carName + '.');
+      announce('Run skipped. Moving to run ' + (nextIndex + 1) + '. ' + nextTest.carName + '. Case ' + nextTest.caseNumber + '.');
       plLoadCurrentTest();
     }
 
-    // --- Pause/Resume ---
     function plTogglePause() {
       playlistMode.paused = !playlistMode.paused;
       var btn = document.getElementById('plPauseBtn');
-      btn.textContent = playlistMode.paused ? 'RESUME' : 'PAUSE';
+      if (btn) btn.textContent = playlistMode.paused ? 'RESUME' : 'PAUSE';
       plSaveState();
       if (playlistMode.paused) {
         announce('Testing paused. Press Resume to continue.');
@@ -1929,48 +2646,46 @@
       }
     }
 
-    // --- Stop Testing ---
     function plStopTesting() {
       if (!confirm('Stop testing? Completed results will be kept.')) return;
       playlistMode.active = false;
       playlistMode.paused = false;
       plSaveState();
 
-      // If we have any results, show completed phase
       var hasResults = playlistMode.results.some(function(r) { return r && !r.skipped; });
       if (hasResults) {
         plBuildSummary();
-        plShowPhase('completed');
+        plGoToPhase(6, true);
         announce('Testing stopped. Results available for export.');
       } else {
-        plShowPhase('setup');
+        plGoToPhase(1, true);
         announce('Testing stopped. No results collected.');
       }
     }
 
-    // --- Complete Testing ---
     function plCompleteTesting() {
       playlistMode.active = false;
       playlistMode.paused = false;
 
-      // Final progress
       var progressBar = document.getElementById('plProgressBar');
-      progressBar.style.width = '100%';
-      document.getElementById('plProgressText').textContent = '100%';
+      if (progressBar) {
+        progressBar.style.width = '100%';
+        document.getElementById('plProgressText').textContent = '100%';
+      }
 
       plSaveState();
       plBuildSummary();
-      plShowPhase('completed');
+      plGoToPhase(6, true);
 
       var completedCount = playlistMode.results.filter(function(r) { return r && !r.skipped; }).length;
       announce('All ' + completedCount + ' tests complete! Great work, scientist! Export your data below.');
     }
 
-    // --- Build Summary Table ---
+    // ===== PHASE 6: SUMMARY & EXPORT =====
     function plBuildSummary() {
       var container = document.getElementById('plSummary');
+      if (!container) return;
 
-      // Group results by car, then by condition
       var cars = {};
       for (var i = 0; i < playlistMode.tests.length; i++) {
         var test = playlistMode.tests[i];
@@ -1979,9 +2694,7 @@
         if (!cars[test.carName]) cars[test.carName] = { baseWeight: test.baseWeight, conditions: {} };
         if (!cars[test.carName].conditions[test.conditionLabel]) {
           cars[test.carName].conditions[test.conditionLabel] = {
-            addedWeight: test.addedWeight,
-            totalWeight: test.totalWeight,
-            trials: []
+            addedWeight: test.addedWeight, totalWeight: test.totalWeight, trials: []
           };
         }
         cars[test.carName].conditions[test.conditionLabel].trials.push(result);
@@ -1994,7 +2707,7 @@
         var carData = cars[carName];
         var numTrials = playlistMode.config.trialsPerCondition;
 
-        html += '<h3 style="font-size:0.9rem; font-weight:700; color:var(--accent); margin-top:12px;">' +
+        html += '<h3 style="font-size:0.9rem;font-weight:700;color:var(--accent);margin-top:12px;">' +
           escHtml(carName) + ' (' + carData.baseWeight + 'g base)</h3>';
         html += '<table class="pl-summary-table"><thead><tr>' +
           '<th>Condition</th><th>Added (g)</th><th>Total (g)</th>';
@@ -2025,14 +2738,14 @@
       container.innerHTML = html;
     }
 
-    // --- CSV Export (Raw Data) ---
     function plExportCSV() {
-      var csv = 'Run,Car,BaseWeight(g),AddedWeight(g),TotalWeight(g),Condition,Trial,Time(s),Speed(m/s),Speed(mph),Momentum(kg*m/s),KE(J)\n';
+      var csv = 'Run,CaseNumber,Car,BaseWeight(g),AddedWeight(g),TotalWeight(g),Condition,Trial,Time(s),Speed(m/s),Speed(mph),Momentum(kg*m/s),KE(J)\n';
       for (var i = 0; i < playlistMode.tests.length; i++) {
         var test = playlistMode.tests[i];
         var result = playlistMode.results[i];
         if (!result || result.skipped) continue;
         csv += test.index + ',' +
+          test.caseNumber + ',' +
           escCsvField(test.carName) + ',' +
           test.baseWeight + ',' +
           test.addedWeight.toFixed(1) + ',' +
@@ -2055,19 +2768,18 @@
       return str;
     }
 
-    // --- Summary Export ---
     function plExportSummary() {
-      var trackLen = parseFloat(document.getElementById('trackLength').value) || 2.0;
+      var trackLen = parseFloat(document.getElementById('trackLength').value) || 6.01;
+      var v = playlistMode.config.variables || {};
       var lines = [];
       lines.push('M.A.S.S. TRAP SCIENCE FAIR DATA SUMMARY');
       lines.push('Generated: ' + new Date().toLocaleString());
       lines.push('');
-      lines.push('Independent Variable: Added Weight (grams)');
-      lines.push('Dependent Variable: Time (seconds) / Speed (m/s)');
-      lines.push('Controlled Variables: Track length (' + trackLen.toFixed(2) + 'm), Start height, Release method, Car model per condition group');
+      lines.push('Independent Variable: ' + (v.iv || 'Added Weight (grams)'));
+      lines.push('Dependent Variable: ' + (v.dv || 'Time (seconds) / Speed (m/s)'));
+      lines.push('Controlled Variables: ' + (v.cv || 'Track length (' + trackLen.toFixed(2) + 'm), Start height, Release method'));
       lines.push('');
 
-      // Build same structure as summary table
       var cars = {};
       for (var i = 0; i < playlistMode.tests.length; i++) {
         var test = playlistMode.tests[i];
@@ -2076,9 +2788,7 @@
         if (!cars[test.carName]) cars[test.carName] = { baseWeight: test.baseWeight, conditions: {} };
         if (!cars[test.carName].conditions[test.conditionLabel]) {
           cars[test.carName].conditions[test.conditionLabel] = {
-            addedWeight: test.addedWeight,
-            totalWeight: test.totalWeight,
-            trials: []
+            addedWeight: test.addedWeight, totalWeight: test.totalWeight, trials: []
           };
         }
         cars[test.carName].conditions[test.conditionLabel].trials.push(result);
@@ -2090,8 +2800,6 @@
         var carName = carNames[ci];
         var carData = cars[carName];
         lines.push('Car: ' + carName + ' (' + carData.baseWeight + 'g base)');
-
-        // Header row
         var hdr = 'Condition\tAdded(g)\tTotal(g)';
         for (var t = 1; t <= numTrials; t++) hdr += '\tTrial ' + t + '(s)';
         hdr += '\tAvg Time(s)\tAvg Speed(m/s)';
@@ -2129,22 +2837,171 @@
       window.URL.revokeObjectURL(url);
     }
 
-    // --- Clear & Start Over ---
+    function plGenerateReport() {
+      var trackLen = parseFloat(document.getElementById('trackLength').value) || 6.01;
+      var v = playlistMode.config.variables || {};
+      var reportData = {
+        trackLength: trackLen,
+        generated: new Date().toISOString(),
+        trialsPerCondition: playlistMode.config.trialsPerCondition,
+        variables: v,
+        tests: [],
+        cars: {},
+        photos: []
+      };
+
+      // Build photo lookup from evidence log
+      var photoLookup = {};
+      for (var e = 0; e < evidenceLog.length; e++) {
+        var ev = evidenceLog[e];
+        if (ev.caseNumber && (ev.photoUrl || (ev.setupPhotos && ev.setupPhotos.length > 0))) {
+          photoLookup[ev.caseNumber] = ev;
+          if (ev.photoUrl || (ev.setupPhotos && ev.setupPhotos.length > 0)) {
+            reportData.photos.push({
+              caseNumber: ev.caseNumber,
+              car: ev.car,
+              condition: ev.condition || '',
+              trial: ev.trial || '',
+              url: ev.photoUrl || (ev.setupPhotos[0] ? ev.setupPhotos[0].fullUrl : ''),
+              thumb: ev.photoThumb || (ev.setupPhotos[0] ? ev.setupPhotos[0].thumbUrl : ''),
+              timestamp: ev.timestamp,
+              weight: ev.weight
+            });
+          }
+        }
+      }
+
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        var test = playlistMode.tests[i];
+        var result = playlistMode.results[i];
+        if (!result || result.skipped) continue;
+        var testEntry = {
+          run: test.index,
+          caseNumber: test.caseNumber,
+          car: test.carName,
+          baseWeight: test.baseWeight,
+          addedWeight: test.addedWeight,
+          totalWeight: test.totalWeight,
+          condition: test.conditionLabel,
+          trial: test.trial,
+          time_s: result.time_s,
+          speed_mps: result.speed_mps,
+          speed_mph: result.speed_mph,
+          momentum: result.momentum,
+          ke: result.ke
+        };
+        var evEntry = photoLookup[test.caseNumber];
+        if (evEntry && evEntry.photoUrl) {
+          testEntry.photoUrl = evEntry.photoUrl;
+          testEntry.photoThumb = evEntry.photoThumb;
+        }
+        reportData.tests.push(testEntry);
+        if (!reportData.cars[test.carName]) reportData.cars[test.carName] = { baseWeight: test.baseWeight, conditions: {} };
+        if (!reportData.cars[test.carName].conditions[test.conditionLabel]) {
+          reportData.cars[test.carName].conditions[test.conditionLabel] = {
+            addedWeight: test.addedWeight, totalWeight: test.totalWeight, trials: []
+          };
+        }
+        reportData.cars[test.carName].conditions[test.conditionLabel].trials.push({
+          time_s: result.time_s, speed_mps: result.speed_mps, speed_mph: result.speed_mph,
+          momentum: result.momentum, ke: result.ke
+        });
+      }
+
+      localStorage.setItem('mass_report_data', JSON.stringify(reportData));
+
+      // Save report to ESP32
+      plSaveReport(reportData);
+
+      window.open('/science_fair_report.html', '_blank');
+      announce('Opening your Science Fair Report in a new tab!');
+    }
+
+    function plSaveReport(reportData) {
+      var ts = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
+      var filename = '/reports/report_' + ts + '.json';
+      try {
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/api/files?path=' + encodeURIComponent(filename), true);
+        xhr.setRequestHeader('X-API-Key', 'admin');
+        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+        xhr.send(JSON.stringify(reportData));
+      } catch (e) { console.error('[REPORT] Save failed:', e); }
+
+      // Also track in localStorage
+      var saved = JSON.parse(localStorage.getItem('mass_saved_reports') || '[]');
+      saved.push({ filename: filename, generated: reportData.generated, testCount: reportData.tests.length });
+      // Keep within max limit (n+1 for safety)
+      var maxReports = (playlistMode.config.maxSavedReports || 10) + 1;
+      if (saved.length > maxReports) {
+        saved = saved.slice(-maxReports);
+      }
+      localStorage.setItem('mass_saved_reports', JSON.stringify(saved));
+    }
+
+    function plShowPastReports() {
+      var saved = JSON.parse(localStorage.getItem('mass_saved_reports') || '[]');
+      if (saved.length === 0) { alert('No saved reports yet.'); return; }
+
+      var overlay = document.createElement('div');
+      overlay.id = 'plReportsOverlay';
+      overlay.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;z-index:10000;background:rgba(0,0,0,0.85);overflow-y:auto;padding:20px;';
+
+      var html = '<div style="max-width:500px;margin:0 auto;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">' +
+          '<h2 style="color:var(--accent);margin:0;">PAST REPORTS</h2>' +
+          '<button class="btn btn-danger" onclick="document.getElementById(\'plReportsOverlay\').remove()">CLOSE</button>' +
+        '</div>' +
+        '<div style="margin-bottom:8px;">' +
+          '<label style="font-size:0.8rem;color:var(--text-muted);">Max saved reports: </label>' +
+          '<input type="number" value="' + (playlistMode.config.maxSavedReports || 10) + '" min="1" max="50" ' +
+            'style="width:60px;background:var(--card-bg);color:var(--text);border:1px solid var(--border);border-radius:4px;padding:4px;" ' +
+            'onchange="playlistMode.config.maxSavedReports=parseInt(this.value)||10;plSaveConfig();">' +
+        '</div>';
+
+      for (var i = saved.length - 1; i >= 0; i--) {
+        var r = saved[i];
+        html += '<div style="border:1px solid var(--border);border-radius:6px;padding:10px;margin:6px 0;">' +
+          '<div style="font-weight:700;color:var(--accent);font-size:0.85rem;">' + (r.generated ? new Date(r.generated).toLocaleString() : 'Unknown') + '</div>' +
+          '<div style="font-size:0.75rem;color:var(--text-muted);">' + (r.testCount || '?') + ' tests | ' + r.filename + '</div>' +
+        '</div>';
+      }
+      html += '</div>';
+      overlay.innerHTML = html;
+      document.body.appendChild(overlay);
+    }
+
+    function plReprintWithResults() {
+      // Reprint evidence tags with race data filled in
+      var entries = [];
+      for (var i = 0; i < playlistMode.tests.length; i++) {
+        var test = playlistMode.tests[i];
+        for (var e = 0; e < evidenceLog.length; e++) {
+          if (evidenceLog[e].caseNumber === test.caseNumber) {
+            entries.push(evidenceLog[e]);
+            break;
+          }
+        }
+      }
+      if (entries.length === 0) { alert('No evidence entries to print.'); return; }
+      evShowTagsOverlay(entries);
+    }
+
     function plClearAndRestart() {
-      if (!confirm('Clear all results and start over?')) return;
+      if (!confirm('Clear all results and start over? Evidence entries will be kept.')) return;
       playlistMode.active = false;
       playlistMode.paused = false;
       playlistMode.tests = [];
       playlistMode.currentIndex = 0;
       playlistMode.results = [];
+      playlistMode.currentPhase = 1;
+      playlistMode.highestPhase = 1;
       localStorage.removeItem('mass_playlist_state');
-      plShowPhase('setup');
+      plGoToPhase(1, true);
       plRenderCarSelector();
-      document.getElementById('plPreview').style.display = 'none';
-      document.getElementById('plStartBtn').disabled = true;
       var badge = document.getElementById('playlistBadge');
-      badge.style.display = 'none';
-      announce('Playlist cleared. Ready to set up a new test plan.');
+      if (badge) badge.style.display = 'none';
+      announce('Experiment cleared. Ready to set up a new test plan.');
     }
 
     // ========================================================================
@@ -2152,6 +3009,141 @@
     // ========================================================================
     var evidenceLog = JSON.parse(localStorage.getItem('mass_evidence_log') || '[]');
     var evidenceCounter = parseInt(localStorage.getItem('mass_evidence_counter') || '0');
+
+    // --- PRE-RACE PHOTO BUFFER ---
+    // Photos captured BEFORE a race are held here until the race finishes
+    // and a case number is assigned. Then they auto-link to the evidence entry.
+    // Each item: { thumbUrl, fullUrl, deleteUrl, timestamp, car, condition }
+    var evPendingPhotos = [];
+
+    function evCaptureSetupPhoto() {
+      var input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'environment'; // Rear camera on mobile
+      input.onchange = function() {
+        if (!input.files || !input.files[0]) return;
+        var file = input.files[0];
+        if (file.size > 32 * 1024 * 1024) {
+          alert('Photo too large (max 32MB)');
+          return;
+        }
+
+        // Visual feedback: show uploading state on both buttons
+        var btns = [document.getElementById('btnSetupPhoto'), document.getElementById('plSetupPhotoBtn')];
+        btns.forEach(function(btn) { if (btn) { btn.textContent = '⏳ UPLOADING...'; btn.disabled = true; } });
+
+        // Capture context about what's being tested RIGHT NOW
+        var photoMeta = {
+          timestamp: new Date().toISOString(),
+          car: activeCar ? activeCar.name : 'Unknown',
+          carId: activeCar ? activeCar.id : null,
+          condition: null,
+          trial: null
+        };
+        if (playlistMode.active && playlistMode.tests[playlistMode.currentIndex]) {
+          var plTest = playlistMode.tests[playlistMode.currentIndex];
+          photoMeta.condition = plTest.conditionLabel;
+          photoMeta.trial = plTest.trial;
+          photoMeta.car = plTest.carName;
+        }
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var base64 = e.target.result.split(',')[1];
+
+          var formData = new FormData();
+          formData.append('image', base64);
+          formData.append('name', 'setup_' + Date.now());
+
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', 'https://api.imgbb.com/1/upload?key=' + IMGBB_API_KEY, true);
+          xhr.onload = function() {
+            if (xhr.status === 200) {
+              try {
+                var resp = JSON.parse(xhr.responseText);
+                if (resp.data && resp.data.url) {
+                  photoMeta.fullUrl = resp.data.url;
+                  photoMeta.thumbUrl = resp.data.thumb ? resp.data.thumb.url : resp.data.url;
+                  photoMeta.deleteUrl = resp.data.delete_url || '';
+                  evPendingPhotos.push(photoMeta);
+                  evUpdateSetupPhotoCount();
+                  announce('Setup photo captured. ' + evPendingPhotos.length + ' photo' +
+                    (evPendingPhotos.length > 1 ? 's' : '') + ' ready. Now run the car!');
+                  btns.forEach(function(btn) {
+                    if (btn) {
+                      btn.innerHTML = '&#x2705; PHOTO READY (' + evPendingPhotos.length + ')';
+                      btn.disabled = false;
+                    }
+                  });
+                  // Reset button text after a moment
+                  setTimeout(function() { evResetSetupPhotoButtons(); }, 3000);
+                } else {
+                  btns.forEach(function(btn) { if (btn) { btn.textContent = '❌ UPLOAD FAILED'; btn.disabled = false; } });
+                  setTimeout(function() { evResetSetupPhotoButtons(); }, 3000);
+                }
+              } catch(err) {
+                btns.forEach(function(btn) { if (btn) { btn.textContent = '❌ ERROR'; btn.disabled = false; } });
+                setTimeout(function() { evResetSetupPhotoButtons(); }, 3000);
+              }
+            } else {
+              btns.forEach(function(btn) { if (btn) { btn.textContent = '❌ HTTP ' + xhr.status; btn.disabled = false; } });
+              setTimeout(function() { evResetSetupPhotoButtons(); }, 3000);
+            }
+          };
+          xhr.onerror = function() {
+            btns.forEach(function(btn) { if (btn) { btn.textContent = '❌ OFFLINE'; btn.disabled = false; } });
+            setTimeout(function() { evResetSetupPhotoButtons(); }, 3000);
+          };
+          xhr.send(formData);
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    }
+
+    // Show evidence tags for all runs from the most recent playlist session
+    function evShowPlaylistEvidence() {
+      // Get the count of completed tests in the playlist
+      var completedCount = 0;
+      if (playlistMode.results) {
+        completedCount = playlistMode.results.filter(function(r) { return r && !r.skipped; }).length;
+      }
+      if (completedCount === 0) {
+        alert('No completed test runs to show evidence for.');
+        return;
+      }
+      // Get the most recent N evidence entries (where N = completed playlist runs)
+      var recentEntries = evidenceLog.slice(-completedCount);
+      evShowTagsOverlay(recentEntries);
+    }
+
+    function evResetSetupPhotoButtons() {
+      var count = evPendingPhotos.length;
+      var normalBtn = document.getElementById('btnSetupPhoto');
+      var plBtn = document.getElementById('plSetupPhotoBtn');
+      if (normalBtn) {
+        normalBtn.disabled = false;
+        normalBtn.innerHTML = '&#x1F4F7; SETUP PHOTO' +
+          (count > 0 ? ' <span class="playlist-badge" style="display:inline;">' + count + '</span>' : '');
+      }
+      if (plBtn) {
+        plBtn.disabled = false;
+        plBtn.innerHTML = '&#x1F4F7; SETUP PHOTO \u2014 Snap scale/car BEFORE this run' +
+          (count > 0 ? ' <span class="playlist-badge" style="display:inline;">' + count + '</span>' : '');
+      }
+    }
+
+    function evUpdateSetupPhotoCount() {
+      var count = evPendingPhotos.length;
+      var badges = [document.getElementById('setupPhotoCount'), document.getElementById('plSetupPhotoCount')];
+      badges.forEach(function(badge) {
+        if (badge) {
+          badge.textContent = count;
+          badge.style.display = count > 0 ? 'inline' : 'none';
+        }
+      });
+    }
 
     function evNextCaseNumber() {
       evidenceCounter++;
@@ -2169,33 +3161,87 @@
     }
 
     // Record evidence entry when a race finishes
+    // Now auto-links any pre-race setup photos from the pending buffer
+    // Record evidence entry when a race finishes
+    // DUAL PATH: playlist mode UPDATES pre-assigned entries, normal mode CREATES new ones
     function evRecordRun(raceData, playlistTest) {
-      var caseNum = evNextCaseNumber();
+      var speed_mps = raceData.speed_mps || (raceData.speed_mph ? raceData.speed_mph / MPS_TO_MPH : 0);
+      var speed_mph = raceData.speed_mph || (speed_mps * MPS_TO_MPH);
+      var momentum = raceData.momentum || 0;
+      var ke = raceData.ke || 0;
+
+      // PATH 1: Playlist mode with pre-assigned case number — UPDATE existing entry
+      if (playlistTest && playlistTest.caseNumber) {
+        var caseNum = playlistTest.caseNumber;
+        for (var i = 0; i < evidenceLog.length; i++) {
+          if (evidenceLog[i].caseNumber === caseNum) {
+            // UPDATE the pre-created entry with race data
+            evidenceLog[i].timestamp = new Date().toISOString();
+            evidenceLog[i].time_s = raceData.time;
+            evidenceLog[i].speed_mps = speed_mps;
+            evidenceLog[i].speed_mph = speed_mph;
+            evidenceLog[i].momentum = momentum;
+            evidenceLog[i].ke = ke;
+            evidenceLog[i].totalRuns = raceData.totalRuns;
+            evidenceLog[i].status = 'completed';
+            break;
+          }
+        }
+        localStorage.setItem('mass_evidence_log', JSON.stringify(evidenceLog));
+        // Quiet announce in playlist mode — don't block the flow
+        announce('Evidence ' + caseNum + ' updated with race data.');
+        return caseNum;
+      }
+
+      // PATH 2: Normal mode — CREATE a new evidence entry
+      var caseNum2 = evNextCaseNumber();
       var entry = {
-        caseNumber: caseNum,
+        caseNumber: caseNum2,
         timestamp: new Date().toISOString(),
         car: raceData.car || (activeCar ? activeCar.name : 'Unknown'),
         carId: activeCar ? activeCar.id : null,
         weight: raceData.weight,
         time_s: raceData.time,
-        speed_mps: raceData.speed_mps || (raceData.speed_mph ? raceData.speed_mph / MPS_TO_MPH : 0),
-        speed_mph: raceData.speed_mph || 0,
-        momentum: raceData.momentum || 0,
-        ke: raceData.ke || 0,
+        speed_mps: speed_mps,
+        speed_mph: speed_mph,
+        momentum: momentum,
+        ke: ke,
         totalRuns: raceData.totalRuns,
-        photoUrl: null // Populated later when photo is linked
+        photoUrl: null,
+        photoThumb: null,
+        photoDeleteUrl: null,
+        setupPhotos: [],
+        status: 'completed'
       };
-      if (playlistTest) {
-        entry.condition = playlistTest.conditionLabel;
-        entry.addedWeight = playlistTest.addedWeight;
-        entry.baseWeight = playlistTest.baseWeight;
-        entry.trial = playlistTest.trial;
+
+      // AUTO-LINK pending setup photos (from the setup photo button)
+      if (evPendingPhotos.length > 0) {
+        entry.setupPhotos = evPendingPhotos.slice();
+        entry.photoUrl = evPendingPhotos[0].fullUrl;
+        entry.photoThumb = evPendingPhotos[0].thumbUrl;
+        entry.photoDeleteUrl = evPendingPhotos[0].deleteUrl || '';
+        evPendingPhotos = [];
+        evUpdateSetupPhotoCount();
+        evResetSetupPhotoButtons();
       }
+
       evidenceLog.push(entry);
-      // Keep last 500 entries
       if (evidenceLog.length > 500) evidenceLog = evidenceLog.slice(-500);
       localStorage.setItem('mass_evidence_log', JSON.stringify(evidenceLog));
-      return caseNum;
+
+      // AUTO-SHOW tag in normal mode only
+      var showEntry = entry;
+      setTimeout(function() {
+        evShowTagsOverlay([showEntry]);
+        if (showEntry.setupPhotos.length > 0) {
+          announce('Evidence ' + caseNum2 + ' logged with ' + showEntry.setupPhotos.length +
+            ' setup photo' + (showEntry.setupPhotos.length > 1 ? 's' : '') + '. Ready to print.');
+        } else {
+          announce('Evidence ' + caseNum2 + ' logged. Tap the camera icon to add a photo.');
+        }
+      }, 800);
+
+      return caseNum2;
     }
 
     // NFC scan handler — reads URL params, selects car, arms track
@@ -2297,32 +3343,254 @@
       return img;
     }
 
-    // Evidence Tag Generator — printable card
+    // ===== LABEL SIZE CONFIGURATION =====
+    var evLabelPresets = {
+      'munbyn_3x2':    { name: 'Munbyn 4x6" (76.65 x 49.27mm)', w: 76.65, h: 49.27 },
+      'dymo_30336':    { name: 'DYMO 30336 (2.125 x 1")', w: 54, h: 25.4 },
+      'dymo_30334':    { name: 'DYMO 30334 (2.312 x 1.25")', w: 57, h: 32 },
+      'avery_5160':    { name: 'Avery 5160 (2.625 x 1")', w: 66.7, h: 25.4 },
+      'brother_dk1201': { name: 'Brother DK-1201 (90 x 29mm)', w: 90, h: 29 },
+      'full_page':     { name: 'Full Page (no size limit)', w: 0, h: 0 },
+      'custom':        { name: 'Custom Size', w: 76.65, h: 49.27 }
+    };
+
+    function evGetLabelSize() {
+      var saved = localStorage.getItem('mass_label_config');
+      if (saved) {
+        try { return JSON.parse(saved); } catch(e) {}
+      }
+      return { preset: 'munbyn_3x2', w: 76.65, h: 49.27 };
+    }
+    function evSaveLabelSize(preset, w, h) {
+      localStorage.setItem('mass_label_config', JSON.stringify({ preset: preset, w: w, h: h }));
+    }
+
+    // ===== ImgBB PHOTO UPLOAD =====
+    var IMGBB_API_KEY = '***REMOVED***';
+
+    // Upload a photo to ImgBB and link it to an evidence entry
+    function evUploadPhoto(caseNumber) {
+      // Create hidden file input
+      var input = document.createElement('input');
+      input.type = 'file';
+      input.accept = 'image/*';
+      input.capture = 'environment'; // Prefer rear camera on mobile
+      input.onchange = function() {
+        if (!input.files || !input.files[0]) return;
+        var file = input.files[0];
+        if (file.size > 32 * 1024 * 1024) {
+          alert('Photo too large (max 32MB)');
+          return;
+        }
+
+        // Show upload progress on the button
+        var btn = document.getElementById('evPhotoBtn_' + caseNumber);
+        var origText = btn ? btn.textContent : '';
+        if (btn) { btn.textContent = 'UPLOADING...'; btn.disabled = true; }
+
+        // Read file as base64
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          var base64 = e.target.result.split(',')[1]; // Strip data:image/...;base64, prefix
+
+          // POST to ImgBB
+          var formData = new FormData();
+          formData.append('image', base64);
+          formData.append('name', caseNumber + '_' + Date.now());
+
+          var xhr = new XMLHttpRequest();
+          xhr.open('POST', 'https://api.imgbb.com/1/upload?key=' + IMGBB_API_KEY, true);
+          xhr.onload = function() {
+            if (xhr.status === 200) {
+              try {
+                var resp = JSON.parse(xhr.responseText);
+                if (resp.data && resp.data.url) {
+                  // Store photo URL in the evidence entry
+                  evLinkPhoto(caseNumber, resp.data.url, resp.data.thumb ? resp.data.thumb.url : resp.data.url, resp.data.delete_url || '');
+                  if (btn) { btn.textContent = '✅ PHOTO'; btn.disabled = false; }
+                  announce('Photo uploaded for ' + caseNumber);
+                  // Refresh the tag display
+                  evRefreshTagPhoto(caseNumber, resp.data.thumb ? resp.data.thumb.url : resp.data.url);
+                } else {
+                  if (btn) { btn.textContent = '❌ ERROR'; btn.disabled = false; }
+                  alert('Upload failed: unexpected response');
+                }
+              } catch(err) {
+                if (btn) { btn.textContent = '❌ ERROR'; btn.disabled = false; }
+                alert('Upload failed: ' + err.message);
+              }
+            } else {
+              if (btn) { btn.textContent = '❌ ERROR'; btn.disabled = false; }
+              alert('Upload failed: HTTP ' + xhr.status);
+            }
+            // Reset button after delay
+            setTimeout(function() { if (btn) { btn.textContent = origText || '📷'; btn.disabled = false; } }, 3000);
+          };
+          xhr.onerror = function() {
+            if (btn) { btn.textContent = '❌ OFFLINE'; btn.disabled = false; }
+            alert('Upload failed — check internet connection');
+            setTimeout(function() { if (btn) { btn.textContent = origText || '📷'; btn.disabled = false; } }, 3000);
+          };
+          xhr.send(formData);
+        };
+        reader.readAsDataURL(file);
+      };
+      input.click();
+    }
+
+    // Link a photo URL to an evidence log entry by case number
+    // Now appends to setupPhotos array so all photos are tracked
+    function evLinkPhoto(caseNumber, fullUrl, thumbUrl, deleteUrl) {
+      for (var i = 0; i < evidenceLog.length; i++) {
+        if (evidenceLog[i].caseNumber === caseNumber) {
+          // Set as primary photo if none exists
+          if (!evidenceLog[i].photoUrl) {
+            evidenceLog[i].photoUrl = fullUrl;
+            evidenceLog[i].photoThumb = thumbUrl;
+            evidenceLog[i].photoDeleteUrl = deleteUrl;
+          }
+          // Append to setupPhotos array for multi-photo support
+          if (!evidenceLog[i].setupPhotos) evidenceLog[i].setupPhotos = [];
+          evidenceLog[i].setupPhotos.push({
+            fullUrl: fullUrl,
+            thumbUrl: thumbUrl,
+            deleteUrl: deleteUrl,
+            timestamp: new Date().toISOString()
+          });
+          break;
+        }
+      }
+      localStorage.setItem('mass_evidence_log', JSON.stringify(evidenceLog));
+    }
+
+    // Refresh a tag's photo thumbnail in the overlay without rebuilding everything
+    function evRefreshTagPhoto(caseNumber, thumbUrl) {
+      var placeholder = document.getElementById('evPhoto_' + caseNumber);
+      if (placeholder) {
+        // Find the entry to see if there are multiple photos
+        var entry = null;
+        for (var i = 0; i < evidenceLog.length; i++) {
+          if (evidenceLog[i].caseNumber === caseNumber) { entry = evidenceLog[i]; break; }
+        }
+        if (entry && entry.setupPhotos && entry.setupPhotos.length > 0) {
+          // Rebuild all thumbnails
+          var html = '';
+          for (var pi = 0; pi < entry.setupPhotos.length; pi++) {
+            var sp = entry.setupPhotos[pi];
+            html += '<img src="' + (sp.thumbUrl || sp.fullUrl) + '" alt="Photo ' + (pi + 1) + '" ' +
+              'style="max-width:45px;max-height:35px;border-radius:3px;border:1px solid var(--accent);cursor:pointer;" ' +
+              'onclick="window.open(\'' + escHtml(sp.fullUrl) + '\', \'_blank\')">';
+          }
+          placeholder.innerHTML = html;
+        } else {
+          placeholder.innerHTML = '<img src="' + thumbUrl + '" alt="Evidence photo" ' +
+            'style="max-width:60px;max-height:45px;border-radius:3px;border:1px solid var(--accent);cursor:pointer;" ' +
+            'onclick="window.open(this.src.replace(/\\/thumbnail\\//, \'/full/\'), \'_blank\')">';
+        }
+        // Update the button text
+        var btn = document.getElementById('evPhotoBtn_' + caseNumber);
+        if (btn) btn.textContent = '📷 +MORE';
+      }
+    }
+
+    // Evidence Tag Generator — sized to fit labels
     function evGenerateTag(entry) {
+      var lbl = evGetLabelSize();
+      var qrSize = lbl.h > 0 ? Math.min(Math.floor(lbl.h * 0.75), 80) : 80;
+      if (qrSize < 30) qrSize = 30;
+
+      var hasPhoto = entry.photoUrl || entry.photoThumb;
+      var setupPhotos = entry.setupPhotos || [];
+      var hasSetupPhotos = setupPhotos.length > 0;
+
       var tagHtml = '<div class="ev-tag">' +
         '<div class="ev-tag-header">' +
           '<div class="ev-tag-badge">M.A.S.S. TRAP</div>' +
           '<div class="ev-tag-case">' + entry.caseNumber + '</div>' +
         '</div>' +
         '<div class="ev-tag-body">' +
-          '<div class="ev-tag-qr" id="evQr_' + entry.caseNumber + '"></div>' +
+          '<div class="ev-tag-qr" id="evQr_' + entry.caseNumber + '" data-qr-size="' + qrSize + '"></div>' +
           '<div class="ev-tag-info">' +
-            '<div><strong>Vehicle:</strong> ' + escHtml(entry.car) + '</div>' +
-            '<div><strong>Mass:</strong> ' + entry.weight + 'g</div>';
+            '<div><b>' + escHtml(entry.car) + '</b></div>' +
+            '<div>' + entry.weight + 'g';
       if (entry.condition) {
-        tagHtml += '<div><strong>Condition:</strong> ' + escHtml(entry.condition) + '</div>' +
-          '<div><strong>Trial:</strong> ' + entry.trial + '</div>';
+        tagHtml += ' | ' + escHtml(entry.condition);
       }
-      tagHtml += '<div><strong>Time:</strong> ' + safeFixed(entry.time_s, 4) + 's</div>' +
-            '<div><strong>Speed:</strong> ' + safeFixed(entry.speed_mps, 3) + ' m/s</div>' +
+      tagHtml += '</div>' +
+            '<div>' + safeFixed(entry.time_s, 4) + 's / ' + safeFixed(entry.speed_mps, 3) + ' m/s</div>' +
             '<div class="ev-tag-ts">' + new Date(entry.timestamp).toLocaleString() + '</div>' +
+          '</div>' +
+          // Photo section: setup photo thumbnails + upload button for additional post-race photos
+          '<div class="ev-tag-photo" style="margin-left:auto;text-align:center;">' +
+            '<div id="evPhoto_' + entry.caseNumber + '" style="display:flex;gap:2px;flex-wrap:wrap;justify-content:center;">';
+
+      // Show all setup photos as thumbnails (pre-race evidence)
+      if (hasSetupPhotos) {
+        for (var pi = 0; pi < setupPhotos.length; pi++) {
+          var sp = setupPhotos[pi];
+          tagHtml += '<img src="' + (sp.thumbUrl || sp.fullUrl) + '" alt="Setup photo ' + (pi + 1) + '" ' +
+            'style="max-width:45px;max-height:35px;border-radius:3px;border:1px solid var(--accent);cursor:pointer;" ' +
+            'onclick="window.open(\'' + escHtml(sp.fullUrl) + '\', \'_blank\')" title="Setup photo ' + (pi + 1) + '">';
+        }
+      } else if (hasPhoto) {
+        // Legacy: single photo (from old evidence entries or post-race uploads)
+        tagHtml += '<img src="' + (entry.photoThumb || entry.photoUrl) + '" alt="Evidence" ' +
+          'style="max-width:60px;max-height:45px;border-radius:3px;border:1px solid var(--accent);cursor:pointer;" ' +
+          'onclick="window.open(\'' + escHtml(entry.photoUrl || entry.photoThumb) + '\', \'_blank\')">';
+      }
+
+      tagHtml += '</div>' +
+            '<button class="btn btn-sm" id="evPhotoBtn_' + entry.caseNumber + '" ' +
+              'onclick="evUploadPhoto(\'' + entry.caseNumber + '\')" ' +
+              'style="font-size:0.65rem;padding:2px 6px;margin-top:2px;" ' +
+              'title="Add another photo to this evidence entry">' +
+              (hasSetupPhotos ? '📷 +MORE' : (hasPhoto ? '📷 +' : '📷 ADD')) + '</button>' +
           '</div>' +
         '</div>' +
       '</div>';
       return tagHtml;
     }
 
-    // Show evidence tags overlay with print button
+    // Label size config bar HTML
+    function evLabelConfigHtml() {
+      var lbl = evGetLabelSize();
+      var html = '<div class="ev-label-config">' +
+        '<label>Label:</label>' +
+        '<select id="evLabelPreset" onchange="evOnPresetChange()">';
+      var keys = Object.keys(evLabelPresets);
+      for (var i = 0; i < keys.length; i++) {
+        var k = keys[i];
+        html += '<option value="' + k + '"' + (lbl.preset === k ? ' selected' : '') + '>' + evLabelPresets[k].name + '</option>';
+      }
+      html += '</select>' +
+        '<span id="evCustomSize" style="display:' + (lbl.preset === 'custom' ? 'inline' : 'none') + ';">' +
+          'W:<input type="number" id="evLabelW" value="' + lbl.w + '" step="0.01" onchange="evOnCustomSize()">mm ' +
+          'H:<input type="number" id="evLabelH" value="' + lbl.h + '" step="0.01" onchange="evOnCustomSize()">mm' +
+        '</span>' +
+        '</div>';
+      return html;
+    }
+    function evOnPresetChange() {
+      var sel = document.getElementById('evLabelPreset');
+      var preset = sel.value;
+      var p = evLabelPresets[preset] || evLabelPresets['munbyn_3x2'];
+      var custom = document.getElementById('evCustomSize');
+      if (custom) custom.style.display = preset === 'custom' ? 'inline' : 'none';
+      if (preset !== 'custom') {
+        evSaveLabelSize(preset, p.w, p.h);
+      } else {
+        var w = parseFloat(document.getElementById('evLabelW').value) || 76.65;
+        var h = parseFloat(document.getElementById('evLabelH').value) || 49.27;
+        evSaveLabelSize('custom', w, h);
+      }
+    }
+    function evOnCustomSize() {
+      var w = parseFloat(document.getElementById('evLabelW').value) || 76.65;
+      var h = parseFloat(document.getElementById('evLabelH').value) || 49.27;
+      evSaveLabelSize('custom', w, h);
+    }
+
+    // Show evidence tags overlay with print button + label config
     function evShowTagsOverlay(entries) {
       if (!entries || entries.length === 0) {
         alert('No evidence to tag!');
@@ -2334,13 +3602,14 @@
         'background:rgba(0,0,0,0.85);overflow-y:auto;padding:20px;';
 
       var content = '<div style="max-width:600px;margin:0 auto;">' +
-        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
           '<h2 style="color:var(--accent);margin:0;">EVIDENCE TAGS</h2>' +
           '<div>' +
-            '<button class="btn btn-success" onclick="evPrintTags()" style="margin-right:8px;">PRINT</button>' +
+            '<button class="btn btn-success" onclick="evPrintTags()" style="margin-right:8px;">PRINT LABELS</button>' +
             '<button class="btn btn-danger" onclick="document.getElementById(\'evOverlay\').remove()">CLOSE</button>' +
           '</div>' +
-        '</div>';
+        '</div>' +
+        evLabelConfigHtml();
 
       for (var i = 0; i < entries.length; i++) {
         content += evGenerateTag(entries[i]);
@@ -2349,41 +3618,66 @@
       overlay.innerHTML = content;
       document.body.appendChild(overlay);
 
-      // Inject QR codes
+      // Inject QR codes at the right size
       for (var j = 0; j < entries.length; j++) {
         var qrContainer = document.getElementById('evQr_' + entries[j].caseNumber);
         if (qrContainer) {
+          var qrSize = parseInt(qrContainer.getAttribute('data-qr-size')) || 80;
           var url = window.location.protocol + '//' + window.location.host +
             '/evidence#' + entries[j].caseNumber;
-          qrContainer.appendChild(evGenerateQrSvg(url, 100));
+          qrContainer.appendChild(evGenerateQrSvg(url, qrSize));
         }
       }
     }
 
+    // Print tags formatted for the configured label size
     function evPrintTags() {
       var overlay = document.getElementById('evOverlay');
       if (!overlay) return;
+      var lbl = evGetLabelSize();
+      var hasSize = lbl.w > 0 && lbl.h > 0;
+
       var printWin = window.open('', '_blank');
-      printWin.document.write('<!DOCTYPE html><html><head><title>Evidence Tags</title>' +
-        '<style>' +
-        'body{font-family:monospace;background:#fff;color:#000;padding:10px;}' +
-        '.ev-tag{border:2px solid #000;border-radius:8px;padding:12px;margin:10px 0;page-break-inside:avoid;max-width:400px;}' +
-        '.ev-tag-header{text-align:center;border-bottom:2px solid #000;padding-bottom:8px;margin-bottom:8px;}' +
-        '.ev-tag-badge{font-size:0.7rem;font-weight:900;letter-spacing:2px;text-transform:uppercase;}' +
-        '.ev-tag-case{font-size:1.4rem;font-weight:900;letter-spacing:3px;}' +
-        '.ev-tag-body{display:flex;gap:12px;align-items:flex-start;}' +
-        '.ev-tag-qr{flex-shrink:0;}' +
-        '.ev-tag-info{font-size:0.8rem;line-height:1.6;}' +
-        '.ev-tag-ts{font-size:0.65rem;color:#666;margin-top:4px;}' +
-        '@media print{body{margin:0;}.ev-tag{border:1px solid #000;}}' +
-        '</style></head><body>');
+      var css = 'body{font-family:"Consolas","Courier New",monospace;background:#fff;color:#000;margin:0;padding:0;}';
+
+      if (hasSize) {
+        // Fixed-size labels: each tag is exactly the label dimensions
+        css += '@page{size:' + lbl.w + 'mm ' + lbl.h + 'mm;margin:0;}';
+        css += '.ev-tag{width:' + lbl.w + 'mm;height:' + lbl.h + 'mm;box-sizing:border-box;' +
+          'border:1px solid #000;padding:2mm 2.5mm;margin:0;page-break-after:always;overflow:hidden;border-radius:0;}';
+        css += '.ev-tag-header{display:flex;justify-content:space-between;align-items:center;' +
+          'border-bottom:1px solid #000;padding-bottom:1.5mm;margin-bottom:1.5mm;}';
+        css += '.ev-tag-badge{font-size:5pt;font-weight:900;letter-spacing:1px;text-transform:uppercase;}';
+        css += '.ev-tag-case{font-size:9pt;font-weight:900;letter-spacing:1.5px;}';
+        css += '.ev-tag-body{display:flex;gap:2mm;align-items:flex-start;}';
+        css += '.ev-tag-qr{flex-shrink:0;}';
+        css += '.ev-tag-info{font-size:6pt;line-height:1.4;}';
+        css += '.ev-tag-info b{font-size:7pt;}';
+        css += '.ev-tag-ts{font-size:5pt;color:#444;margin-top:1mm;}';
+      } else {
+        // Full page: larger tags, no page-size constraint
+        css += '.ev-tag{border:2px solid #000;border-radius:6px;padding:12px;margin:10px auto;' +
+          'page-break-inside:avoid;max-width:400px;}';
+        css += '.ev-tag-header{display:flex;justify-content:space-between;align-items:center;' +
+          'border-bottom:2px solid #000;padding-bottom:6px;margin-bottom:6px;}';
+        css += '.ev-tag-badge{font-size:7pt;font-weight:900;letter-spacing:2px;text-transform:uppercase;}';
+        css += '.ev-tag-case{font-size:14pt;font-weight:900;letter-spacing:3px;}';
+        css += '.ev-tag-body{display:flex;gap:10px;align-items:flex-start;}';
+        css += '.ev-tag-qr{flex-shrink:0;}';
+        css += '.ev-tag-info{font-size:9pt;line-height:1.6;}';
+        css += '.ev-tag-ts{font-size:7pt;color:#666;margin-top:3px;}';
+      }
+      css += '@media print{body{margin:0;padding:0;}}';
+
+      printWin.document.write('<!DOCTYPE html><html><head><title>Evidence Labels</title>' +
+        '<style>' + css + '</style></head><body>');
       var tags = overlay.querySelectorAll('.ev-tag');
       for (var i = 0; i < tags.length; i++) {
         printWin.document.write(tags[i].outerHTML);
       }
       printWin.document.write('</body></html>');
       printWin.document.close();
-      printWin.print();
+      setTimeout(function() { printWin.print(); }, 300);
     }
 
     // Copy NFC URL to clipboard with visual feedback

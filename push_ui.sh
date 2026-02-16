@@ -28,6 +28,8 @@ FILES=(
   console.html
   start_status.html
   speedtrap_status.html
+  about.html
+  science_fair_report.html
 )
 
 echo "========================================"
@@ -61,6 +63,13 @@ for FILE in "${FILES[@]}"; do
   fi
 
   SIZE=$(wc -c < "$FILEPATH" | tr -d ' ')
+
+  if [ "$SIZE" -eq 0 ]; then
+    echo "  SKIP  /${FILE} — file is 0 bytes (refusing to push empty file)"
+    FAIL=$((FAIL + 1))
+    continue
+  fi
+
   echo -n "  PUSH  /${FILE} (${SIZE} bytes)... "
 
   HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \

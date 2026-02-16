@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.A.S.S. Trap — Forensic-Grade Physics Lab for $7</title>
+<meta name="description" content="Turn a Hot Wheels track into a forensic-grade physics laboratory. Microsecond timing, evidence chain of custody, and a full web dashboard — all on a $7 ESP32.">
+<meta name="keywords" content="ESP32, Hot Wheels, physics, science fair, speed trap, STEM, maker, DIY">
+<meta property="og:title" content="M.A.S.S. Trap — Motion Analysis & Speed System">
+<meta property="og:description" content="A forensic-grade physics lab disguised as a Hot Wheels speedometer. Built by a dad and his kids.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://ryan4n6.github.io/MASS-Trap/">
+<link rel="canonical" href="https://ryan4n6.github.io/MASS-Trap/">
+<style>
+/* ============================================================
+   M.A.S.S. Trap — GitHub Pages
+   Design language: Navy + Gold (Judge Dredd shield palette)
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#091B2F;--navy-light:#0d2847;--navy-mid:#112d4e;--navy-card:#0f2340;
+  --gold:#D4AF37;--gold-dim:rgba(212,175,55,0.25);--gold-glow:rgba(212,175,55,0.08);
+  --orange:#FF4500;--orange-dim:rgba(255,69,0,0.15);
+  --text:#E8E8E8;--text-muted:#8899AA;--text-dim:#556677;
+  --green:#28a745;--red:#dc3545;--cyan:#17a2b8;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"SF Mono",Monaco,"Cascadia Code","Fira Code",monospace;
+  --max-w:1100px;
+  --radius:12px;
+}
+html{scroll-behavior:smooth}
+body{background:var(--navy);color:var(--text);font-family:var(--font);line-height:1.7;-webkit-font-smoothing:antialiased}
+a{color:var(--gold);text-decoration:none;transition:color 0.2s}
+a:hover{color:#e8c84a;text-decoration:underline}
+img{max-width:100%;height:auto}
+.container{max-width:var(--max-w);margin:0 auto;padding:0 20px}
+
+/* === HERO === */
+.hero{text-align:center;padding:80px 20px 60px;position:relative;overflow:hidden}
+.hero::before{content:"";position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at center,var(--gold-glow) 0%,transparent 70%);pointer-events:none}
+.hero-badge{display:inline-block;background:var(--gold);color:var(--navy);font-size:0.65rem;font-weight:800;padding:4px 16px;border-radius:20px;text-transform:uppercase;letter-spacing:2px;margin-bottom:20px}
+.hero h1{font-size:3.5rem;color:var(--gold);letter-spacing:4px;font-weight:900;line-height:1.1;margin-bottom:8px}
+.hero h1 span{display:block;font-size:1rem;color:var(--text-muted);letter-spacing:6px;font-weight:400;margin-top:8px}
+.hero-tagline{font-size:1.15rem;color:var(--text-muted);max-width:640px;margin:16px auto 0;line-height:1.8}
+.hero-tagline strong{color:var(--text)}
+.hero-tagline em{color:var(--gold);font-style:normal}
+.hero-cta{margin-top:36px;display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:14px 28px;border-radius:8px;font-weight:700;font-size:0.95rem;letter-spacing:0.5px;transition:all 0.2s;border:none;cursor:pointer;text-decoration:none}
+.btn:hover{text-decoration:none;transform:translateY(-1px)}
+.btn-gold{background:var(--gold);color:var(--navy)}
+.btn-gold:hover{background:#e8c84a;color:var(--navy)}
+.btn-outline{background:transparent;color:var(--gold);border:2px solid var(--gold)}
+.btn-outline:hover{background:var(--gold-glow);color:var(--gold)}
+.btn-orange{background:var(--orange);color:white}
+.btn-orange:hover{background:#ff5a1f}
+@media(max-width:600px){.hero h1{font-size:2.2rem;letter-spacing:2px}.hero{padding:50px 16px 40px}.hero-cta{flex-direction:column;align-items:center}}
+
+/* === STATS BANNER === */
+.stats-banner{background:var(--navy-light);border-top:1px solid var(--gold-dim);border-bottom:1px solid var(--gold-dim);padding:24px 0}
+.stats-row{display:flex;justify-content:center;gap:40px;flex-wrap:wrap}
+.stat{text-align:center}
+.stat-val{font-size:1.6rem;font-weight:800;color:var(--gold);font-family:var(--mono)}
+.stat-lbl{font-size:0.65rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1.5px;margin-top:2px}
+@media(max-width:600px){.stats-row{gap:20px}.stat-val{font-size:1.2rem}}
+
+/* === SECTIONS === */
+.section{padding:80px 0}
+.section:nth-child(even){background:var(--navy-light)}
+.section-header{text-align:center;margin-bottom:48px}
+.section-header h2{font-size:2rem;color:var(--gold);letter-spacing:2px;margin-bottom:8px}
+.section-header p{color:var(--text-muted);font-size:1rem;max-width:600px;margin:0 auto}
+@media(max-width:600px){.section{padding:50px 0}.section-header h2{font-size:1.5rem}}
+
+/* === FEATURE CARDS === */
+.features-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px}
+.feature-card{background:var(--navy-card);border:1px solid var(--gold-dim);border-radius:var(--radius);padding:28px 24px;transition:border-color 0.3s,transform 0.2s}
+.feature-card:hover{border-color:var(--gold);transform:translateY(-2px)}
+.feature-icon{font-size:2rem;margin-bottom:12px}
+.feature-card h3{color:var(--text);font-size:1.05rem;margin-bottom:6px}
+.feature-card p{color:var(--text-muted);font-size:0.88rem;line-height:1.6}
+
+/* === BUILD TIERS === */
+.tiers-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+.tier-card{background:var(--navy-card);border:2px solid var(--gold-dim);border-radius:var(--radius);overflow:hidden;transition:border-color 0.3s,transform 0.2s}
+.tier-card:hover{border-color:var(--gold);transform:translateY(-3px)}
+.tier-card.recommended{border-color:var(--gold)}
+.tier-header{padding:24px 20px 16px;text-align:center;border-bottom:1px solid var(--gold-dim)}
+.tier-badge{display:inline-block;background:var(--gold);color:var(--navy);font-size:0.6rem;font-weight:800;padding:3px 10px;border-radius:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.tier-name{font-size:1.3rem;color:var(--text);font-weight:700}
+.tier-price{font-size:2rem;color:var(--gold);font-weight:900;font-family:var(--mono);margin:8px 0 4px}
+.tier-price span{font-size:0.8rem;color:var(--text-muted);font-weight:400}
+.tier-desc{font-size:0.82rem;color:var(--text-muted)}
+.tier-body{padding:20px}
+.tier-list{list-style:none;padding:0}
+.tier-list li{padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:0.88rem;color:var(--text-muted);display:flex;align-items:flex-start;gap:8px}
+.tier-list li:last-child{border-bottom:none}
+.tier-list li::before{content:"";flex-shrink:0;width:6px;height:6px;background:var(--gold);border-radius:50%;margin-top:8px}
+.tier-list li strong{color:var(--text)}
+.tier-footer{padding:16px 20px;border-top:1px solid var(--gold-dim);text-align:center}
+
+/* === COMING SOON === */
+.coming-soon{background:var(--navy-card);border:2px dashed var(--gold-dim);border-radius:var(--radius);padding:48px 32px;text-align:center;max-width:700px;margin:0 auto}
+.coming-soon h3{color:var(--gold);font-size:1.3rem;margin-bottom:8px}
+.coming-soon p{color:var(--text-muted);font-size:0.92rem}
+.coming-soon .emoji{font-size:3rem;margin-bottom:16px}
+
+/* === ROADMAP === */
+.roadmap{max-width:700px;margin:0 auto}
+.roadmap-item{display:flex;gap:20px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.roadmap-item:last-child{border-bottom:none}
+.roadmap-status{flex-shrink:0;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.9rem;margin-top:2px}
+.roadmap-status.done{background:rgba(40,167,69,0.2);border:1px solid var(--green)}
+.roadmap-status.wip{background:var(--orange-dim);border:1px solid var(--orange)}
+.roadmap-status.planned{background:var(--gold-glow);border:1px solid var(--gold-dim)}
+.roadmap-item h4{color:var(--text);font-size:0.95rem;margin-bottom:2px}
+.roadmap-item p{color:var(--text-muted);font-size:0.82rem}
+
+/* === QUOTE === */
+.quote-block{background:linear-gradient(135deg,var(--navy-card),var(--navy-mid));border:2px solid var(--gold);border-radius:var(--radius);padding:32px;text-align:center;max-width:700px;margin:0 auto}
+.quote-block blockquote{font-size:1.1rem;color:var(--cyan);font-style:italic;line-height:1.7}
+.quote-block cite{display:block;margin-top:12px;color:var(--text-muted);font-size:0.85rem;font-style:normal}
+
+/* === FOOTER === */
+.site-footer{background:var(--navy-light);border-top:1px solid var(--gold-dim);padding:40px 0;text-align:center}
+.footer-links{display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:16px}
+.footer-links a{color:var(--text-muted);font-size:0.85rem}
+.footer-links a:hover{color:var(--gold)}
+.footer-copy{color:var(--text-dim);font-size:0.75rem}
+.footer-copy a{color:var(--text-muted)}
+
+/* === POPUP TIPS (VH1 Pop-Up Video style) === */
+.tip-bubble{position:relative;background:var(--navy-card);border:1px solid var(--gold);border-radius:10px;padding:16px 20px;margin:20px 0;font-size:0.88rem;color:var(--text-muted);line-height:1.6}
+.tip-bubble::before{content:"";position:absolute;top:-8px;left:24px;width:16px;height:16px;background:var(--navy-card);border-left:1px solid var(--gold);border-top:1px solid var(--gold);transform:rotate(45deg)}
+.tip-label{display:inline-block;background:var(--gold);color:var(--navy);font-size:0.6rem;font-weight:800;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.tip-bubble strong{color:var(--text)}
+.tip-bubble em{color:var(--cyan);font-style:normal}
+
+/* === AFFILIATE NOTICE === */
+.affiliate-notice{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:8px;padding:12px 16px;font-size:0.75rem;color:var(--text-dim);text-align:center;margin-top:24px}
+</style>
+</head>
+<body>
+
+<!-- ==================== HERO ==================== -->
+<div class="hero">
+  <div class="hero-badge">Open Source &bull; Built by a Dad &bull; Powered by ESP32</div>
+  <h1>M.A.S.S. TRAP<span>Motion Analysis &amp; Speed System</span></h1>
+  <p class="hero-tagline">
+    A <em>forensic-grade physics laboratory</em> disguised as a Hot Wheels track speedometer.
+    <strong>Microsecond timing. Evidence chain of custody. Full web dashboard.</strong>
+    All running on a <em>$7 microcontroller</em>.
+  </p>
+  <div class="hero-cta">
+    <a href="#build" class="btn btn-gold">Build One</a>
+    <a href="https://github.com/Ryan4n6/MASS-Trap" class="btn btn-outline" target="_blank">View on GitHub</a>
+    <a href="https://github.com/Ryan4n6/MASS-Trap/releases/latest" class="btn btn-outline" target="_blank">Download Firmware</a>
+  </div>
+</div>
+
+<!-- ==================== STATS BANNER ==================== -->
+<div class="stats-banner">
+  <div class="stats-row">
+    <div class="stat"><div class="stat-val">21,500+</div><div class="stat-lbl">Lines of Code</div></div>
+    <div class="stat"><div class="stat-val">$7</div><div class="stat-lbl">Hardware Cost</div></div>
+    <div class="stat"><div class="stat-val">&micro;s</div><div class="stat-lbl">Timing Precision</div></div>
+    <div class="stat"><div class="stat-val">25+</div><div class="stat-lbl">API Endpoints</div></div>
+    <div class="stat"><div class="stat-val">0</div><div class="stat-lbl">Frameworks Used</div></div>
+  </div>
+</div>
+
+<!-- ==================== WHAT IS IT ==================== -->
+<div class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>What Is This Thing?</h2>
+      <p>Everything you need to run a real physics experiment with toy cars.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon">&#9201;</div>
+        <h3>Microsecond Race Timing</h3>
+        <p>Hardware interrupt-driven timing on dual-core ESP32-S3. IR break-beam sensors at start and finish. No polling, no missed events, no excuses.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128202;</div>
+        <h3>Full Physics Dashboard</h3>
+        <p>Speed, velocity, momentum, kinetic energy &mdash; calculated in real-time and served over WiFi. Five visual themes. Works on any browser.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128274;</div>
+        <h3>Evidence Chain of Custody</h3>
+        <p>Every race gets a case number, QR-coded evidence tag, and printable label. NFC stickers auto-identify cars. Forensic-grade data logging.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#127891;</div>
+        <h3>Science Fair Mode</h3>
+        <p>Guided 6-phase testing workflow. Define variables, intake vehicles, assign case numbers, collect data, generate reports. One button = full submission.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128225;</div>
+        <h3>ESP-NOW Mesh Network</h3>
+        <p>Up to 3 devices communicate wirelessly: start gate, finish gate, and mid-track speed trap. Microsecond-synced clocks. Auto-discovery.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#127911;</div>
+        <h3>Audio Announcer</h3>
+        <p>Built-in I2S audio calls out race results, car names, and speed records through a speaker. Your track talks back. No external apps needed.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128161;</div>
+        <h3>WLED LED Integration</h3>
+        <p>Sync addressable LED strips to race state. Armed = breathing blue. Racing = chase animation. Finish = celebration burst. 1000+ LEDs supported.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">&#128241;</div>
+        <h3>NFC + LiDAR + OTA</h3>
+        <p>NFC stickers on cars for auto-identification. TF-Luna LiDAR for auto-arming. Browser-based firmware updates. No cables needed after first flash.</p>
+      </div>
+    </div>
+
+    <div class="tip-bubble" style="max-width:700px;margin:32px auto 0">
+      <div class="tip-label">Ryan Says</div>
+      This started as a weekend project for my son's science fair. Two months and 21,000 lines of code later, it's a full forensic physics lab that runs on hardware cheaper than the Hot Wheels cars it measures. <strong>If a 10-year-old can operate it, so can you.</strong>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== BUILD TIERS ==================== -->
+<div class="section" id="build">
+  <div class="container">
+    <div class="section-header">
+      <h2>Build Your Own</h2>
+      <p>Pick your budget. Get the parts. Flash the firmware. Race.</p>
+    </div>
+    <div class="tiers-grid">
+
+      <!-- Tier 1: Starter -->
+      <div class="tier-card">
+        <div class="tier-header">
+          <div class="tier-name">Starter Track</div>
+          <div class="tier-price">~$25 <span>estimated</span></div>
+          <div class="tier-desc">Minimum viable speed trap</div>
+        </div>
+        <div class="tier-body">
+          <ul class="tier-list">
+            <li><strong>ESP32-S3-WROOM-1 N16R8</strong> &mdash; the brain ($7)</li>
+            <li><strong>2x IR break-beam sensors</strong> &mdash; start + finish detection ($4)</li>
+            <li><strong>Breadboard + jumper wires</strong> &mdash; no soldering needed ($5)</li>
+            <li><strong>USB-C cable + power</strong> &mdash; phone charger works ($3)</li>
+            <li><strong>Hot Wheels track + car</strong> &mdash; any track, any car ($6)</li>
+            <li>WiFi dashboard with timing and speed</li>
+            <li>CSV data export for science fair</li>
+          </ul>
+        </div>
+        <div class="tier-footer">
+          <a href="store.html#starter" class="btn btn-outline" style="width:100%;justify-content:center">View Parts List</a>
+        </div>
+      </div>
+
+      <!-- Tier 2: Science Fair (Recommended) -->
+      <div class="tier-card recommended">
+        <div class="tier-header">
+          <div class="tier-badge">Ryan Recommends</div>
+          <div class="tier-name">Science Fair Ready</div>
+          <div class="tier-price">~$60 <span>estimated</span></div>
+          <div class="tier-desc">Everything Ben used for his project</div>
+        </div>
+        <div class="tier-body">
+          <ul class="tier-list">
+            <li><strong>Everything in Starter</strong>, plus:</li>
+            <li><strong>Milligram scale</strong> &mdash; weigh cars to &plusmn;0.001g ($12)</li>
+            <li><strong>NTAG213 NFC stickers</strong> &mdash; scan car, auto-select ($5/50pk)</li>
+            <li><strong>Tungsten weight set</strong> &mdash; add mass for experiments ($10)</li>
+            <li><strong>MAX98357A I2S amplifier</strong> &mdash; audio announcer ($4)</li>
+            <li><strong>Small speaker</strong> &mdash; 3W, 4 ohm ($3)</li>
+            <li>Evidence tags with QR codes</li>
+            <li>Auto-generated science fair report</li>
+            <li>Guided 6-phase testing workflow</li>
+          </ul>
+        </div>
+        <div class="tier-footer">
+          <a href="store.html#science-fair" class="btn btn-gold" style="width:100%;justify-content:center">View Parts List</a>
+        </div>
+      </div>
+
+      <!-- Tier 3: Full Send -->
+      <div class="tier-card">
+        <div class="tier-header">
+          <div class="tier-name">Full Send</div>
+          <div class="tier-price">~$120 <span>estimated</span></div>
+          <div class="tier-desc">The "it's 3am and I can't stop" build</div>
+        </div>
+        <div class="tier-body">
+          <ul class="tier-list">
+            <li><strong>Everything in Science Fair</strong>, plus:</li>
+            <li><strong>2nd ESP32</strong> &mdash; dedicated start gate ($7)</li>
+            <li><strong>3rd ESP32</strong> &mdash; mid-track speed trap ($7)</li>
+            <li><strong>TF-Luna LiDAR</strong> &mdash; auto-detect cars at start ($12)</li>
+            <li><strong>BTF WS2812B LED strip</strong> &mdash; 1000 LEDs of drama ($20)</li>
+            <li><strong>WLED controller</strong> &mdash; separate ESP32 for lights ($7)</li>
+            <li>3-device ESP-NOW mesh network</li>
+            <li>LiDAR auto-arm (hands-free operation)</li>
+            <li>Synchronized LED race animations</li>
+            <li>Mid-track velocity measurement</li>
+          </ul>
+        </div>
+        <div class="tier-footer">
+          <a href="store.html#full-send" class="btn btn-outline" style="width:100%;justify-content:center">View Parts List</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="affiliate-notice">
+      Links to Amazon and other retailers may include affiliate tags. This costs you nothing extra and helps support the project.
+      We only recommend parts we've actually used and tested. No sponsorships. No bullshit.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== BUILD WIZARD (Coming Soon) ==================== -->
+<div class="section" id="wizard">
+  <div class="container">
+    <div class="section-header">
+      <h2>Build Wizard</h2>
+      <p>Tell us what you want to build. We'll tell you exactly how to wire it.</p>
+    </div>
+    <div class="coming-soon">
+      <div class="emoji">&#128268;</div>
+      <h3>Interactive Build Wizard &mdash; Coming Soon</h3>
+      <p>
+        Pick your loadout. See a color-coded pinout diagram showing <strong>exactly</strong> which wire goes where.
+        No schematic reading required. No electronics experience needed.
+        Then plug in your ESP32 and flash the firmware right from your browser.
+      </p>
+      <div style="margin-top:24px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap">
+        <div style="background:var(--gold-glow);border:1px solid var(--gold-dim);border-radius:8px;padding:12px 16px;font-size:0.82rem;color:var(--text-muted)">
+          <strong style="color:var(--gold)">Step 1:</strong> Pick your tier &amp; options
+        </div>
+        <div style="background:var(--gold-glow);border:1px solid var(--gold-dim);border-radius:8px;padding:12px 16px;font-size:0.82rem;color:var(--text-muted)">
+          <strong style="color:var(--gold)">Step 2:</strong> See your custom wiring diagram
+        </div>
+        <div style="background:var(--gold-glow);border:1px solid var(--gold-dim);border-radius:8px;padding:12px 16px;font-size:0.82rem;color:var(--text-muted)">
+          <strong style="color:var(--gold)">Step 3:</strong> Flash firmware from your browser
+        </div>
+      </div>
+    </div>
+
+    <div class="tip-bubble" style="max-width:700px;margin:32px auto 0">
+      <div class="tip-label">Did You Know?</div>
+      <strong>Galileo proved that all objects fall at the same rate in a vacuum in 1589.</strong>
+      But on a real track with friction and air resistance, heavier objects have more momentum to push through.
+      That's exactly what M.A.S.S. Trap measures &mdash; <em>the difference between theory and reality</em>.
+    </div>
+  </div>
+</div>
+
+<!-- ==================== WEB FLASHER (Coming Soon) ==================== -->
+<div class="section" id="flash">
+  <div class="container">
+    <div class="section-header">
+      <h2>Browser Flasher</h2>
+      <p>No software to install. No command line. Just plug in and click.</p>
+    </div>
+    <div class="coming-soon">
+      <div class="emoji">&#9889;</div>
+      <h3>ESP Web Flasher &mdash; Coming Soon</h3>
+      <p>
+        Using <a href="https://esphome.github.io/esp-web-tools/" target="_blank">ESP Web Tools</a>,
+        you'll be able to flash M.A.S.S. Trap firmware directly from this page.
+        Select your build configuration, connect your ESP32 via USB, click Flash. Done.
+        <strong>Works in Chrome and Edge.</strong>
+      </p>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== ROADMAP ==================== -->
+<div class="section" id="roadmap">
+  <div class="container">
+    <div class="section-header">
+      <h2>Project Roadmap</h2>
+      <p>What's built, what's next, and what's cooking at 3am.</p>
+    </div>
+    <div class="roadmap">
+      <div class="roadmap-item">
+        <div class="roadmap-status done">&#10003;</div>
+        <div>
+          <h4>Core Race Timing</h4>
+          <p>Microsecond ISR timing, physics calculations, CSV logging, web dashboard</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status done">&#10003;</div>
+        <div>
+          <h4>ESP-NOW Mesh Network</h4>
+          <p>3-device communication: start gate, finish gate, speed trap. Auto-discovery and clock sync.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status done">&#10003;</div>
+        <div>
+          <h4>Evidence System + NFC</h4>
+          <p>Case numbers, QR evidence tags, NFC stickers for car ID, printable labels, chain of custody.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status done">&#10003;</div>
+        <div>
+          <h4>Science Fair Playlist Mode</h4>
+          <p>6-phase guided workflow: experiment setup, vehicle intake, evidence prep, pre-flight, data collection, report.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status done">&#10003;</div>
+        <div>
+          <h4>Browser Firmware Update</h4>
+          <p>OTA updates from GitHub with MD5 verification. No cables after first flash.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status done">&#10003;</div>
+        <div>
+          <h4>Audio Announcer + WLED</h4>
+          <p>I2S audio playback, race result announcements. WLED integration for LED animations.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status wip">&#9881;</div>
+        <div>
+          <h4>Interactive Build Wizard</h4>
+          <p>Pick your config, see wiring diagrams, flash from browser. Zero anxiety onboarding.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status wip">&#9881;</div>
+        <div>
+          <h4>Parts Store + Affiliate Links</h4>
+          <p>Curated component lists by budget tier with current Amazon pricing.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status planned">&#9734;</div>
+        <div>
+          <h4>Drag Tree Start Gate</h4>
+          <p>Christmas tree countdown lights + servo-controlled launch gate. Full drag strip experience.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status planned">&#9734;</div>
+        <div>
+          <h4>Onboard Telemetry</h4>
+          <p>XIAO ESP32-S3 + accelerometer strapped to a Hot Wheels car. G-force, vibration, real-time radio.</p>
+        </div>
+      </div>
+      <div class="roadmap-item">
+        <div class="roadmap-status planned">&#9734;</div>
+        <div>
+          <h4>LTI Integration</h4>
+          <p>Connect to Moodle/Canvas as an external tool. Auto-submit science fair data for grading. $7 board does what $10K LMS can't.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== QUOTE ==================== -->
+<div class="section">
+  <div class="container">
+    <div class="quote-block">
+      <blockquote>
+        &ldquo;This project was built at kitchen tables and workbenches between the hours of midnight and sunrise.
+        A dad, his two sons, and an AI &mdash; proving that the best tools in the world are worthless
+        without the people willing to stay up all night using them.&rdquo;
+      </blockquote>
+      <cite>&mdash; The Kristina Report&trade;</cite>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-links">
+      <a href="https://github.com/Ryan4n6/MASS-Trap" target="_blank">GitHub</a>
+      <a href="https://github.com/Ryan4n6/MASS-Trap/releases" target="_blank">Releases</a>
+      <a href="store.html">Parts Store</a>
+      <a href="https://github.com/Ryan4n6/MASS-Trap/wiki" target="_blank">Documentation</a>
+      <a href="https://github.com/Ryan4n6/MASS-Trap/issues" target="_blank">Report a Bug</a>
+    </div>
+    <div class="footer-copy">
+      M.A.S.S. Trap &copy; 2026 <a href="https://github.com/Ryan4n6" target="_blank">Ryan Massfeller</a>.
+      Open source under the MIT License.
+      <br>Built with ESP32, Hot Wheels, and an unreasonable amount of caffeine.
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

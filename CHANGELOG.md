@@ -2,6 +2,118 @@
 
 All notable changes to The M.A.S.S. Trap (Motion Analysis & Speed System) will be documented in this file.
 
+## [2.6.0-beta] - 2026-02-16
+
+### The Forensic Lab Manager Update
+
+The 3-phase playlist workflow (Setup → Active → Completed) has been replaced with a **6-phase forensic intake workflow** that mirrors real forensic lab procedures. In real forensics, evidence tags and photographs are prepared BEFORE testing — not after. Case numbers must exist before a single car rolls. The system now acts as a virtual forensic lab manager guiding the operator (Ben, age 10) through proper chain of custody at every step.
+
+Normal (non-playlist) race mode is completely untouched — NFC scan, arm, race, leaderboard, casual play all work exactly as before.
+
+### Added — 6-Phase Science Fair Testing Workflow (`dashboard.html`)
+
+**Phase 1: Experiment Setup** — Define variables, pick template or custom experiment
+- Three experiment templates: "Mass vs Speed" (Ben's science fair), "Car vs Car", "Custom Experiment"
+- Templates auto-fill independent/dependent/controlled variable definitions and weight conditions
+- Manual override for any pre-filled value
+- Weight conditions list with trials-per-condition config
+
+**Phase 2: Vehicle Intake** — Select cars, verify weights, check NFC tags
+- Car selector grid with per-car verification rows
+- NFC status check per vehicle (✅ tagged / ⚠️ no tag)
+- Weight display with milligram precision (0.001g step)
+- Matrix generation using Locard's Exchange Principle ordering (condition → trial → car)
+- Case numbers assigned on transition to Phase 3 via `evNextCaseNumber()`
+
+**Phase 3: Evidence Prep** — The forensically critical phase (BEFORE any racing)
+- Case assignment table: Run # | Case Number | Car | Condition | Trial
+- **PRINT EVIDENCE TAGS** button — prints partial tags (case#, car, weight, QR — no time/speed yet)
+- **📷 CAPTURE SETUP PHOTO** button with auto-assignment to next unphoto'd case number
+- Photo tap-to-override: tap a case row to re-target photos for redo scenarios
+- Photo checklist (advisory): scale readings, test setup, weight additions
+
+**Phase 4: Pre-Flight Check** — Final review before testing begins
+- Full test plan table with case numbers, car names, conditions, trials
+- Step-by-step directions for Ben ("Place car at top", "Wait for Armed", "Release", "Catch at bottom")
+- Auto-detected readiness checklist: WebSocket status, garage count, track length, tags printed, photos taken
+- **BEGIN DATA COLLECTION** button
+
+**Phase 5: Data Collection** — Racing with sanity checks
+- Case number shown in race banner alongside run label
+- Results table includes Case column
+- Sanity checks on every race finish:
+  - Time < 0.1s → "Sensor glitch? Keep or retry?"
+  - Time > 15s → "Car may have stalled. Keep or retry?"
+  - Speed = 0 → "Sensor didn't trigger. Keep or retry?"
+  - 3 identical times in a row → "Possible malfunction"
+- Yellow alert with KEEP RESULT / DISCARD & RETRY buttons
+- Auto-advance pauses during sanity warnings
+- `evRecordRun()` UPDATES pre-assigned evidence entries (doesn't create new ones)
+- Audio prompts: "Run 5 of 20. Blue F-150, plus 7 grams, trial 2 of 3. Release when armed."
+
+**Phase 6: Results & Report** — Summary, export, report generation
+- Summary tables with averages per condition
+- CSV + Summary text export
+- **REPRINT TAGS (WITH RESULTS)** — full evidence tags with time/speed filled in
+- **SCIENCE FAIR REPORT** link to `science_fair_report.html`
+- Report persistence to ESP32 as JSON (configurable max saved reports, never auto-deleted)
+
+### Added — Science Fair Laboratory Report (`science_fair_report.html`)
+- **2,008-line standalone forensic evidence report page** served from ESP32 LittleFS
+- Loads race data from `/api/history`, `/api/garage`, `/api/config` automatically
+- Formatted for both screen (navy/gold M.A.S.S. Trap theme) and print (clean B&W, `@page` rules)
+- Sections: Title Page, Abstract, Hypothesis, Variables, Materials, Procedure, Data Tables, Analysis, Conclusion
+- Auto-calculated statistics: mean, standard deviation, percent difference between conditions
+- Evidence chain of custody section with case numbers and timestamps
+- Physics formula cards with live-substituted values from actual test data
+- Print-optimized: page breaks, no-break sections, grayscale charts
+
+### Added — About / Kristina Report Page (`about.html`)
+- **"The Kristina Report"** — comprehensive project status page named after the stakeholder who needed it most
+- Live device status: fetches `/api/info`, `/api/version`, `/api/wifi-status` in real time
+- Project statistics: lines of code, features, API endpoints, race count, uptime
+- Feature inventory with status indicators (complete / in progress / planned)
+- **The Builders** section: credits for Ryan, Ben, Claude, Uncle Sam, and Kristina
+- Closing remarks / dedication section
+- Version badge now links to About page instead of GitHub releases
+
+### Added — GitHub Pages Site (`docs/`)
+- **`docs/index.html`** — Project landing page with feature highlights, architecture overview, and quick-start guide
+- **`docs/store.html`** — Curated parts store with 3 budget tiers (Starter ~$25, Science Fair ~$60, Full Send ~$120)
+- All Amazon links use real ASINs from actual purchase history with affiliate tag `ryanmassfelle-20`
+- **"The Real Numbers" transparency section** — exact category spending breakdown (~$1,200 total project cost)
+- AliExpress origin story: 15× ESP32-S3 N16R8 boards at $5.61 each, ordered August 17, 2023
+
+### Changed — Evidence System Overhaul (`dashboard.html`)
+- Evidence tags redesigned: smaller, more compact layout with max-width constraint
+- Tag label size configuration bar: select preset sizes or custom dimensions
+- `evRecordRun()` now has two code paths: playlist mode (update pre-assigned entry by case number) vs normal mode (create new entry — unchanged)
+- Photo capture integrated into pre-race workflow (Phase 3) instead of post-race
+- Setup photo bar added above dry-run controls
+
+### Changed — Version Badge Routing (`main.js`)
+- Version badge in footer now links to `/about.html` instead of GitHub releases or `/config#firmware-update`
+- Update-available badge text updated to link to About page
+- Consistent "About M.A.S.S. Trap" title text across all badge states
+
+### Changed — UI Push Script (`push_ui.sh`)
+- Added `about.html` and `science_fair_report.html` to file push list
+- Zero-byte file safety check: refuses to push empty files (prevents bricking a UI page with 0-byte LittleFS write)
+
+### Technical Notes
+- **No firmware changes.** All modifications are in LittleFS-served HTML/JS/CSS files. The ESP32 binary from v2.5.0 (commit `58d8137`) is unchanged. Dashboard updates are hot-pushed via the file API.
+- 6-phase workflow adds ~600 lines of JavaScript and ~130 lines of HTML (replacing ~130 lines of the old 3-phase UI)
+- Phase state persisted to both `localStorage` AND ESP32 (`/experiment.json`) at every phase transition and after every race result. Power loss recovery uses whichever has the more recent `savedAt` timestamp.
+- All new JavaScript continues to use ES5 (`var`, not `let`/`const`) for embedded browser compatibility.
+- `dashboard.html` grows from ~3,200 lines to ~4,500 lines (~146KB → ~170KB) — well within ESP32 LittleFS capacity (9.3MB free).
+- Normal race mode decision point in `handleStateUpdate()` unchanged: `playlistMode.active` is only `true` during Phase 5.
+- GitHub Pages served from `docs/` directory (separate from `data/` which contains ESP32 LittleFS files).
+
+### Status
+- ⚠️ **Beta**: 6-phase workflow implemented but not yet field-tested with Ben. Normal mode verified working.
+
+---
+
 ## [2.5.0] - 2026-02-13
 
 ### Thread Safety & Timing Integrity (Critical)

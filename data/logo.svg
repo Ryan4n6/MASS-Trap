@@ -1,0 +1,187 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 480">
+  <!-- M.A.S.S. Trap — Official Badge
+       "Department of Physics Enforcement"
+       Designed for the legacy Richard Massfeller built on asphalt,
+       and the one his son is building in silicon.
+       Est. 2026 — Daytona Beach, FL
+       /* Turn 4 — some corners you don't come back from */ -->
+  <defs>
+    <linearGradient id="shieldGold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F5D96B"/>
+      <stop offset="35%" stop-color="#D4AF37"/>
+      <stop offset="65%" stop-color="#C59D24"/>
+      <stop offset="100%" stop-color="#A8841E"/>
+    </linearGradient>
+    <linearGradient id="shieldNavy" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#142D4C"/>
+      <stop offset="100%" stop-color="#091B2F"/>
+    </linearGradient>
+    <linearGradient id="shieldFace" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1A3A5C"/>
+      <stop offset="100%" stop-color="#0C2240"/>
+    </linearGradient>
+    <linearGradient id="beamGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#FF4500" stop-opacity="0"/>
+      <stop offset="40%" stop-color="#FF4500" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#FF4500" stop-opacity="0"/>
+    </linearGradient>
+    <clipPath id="shieldClip">
+      <path d="M200,18 C105,18 38,72 38,140 L38,195
+               C38,310 105,405 200,458
+               C295,405 362,310 362,195 L362,140
+               C362,72 295,18 200,18 Z"/>
+    </clipPath>
+  </defs>
+
+  <!-- OUTER SHIELD — gold border, the badge edge -->
+  <path d="M200,10 C98,10 28,68 28,140 L28,195
+           C28,316 100,415 200,470
+           C300,415 372,316 372,195 L372,140
+           C372,68 302,10 200,10 Z"
+        fill="url(#shieldGold)"/>
+
+  <!-- INNER SHIELD — navy face -->
+  <path d="M200,24 C108,24 44,76 44,142 L44,195
+           C44,306 110,400 200,450
+           C290,400 356,306 356,195 L356,142
+           C356,76 292,24 200,24 Z"
+        fill="url(#shieldFace)" stroke="#D4AF37" stroke-width="1.5" stroke-opacity="0.3"/>
+
+  <!-- INNER BORDER — thin gold pinstripe -->
+  <path d="M200,36 C116,36 56,82 56,146 L56,195
+           C56,298 116,388 200,436
+           C284,388 344,298 344,195 L344,146
+           C344,82 284,36 200,36 Z"
+        fill="none" stroke="#D4AF37" stroke-width="1" stroke-opacity="0.25"/>
+
+  <!-- TOP BANNER — "M.A.S.S." -->
+  <text x="200" y="82" text-anchor="middle"
+        font-family="'Georgia','Times New Roman',serif"
+        font-weight="bold" font-size="48" fill="#D4AF37"
+        letter-spacing="5">M.A.S.S.</text>
+
+  <!-- SUBTITLE — department name -->
+  <text x="200" y="104" text-anchor="middle"
+        font-family="'Arial Narrow','Segoe UI',sans-serif"
+        font-weight="400" font-size="11" fill="#8CA8C4"
+        letter-spacing="4">MOTION ANALYSIS &amp; SPEED SYSTEM</text>
+
+  <!-- DIVIDER LINE — top -->
+  <line x1="80" y1="114" x2="320" y2="114"
+        stroke="#D4AF37" stroke-width="0.75" stroke-opacity="0.4"/>
+
+  <!-- === CENTRAL EMBLEM: Formula Vee in radar === -->
+  <g transform="translate(200,240)">
+
+    <!-- RADAR RINGS — concentric, fading out -->
+    <circle cx="0" cy="0" r="88" fill="none"
+            stroke="#D4AF37" stroke-width="0.5" stroke-opacity="0.12"/>
+    <circle cx="0" cy="0" r="66" fill="none"
+            stroke="#D4AF37" stroke-width="0.5" stroke-opacity="0.18"/>
+    <circle cx="0" cy="0" r="44" fill="none"
+            stroke="#D4AF37" stroke-width="0.5" stroke-opacity="0.25"/>
+
+    <!-- CROSSHAIR — subtle reticle -->
+    <line x1="0" y1="-95" x2="0" y2="-50" stroke="#D4AF37" stroke-width="0.5" stroke-opacity="0.2"/>
+    <line x1="0" y1="50" x2="0" y2="95" stroke="#D4AF37" stroke-width="0.5" stroke-opacity="0.2"/>
+    <line x1="-95" y1="0" x2="-50" y2="0" stroke="#D4AF37" stroke-width="0.5" stroke-opacity="0.2"/>
+    <line x1="50" y1="0" x2="95" y2="0" stroke="#D4AF37" stroke-width="0.5" stroke-opacity="0.2"/>
+
+    <!-- RADAR BEAM — IR/LiDAR waves sweeping from left -->
+    <path d="M-58,-30 Q-72,0 -58,30" fill="none"
+          stroke="#FF4500" stroke-width="3" stroke-linecap="round" stroke-opacity="0.8"/>
+    <path d="M-70,-42 Q-88,0 -70,42" fill="none"
+          stroke="#FF4500" stroke-width="2.5" stroke-linecap="round" stroke-opacity="0.5"/>
+    <path d="M-80,-52 Q-102,0 -80,52" fill="none"
+          stroke="#FF4500" stroke-width="2" stroke-linecap="round" stroke-opacity="0.3"/>
+
+    <!-- FORMULA VEE — open-wheel silhouette, top-down view
+         Cigar body, exposed front wheels, exposed rear wheels,
+         roll hoop behind driver, nose cone pointing right (toward finish) -->
+    <g transform="rotate(0)">
+      <!-- Nose cone -->
+      <path d="M38,0 L28,-4 L28,4 Z" fill="#D4AF37"/>
+
+      <!-- Main body / tub -->
+      <rect x="-22" y="-5" width="50" height="10" rx="3" fill="#D4AF37"/>
+
+      <!-- Cockpit opening -->
+      <ellipse cx="0" cy="0" rx="8" ry="3.5" fill="#091B2F"/>
+
+      <!-- Roll hoop -->
+      <rect x="-10" y="-6" width="2.5" height="12" rx="1" fill="#C59D24"/>
+
+      <!-- Engine cover (rear) -->
+      <rect x="-22" y="-4" width="12" height="8" rx="2" fill="#B8952B"/>
+
+      <!-- Front wheels — exposed -->
+      <rect x="18" y="-12" width="8" height="4" rx="1.5" fill="#888"/>
+      <rect x="18" y="8" width="8" height="4" rx="1.5" fill="#888"/>
+
+      <!-- Rear wheels — exposed, wider -->
+      <rect x="-24" y="-14" width="9" height="5" rx="2" fill="#888"/>
+      <rect x="-24" y="9" width="9" height="5" rx="2" fill="#888"/>
+
+      <!-- Rear wing struts -->
+      <line x1="-22" y1="-10" x2="-28" y2="-10" stroke="#666" stroke-width="1"/>
+      <line x1="-22" y1="10" x2="-28" y2="10" stroke="#666" stroke-width="1"/>
+
+      <!-- Rear wing -->
+      <rect x="-30" y="-12" width="3" height="24" rx="1" fill="#A8841E"/>
+
+      <!-- Driver helmet dot -->
+      <circle cx="2" cy="0" r="2.5" fill="#FFF" opacity="0.9"/>
+    </g>
+
+    <!-- Speed lines — motion trail behind car -->
+    <line x1="-36" y1="0" x2="-55" y2="0" stroke="#FFF" stroke-width="1.5" stroke-opacity="0.3"/>
+    <line x1="-32" y1="5" x2="-48" y2="5" stroke="#FFF" stroke-width="1" stroke-opacity="0.2"/>
+    <line x1="-32" y1="-5" x2="-48" y2="-5" stroke="#FFF" stroke-width="1" stroke-opacity="0.2"/>
+    <line x1="-30" y1="10" x2="-40" y2="10" stroke="#FFF" stroke-width="0.75" stroke-opacity="0.12"/>
+    <line x1="-30" y1="-10" x2="-40" y2="-10" stroke="#FFF" stroke-width="0.75" stroke-opacity="0.12"/>
+  </g>
+
+  <!-- === BOTTOM TEXT AREA === -->
+
+  <!-- DIVIDER LINE — bottom -->
+  <line x1="80" y1="350" x2="320" y2="350"
+        stroke="#D4AF37" stroke-width="0.75" stroke-opacity="0.4"/>
+
+  <!-- "TRAP" — main word mark -->
+  <text x="200" y="392" text-anchor="middle"
+        font-family="'Georgia','Times New Roman',serif"
+        font-weight="bold" font-size="44" fill="#FFFFFF"
+        letter-spacing="8">TRAP</text>
+
+  <!-- BOTTOM BANNER — ribbon with establishment -->
+  <path d="M120,408 L280,408 L272,428 L128,428 Z"
+        fill="#0C2240" stroke="#D4AF37" stroke-width="1"/>
+  <text x="200" y="423" text-anchor="middle"
+        font-family="'Arial Narrow','Segoe UI',sans-serif"
+        font-weight="bold" font-size="12" fill="#D4AF37"
+        letter-spacing="3">EST. 2026</text>
+
+  <!-- STARS — flanking the emblem, 5-point, proper geometry -->
+  <!-- Left star -->
+  <polygon points="72,180 76,190 87,190 78,197 82,208 72,201 62,208 66,197 57,190 68,190"
+           fill="#D4AF37" fill-opacity="0.8"/>
+  <!-- Right star -->
+  <polygon points="328,180 332,190 343,190 334,197 338,208 328,201 318,208 322,197 313,190 324,190"
+           fill="#D4AF37" fill-opacity="0.8"/>
+
+  <!-- Small accent stars -->
+  <polygon points="72,290 75,297 82,297 76,302 78,309 72,305 66,309 68,302 62,297 69,297"
+           fill="#D4AF37" fill-opacity="0.5" transform="scale(0.7) translate(30,130)"/>
+  <polygon points="328,290 331,297 338,297 332,302 334,309 328,305 322,309 324,302 318,297 325,297"
+           fill="#D4AF37" fill-opacity="0.5" transform="scale(0.7) translate(140,130)"/>
+
+  <!-- === HIDDEN EASTER EGGS (view source, detective) === -->
+  <!-- Richard Massfeller — Formula Vee, CFR SCCA, Daytona Beach -->
+  <!-- Sam Troia — 12/02/1949, North Adams, MA — Columbia, NYC -->
+  <!-- Stephen Henry "Beaver" Massfeller — Pipeline, 1983 -->
+  <!-- Judge Max Massfeller — 1313 Daytona Ave, Holly Hill -->
+  <!-- Bettie Rhodes Massfeller — Halifax Medical, 47 years -->
+  <!-- Ben & Sam — the next generation -->
+  <!-- Scott Russell #1 — Mr. Daytona, 5x Daytona 200 -->
+  <!-- Gate code: 1959 -->
+</svg>

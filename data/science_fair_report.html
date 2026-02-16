@@ -1,0 +1,2009 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.A.S.S. Trap — Science Fair Laboratory Report</title>
+<style>
+/* ========================================================================
+   M.A.S.S. TRAP — FORENSIC SCIENCE FAIR REPORT
+   Motion Analysis & Speed System — Laboratory Evidence Report
+   Generated: 2026-02-15 | Case Series: MASS26
+   ======================================================================== */
+
+:root {
+  --navy: #091B2F;
+  --navy-light: #0D2844;
+  --navy-mid: #132E4A;
+  --gold: #D4AF37;
+  --gold-light: #E8C84A;
+  --orange: #FF4500;
+  --orange-glow: rgba(255, 69, 0, 0.15);
+  --green: #00C853;
+  --red: #FF1744;
+  --cyan: #00BCD4;
+  --white: #F5F5F5;
+  --gray: #9E9E9E;
+  --gray-dark: #616161;
+  --paper: #FAFAFA;
+  --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+@page {
+  size: letter;
+  margin: 0.75in;
+}
+
+body {
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  background: var(--navy);
+  color: var(--white);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* === PRINT STYLES === */
+@media print {
+  body { background: white; color: #1a1a1a; font-size: 10pt; line-height: 1.4; }
+  .report-container { max-width: 100%; padding: 0; }
+  .cover-page { page-break-after: always; min-height: auto; padding: 2em 0; background: white !important; }
+  .cover-badge { filter: none; }
+  .section { page-break-inside: avoid; border: 1px solid #ccc !important; background: white !important; color: #1a1a1a !important; box-shadow: none !important; }
+  .section-header { background: #2a2a2a !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .data-table th { background: #2a2a2a !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .status-bar, .no-print { display: none !important; }
+  .watermark { opacity: 0.03; }
+  .toc a { color: #1a1a1a; }
+  .variable-card { border: 1px solid #ccc; background: #f5f5f5 !important; color: #1a1a1a !important; }
+  .variable-label { color: #333 !important; }
+  #photoGalleryGrid { grid-template-columns: repeat(3, 1fr) !important; gap: 8px !important; }
+  #photoGalleryGrid img { height: 100px !important; }
+  #photoGalleryGrid div { border-color: #ccc !important; background: #f9f9f9 !important; }
+  #photoGalleryGrid a { text-decoration: none; }
+}
+
+/* === REPORT CONTAINER === */
+.report-container {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* === STATUS BAR (screen only) === */
+.status-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background: linear-gradient(90deg, var(--navy) 0%, var(--navy-light) 50%, var(--navy) 100%);
+  border-bottom: 2px solid var(--gold);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  z-index: 1000;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 0.75rem;
+  color: var(--gold);
+}
+.status-bar .blink {
+  animation: blink 1.5s ease-in-out infinite;
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.status-bar .classification {
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+/* === COVER PAGE === */
+.cover-page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 4rem 2rem;
+  position: relative;
+  overflow: hidden;
+  margin-top: 40px;
+}
+
+.cover-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 30%, rgba(212, 175, 55, 0.08) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.watermark {
+  position: absolute;
+  font-size: 20vw;
+  font-weight: 900;
+  color: rgba(212, 175, 55, 0.03);
+  letter-spacing: 2vw;
+  pointer-events: none;
+  user-select: none;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(-15deg);
+  white-space: nowrap;
+}
+
+.cover-badge {
+  width: 140px;
+  height: 140px;
+  border: 4px solid var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2rem;
+  position: relative;
+  background: var(--navy-light);
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.2), inset 0 0 20px rgba(212, 175, 55, 0.1);
+}
+
+.cover-badge-inner {
+  font-size: 3.5rem;
+  line-height: 1;
+}
+
+.cover-title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 20px rgba(212, 175, 55, 0.3);
+}
+
+.cover-subtitle {
+  font-size: 1.1rem;
+  font-weight: 300;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--gray);
+  margin-bottom: 3rem;
+}
+
+.cover-report-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+  line-height: 1.3;
+}
+
+.cover-case-id {
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 1.2rem;
+  color: var(--orange);
+  letter-spacing: 2px;
+  margin-bottom: 3rem;
+  padding: 0.5rem 1.5rem;
+  border: 1px solid var(--orange);
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.cover-meta {
+  display: grid;
+  grid-template-columns: auto auto;
+  gap: 0.5rem 2rem;
+  text-align: left;
+  font-size: 0.95rem;
+  color: var(--gray);
+  margin-top: 1rem;
+}
+.cover-meta .label {
+  font-weight: 600;
+  color: var(--gold);
+  text-align: right;
+}
+.cover-meta .value {
+  color: var(--white);
+}
+
+.cover-divider {
+  width: 200px;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  margin: 2rem auto;
+}
+
+/* === EXECUTIVE SUMMARY BAR === */
+.exec-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin: 2rem 0;
+}
+.exec-card {
+  background: var(--navy-light);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  border-radius: 8px;
+  padding: 1.2rem;
+  text-align: center;
+}
+.exec-card .num {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--gold);
+  font-family: 'Consolas', monospace;
+}
+.exec-card .desc {
+  font-size: 0.8rem;
+  color: var(--gray);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 0.3rem;
+}
+
+/* === TABLE OF CONTENTS === */
+.toc {
+  background: var(--navy-light);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+.toc h2 {
+  font-size: 1.1rem;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+.toc-list {
+  list-style: none;
+  counter-reset: toc;
+}
+.toc-list li {
+  counter-increment: toc;
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+}
+.toc-list li::before {
+  content: counter(toc, decimal-leading-zero);
+  font-family: 'Consolas', monospace;
+  font-weight: 700;
+  color: var(--orange);
+  margin-right: 1rem;
+  font-size: 0.9rem;
+  min-width: 2rem;
+}
+.toc a {
+  color: var(--white);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.toc a:hover { color: var(--gold); }
+
+/* === SECTIONS === */
+.section {
+  background: var(--navy-light);
+  border: 1px solid rgba(212, 175, 55, 0.15);
+  border-radius: 12px;
+  margin: 2rem 0;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+.section-header {
+  background: linear-gradient(135deg, var(--navy-mid) 0%, var(--navy-light) 100%);
+  padding: 1.2rem 2rem;
+  border-bottom: 2px solid var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.section-number {
+  font-family: 'Consolas', monospace;
+  font-size: 0.8rem;
+  color: var(--orange);
+  background: rgba(255, 69, 0, 0.15);
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  font-weight: 700;
+}
+.section-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+.section-body {
+  padding: 2rem;
+}
+.section-body p {
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* === VARIABLE CARDS === */
+.variable-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+.variable-card {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  padding: 1.5rem;
+  border-left: 4px solid var(--gold);
+  transition: transform 0.2s;
+}
+.variable-card:hover { transform: translateY(-2px); }
+.variable-card.independent { border-left-color: var(--orange); }
+.variable-card.dependent { border-left-color: var(--green); }
+.variable-card.controlled { border-left-color: var(--cyan); }
+.variable-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gray);
+  margin-bottom: 0.5rem;
+}
+.variable-card.independent .variable-label { color: var(--orange); }
+.variable-card.dependent .variable-label { color: var(--green); }
+.variable-card.controlled .variable-label { color: var(--cyan); }
+.variable-name {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 0.5rem;
+}
+.variable-detail {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+/* === HYPOTHESIS BOX === */
+.hypothesis-box {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(255, 69, 0, 0.05));
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 1.5rem 0;
+  text-align: center;
+}
+.hypothesis-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  color: var(--gold);
+  margin-bottom: 0.8rem;
+}
+.hypothesis-text {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--white);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+/* === DATA TABLES === */
+.data-table-wrapper {
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border-radius: 8px;
+  border: 1px solid rgba(212, 175, 55, 0.15);
+}
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.data-table th {
+  background: var(--navy-mid);
+  color: var(--gold);
+  padding: 0.8rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid var(--gold);
+  white-space: nowrap;
+}
+.data-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+  font-family: 'Consolas', monospace;
+  font-size: 0.85rem;
+}
+.data-table tr:nth-child(even) td {
+  background: rgba(0, 0, 0, 0.15);
+}
+.data-table tr:hover td {
+  background: rgba(212, 175, 55, 0.08);
+}
+.data-table .avg-row td {
+  background: rgba(212, 175, 55, 0.1) !important;
+  font-weight: 700;
+  color: var(--gold);
+  border-top: 2px solid var(--gold);
+}
+.data-table .section-divider td {
+  background: var(--navy-mid) !important;
+  color: var(--gold);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.8rem;
+  padding: 0.5rem 1rem;
+}
+.data-table td.numeric {
+  text-align: right;
+}
+
+/* === MATERIALS LIST === */
+.materials-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.material-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  padding: 0.8rem 1rem;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.material-icon {
+  font-size: 1.5rem;
+  min-width: 2rem;
+  text-align: center;
+}
+.material-name {
+  font-weight: 600;
+  color: var(--white);
+  font-size: 0.95rem;
+}
+.material-spec {
+  font-size: 0.8rem;
+  color: var(--gray);
+  margin-top: 0.2rem;
+}
+
+/* === PROCEDURE STEPS === */
+.procedure-list {
+  counter-reset: procedure;
+  margin: 1.5rem 0;
+}
+.procedure-step {
+  counter-increment: procedure;
+  display: flex;
+  gap: 1.2rem;
+  margin-bottom: 1.2rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  border-left: 3px solid rgba(212, 175, 55, 0.3);
+  transition: border-color 0.2s;
+}
+.procedure-step:hover { border-left-color: var(--gold); }
+.procedure-step::before {
+  content: counter(procedure, decimal-leading-zero);
+  font-family: 'Consolas', monospace;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--orange);
+  min-width: 2.5rem;
+  line-height: 1.4;
+}
+.procedure-step .text {
+  color: rgba(255, 255, 255, 0.9);
+  flex: 1;
+}
+.procedure-step .note {
+  font-size: 0.85rem;
+  color: var(--cyan);
+  margin-top: 0.3rem;
+  font-style: italic;
+}
+
+/* === METRIC CALLOUTS === */
+.metric-row {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+.metric-box {
+  flex: 1;
+  min-width: 180px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 1.2rem;
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+.metric-value {
+  font-family: 'Consolas', monospace;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--gold);
+}
+.metric-unit {
+  font-size: 0.9rem;
+  color: var(--gray);
+  margin-left: 0.3rem;
+}
+.metric-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--gray);
+  margin-top: 0.3rem;
+}
+
+/* === ATTESTATION === */
+.attestation {
+  background: rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+  font-family: 'Georgia', 'Times New Roman', serif;
+}
+.attestation-header {
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+.attestation p {
+  margin-bottom: 1rem;
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.85);
+}
+.attestation .sig-line {
+  margin-top: 3rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3rem;
+}
+.attestation .sig-block {
+  border-top: 1px solid var(--gray);
+  padding-top: 0.5rem;
+}
+.attestation .sig-block .name {
+  font-weight: 700;
+  color: var(--white);
+}
+.attestation .sig-block .role {
+  font-size: 0.85rem;
+  color: var(--gray);
+}
+
+/* === FOOTER === */
+.report-footer {
+  text-align: center;
+  padding: 3rem 0;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  margin-top: 3rem;
+}
+.report-footer .system-name {
+  font-size: 1.1rem;
+  color: var(--gold);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.report-footer .version {
+  font-size: 0.8rem;
+  color: var(--gray);
+  margin-top: 0.3rem;
+  font-family: 'Consolas', monospace;
+}
+.report-footer .disclaimer {
+  font-size: 0.75rem;
+  color: var(--gray-dark);
+  margin-top: 1.5rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.5;
+}
+
+/* === ANALYSIS HIGHLIGHT === */
+.analysis-highlight {
+  background: linear-gradient(135deg, rgba(0, 200, 83, 0.08), rgba(0, 188, 212, 0.05));
+  border: 1px solid rgba(0, 200, 83, 0.3);
+  border-radius: 8px;
+  padding: 1.2rem 1.5rem;
+  margin: 1rem 0;
+}
+.analysis-highlight .finding {
+  font-weight: 700;
+  color: var(--green);
+  margin-bottom: 0.3rem;
+}
+.analysis-highlight .detail {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+}
+
+.warning-box {
+  background: rgba(255, 23, 68, 0.08);
+  border: 1px solid rgba(255, 23, 68, 0.3);
+  border-radius: 8px;
+  padding: 1.2rem 1.5rem;
+  margin: 1rem 0;
+}
+.warning-box .label {
+  font-weight: 700;
+  color: var(--red);
+  margin-bottom: 0.3rem;
+}
+
+/* === CHAIN OF CUSTODY TABLE === */
+.coc-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.85rem;
+}
+.coc-table th {
+  background: var(--navy-mid);
+  color: var(--gold);
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 2px solid var(--gold);
+}
+.coc-table td {
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.9);
+}
+.coc-table tr:nth-child(even) td { background: rgba(0,0,0,0.12); }
+
+/* === PHYSICS EQUATIONS === */
+.equation-block {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  padding: 1.2rem 1.5rem;
+  margin: 1rem 0;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 1rem;
+  text-align: center;
+  color: var(--cyan);
+  border: 1px solid rgba(0, 188, 212, 0.2);
+}
+.equation-label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--gray);
+  margin-bottom: 0.5rem;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+/* === INTERACTIVE DATA PLACEHOLDER === */
+.placeholder-note {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: var(--gray);
+  font-style: italic;
+  border: 2px dashed rgba(212, 175, 55, 0.2);
+  border-radius: 12px;
+  margin: 1.5rem 0;
+}
+.placeholder-note .icon { font-size: 2.5rem; margin-bottom: 1rem; }
+.placeholder-note .instruction {
+  color: var(--gold);
+  font-style: normal;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}
+
+/* === RESPONSIVE === */
+@media (max-width: 768px) {
+  .report-container { padding: 1rem; }
+  .cover-title { font-size: 1.8rem; letter-spacing: 3px; }
+  .cover-meta { grid-template-columns: 1fr; gap: 0.3rem 0; }
+  .section-body { padding: 1.2rem; }
+  .exec-summary { grid-template-columns: 1fr 1fr; }
+  .variable-grid { grid-template-columns: 1fr; }
+  .attestation .sig-line { grid-template-columns: 1fr; gap: 2rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- STATUS BAR -->
+<div class="status-bar no-print">
+  <div>
+    <span class="blink">&#9679;</span>&nbsp;
+    M.A.S.S. TRAP v2.5.0 &mdash; LABORATORY REPORT
+  </div>
+  <div class="classification">SCIENCE FAIR EVIDENCE REPORT</div>
+  <div>
+    CASE SERIES: MASS26 &mdash;
+    <span id="reportDate"></span>
+  </div>
+</div>
+
+<div class="report-container">
+
+  <!-- ==================== COVER PAGE ==================== -->
+  <div class="cover-page">
+    <div class="watermark">M.A.S.S.</div>
+
+    <div class="cover-badge">
+      <div class="cover-badge-inner">&#9878;</div>
+    </div>
+
+    <div class="cover-title">M.A.S.S. TRAP</div>
+    <div class="cover-subtitle">Motion Analysis &amp; Speed System</div>
+
+    <div class="cover-divider"></div>
+
+    <div class="cover-report-title">
+      Laboratory Report:<br>
+      Effect of Mass on Velocity in a Gravity-Driven System
+    </div>
+
+    <div class="cover-case-id">CASE SERIES MASS26-001</div>
+
+    <div class="cover-divider"></div>
+
+    <div class="cover-meta">
+      <span class="label">Investigator:</span>
+      <span class="value">Ben Massfeller</span>
+      <span class="label">Grade / School:</span>
+      <span class="value">5th Grade, ***REMOVED***</span>
+      <span class="label">Teacher:</span>
+      <span class="value">Ms. Sofferin &mdash; Science</span>
+      <span class="label">Event:</span>
+      <span class="value">***REMOVED*** Science Fair 2025&ndash;2026</span>
+      <span class="label">Report Date:</span>
+      <span class="value" id="coverDate"></span>
+      <span class="label">System Version:</span>
+      <span class="value">M.A.S.S. Trap v2.5.0 (ESP32-S3)</span>
+    </div>
+  </div>
+
+  <!-- ==================== EXECUTIVE SUMMARY ==================== -->
+  <div class="exec-summary" id="execSummary">
+    <div class="exec-card">
+      <div class="num">6.01</div>
+      <div class="desc">Track Length (meters)</div>
+    </div>
+    <div class="exec-card">
+      <div class="num">&micro;s</div>
+      <div class="desc">Timing Precision</div>
+    </div>
+    <div class="exec-card">
+      <div class="num">0.001</div>
+      <div class="desc">Scale Precision (grams)</div>
+    </div>
+    <div class="exec-card">
+      <div class="num" id="execTrials">&mdash;</div>
+      <div class="desc">Total Trials</div>
+    </div>
+  </div>
+
+  <!-- ==================== TABLE OF CONTENTS ==================== -->
+  <nav class="toc">
+    <h2>Table of Contents</h2>
+    <ol class="toc-list">
+      <li><a href="#sec-question">Testable Question</a></li>
+      <li><a href="#sec-hypothesis">Hypothesis</a></li>
+      <li><a href="#sec-variables">Variables</a></li>
+      <li><a href="#sec-materials">Materials &amp; Equipment</a></li>
+      <li><a href="#sec-procedure">Procedure</a></li>
+      <li><a href="#sec-evidence">Evidence Inventory &amp; Chain of Custody</a></li>
+      <li><a href="#sec-data">Quantitative Data</a></li>
+      <li><a href="#sec-physics">Physics Calculations</a></li>
+      <li><a href="#sec-analysis">Analysis &amp; Trends</a></li>
+      <li><a href="#sec-conclusion">Conclusion</a></li>
+      <li><a href="#sec-sources">Sources of Error &amp; Future Work</a></li>
+      <li><a href="#sec-attestation">Attestation &amp; Integrity Statement</a></li>
+    </ol>
+  </nav>
+
+  <!-- ==================== 01: TESTABLE QUESTION ==================== -->
+  <section class="section" id="sec-question">
+    <div class="section-header">
+      <span class="section-number">01</span>
+      <span class="section-title">Testable Question</span>
+    </div>
+    <div class="section-body">
+      <div class="hypothesis-box">
+        <div class="hypothesis-label">Research Question</div>
+        <div class="hypothesis-text">
+          Does adding mass to a 1:64 scale vehicle change its speed when traveling down a fixed-length, gravity-driven track?
+        </div>
+      </div>
+      <p>
+        This experiment investigates the relationship between the mass of a model vehicle and its velocity
+        when traveling down a 6.01-meter inclined track under the sole influence of gravity. Physics predicts
+        that in a frictionless system, all objects accelerate at the same rate regardless of mass. However,
+        real-world factors like rolling friction, air resistance, and wheel bearing quality may cause heavier
+        vehicles to behave differently than lighter ones.
+      </p>
+      <p>
+        The M.A.S.S. Trap (Motion Analysis &amp; Speed System) provides microsecond-precision electronic
+        timing to measure these differences with scientific accuracy, eliminating human reaction time error
+        from the measurement process.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== 02: HYPOTHESIS ==================== -->
+  <section class="section" id="sec-hypothesis">
+    <div class="section-header">
+      <span class="section-number">02</span>
+      <span class="section-title">Hypothesis</span>
+    </div>
+    <div class="section-body">
+      <div class="hypothesis-box">
+        <div class="hypothesis-label">Hypothesis</div>
+        <div class="hypothesis-text">
+          If mass is added to a gravity-driven vehicle, then it will travel faster (lower elapsed time)
+          because the increased gravitational force overcomes a larger proportion of rolling friction
+          and air resistance losses.
+        </div>
+      </div>
+      <p>
+        <strong>Reasoning:</strong> While gravity accelerates all objects equally in a vacuum (g = 9.81 m/s&sup2;),
+        friction forces do not scale linearly with mass. A heavier car has more gravitational potential energy
+        (PE = mgh) at the top of the track, producing greater kinetic energy at the bottom. Since aerodynamic drag
+        depends on velocity and cross-sectional area (not mass), the heavier vehicle should achieve a higher
+        terminal velocity.
+      </p>
+      <p>
+        The null hypothesis (H&#8320;) states that added mass has no measurable effect on speed &mdash;
+        meaning friction and drag scale perfectly with mass. The experimental results will determine whether
+        we can reject H&#8320;.
+      </p>
+    </div>
+  </section>
+
+  <!-- ==================== 03: VARIABLES ==================== -->
+  <section class="section" id="sec-variables">
+    <div class="section-header">
+      <span class="section-number">03</span>
+      <span class="section-title">Variables</span>
+    </div>
+    <div class="section-body">
+      <div class="variable-grid">
+        <div class="variable-card independent">
+          <div class="variable-label">Independent Variable (Manipulated)</div>
+          <div class="variable-name">Mass Added to Vehicle</div>
+          <div class="variable-detail">
+            Tungsten weights of known mass are attached to the vehicle between test conditions.
+            Conditions: Baseline (0.000g added), +3.5g tungsten, +7.0g tungsten, +14.0g tungsten.
+            All weights measured to &plusmn;0.001g precision using a digital milligram scale.
+          </div>
+        </div>
+        <div class="variable-card dependent">
+          <div class="variable-label">Dependent Variable (Measured)</div>
+          <div class="variable-name">Elapsed Time &amp; Average Speed</div>
+          <div class="variable-detail">
+            Time measured in seconds (to microsecond precision) by infrared break-beam sensors.
+            Average speed calculated as: distance (6.01m) &div; elapsed time. Reported in m/s and mph.
+            Additional calculated values: momentum (p = mv) and kinetic energy (KE = &frac12;mv&sup2;).
+          </div>
+        </div>
+        <div class="variable-card controlled">
+          <div class="variable-label">Controlled Variables (Constants)</div>
+          <div class="variable-name">Track Configuration</div>
+          <div class="variable-detail">
+            Same track for all trials (6.01m measured length). Same starting height and angle.
+            Same release method (gravity start, no push). Track cleaned between condition changes.
+          </div>
+        </div>
+        <div class="variable-card controlled">
+          <div class="variable-label">Controlled Variables (Constants)</div>
+          <div class="variable-name">Vehicle Identity</div>
+          <div class="variable-detail">
+            Same vehicle model used within each test group. Each car identified by NFC evidence tag
+            (NTAG213, 0.025g per sticker &mdash; mass accounted for in all measurements).
+            Vehicles weighed before and after NFC tag application.
+          </div>
+        </div>
+        <div class="variable-card controlled">
+          <div class="variable-label">Controlled Variables (Constants)</div>
+          <div class="variable-name">Measurement System</div>
+          <div class="variable-detail">
+            M.A.S.S. Trap v2.5.0 electronic timing system. IR break-beam detection.
+            ESP32-S3 microsecond timer. Clock drift &lt;5ms over 24 hours (NTP synchronized).
+            Same sensor positions for all runs.
+          </div>
+        </div>
+        <div class="variable-card controlled">
+          <div class="variable-label">Controlled Variables (Constants)</div>
+          <div class="variable-name">Environmental Conditions</div>
+          <div class="variable-detail">
+            All trials conducted in same indoor location. Room temperature.
+            No external wind or vibration sources. Trials randomized using Locard&rsquo;s
+            Exchange Principle ordering to prevent systematic bias.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 04: MATERIALS ==================== -->
+  <section class="section" id="sec-materials">
+    <div class="section-header">
+      <span class="section-number">04</span>
+      <span class="section-title">Materials &amp; Equipment</span>
+    </div>
+    <div class="section-body">
+      <div class="materials-grid">
+        <div class="material-item">
+          <div class="material-icon">&#9881;</div>
+          <div>
+            <div class="material-name">M.A.S.S. Trap Finish Gate</div>
+            <div class="material-spec">ESP32-S3-WROOM-1 N16R8 &bull; Firmware v2.5.0 &bull; IR break-beam sensor</div>
+          </div>
+        </div>
+        <div class="material-item">
+          <div class="material-icon">&#9881;</div>
+          <div>
+            <div class="material-name">M.A.S.S. Trap Start Gate</div>
+            <div class="material-spec">ESP32-S3 &bull; IR break-beam + TF-Luna LiDAR &bull; ESP-NOW mesh link</div>
+          </div>
+        </div>
+        <div class="material-item">
+          <div class="material-icon">&#127923;</div>
+          <div>
+            <div class="material-name">Hot Wheels Ford F-150 (Control)</div>
+            <div class="material-spec">White &bull; 38.000g bare &bull; 38.025g with NFC tag &bull; Stock wheels</div>
+          </div>
+        </div>
+        <div class="material-item">
+          <div class="material-icon">&#127923;</div>
+          <div>
+            <div class="material-name">Hot Wheels Ford F-150 (Test)</div>
+            <div class="material-spec">Blue &bull; 31.521g bare &bull; 31.546g with NFC tag &bull; Stock wheels</div>
+          </div>
+        </div>
+        <div class="material-item">
+          <div class="material-icon">&#9878;</div>
+          <div>
+            <div class="material-name">Digital Milligram Scale</div>
+            <div class="material-spec">Precision: &plusmn;0.001g &bull; Range: 0.000&ndash;100.000g &bull; Calibrated</div>
+          </div>
+        </div>
+        <div class="material-item">
+          <div class="material-icon">&#9883;</div>
+          <div>
+            <div class="material-name">Tungsten Weights (3 sizes)</div>
+            <div class="material-spec">~14g, ~7g, ~3.5g &bull; Exact mass recorded per trial &bull; Non-magnetic</div>
+          </div>
+        </div>
+        <div class="material-item">
+          <div class="material-icon">&#128209;</div>
+          <div>
+            <div class="material-name">NFC Evidence Tags</div>
+            <div class="material-spec">NTAG213 stickers &bull; 0.025g each &bull; 144 bytes &bull; URL-encoded vehicle ID</div>
+          </div>
+        </div>
+        <div class="material-item">
+          <div class="material-icon">&#128207;</div>
+          <div>
+            <div class="material-name">Hot Wheels Track</div>
+            <div class="material-spec">Measured length: 6.01 meters &bull; Standard orange track with connectors</div>
+          </div>
+        </div>
+        <div class="material-item">
+          <div class="material-icon">&#128187;</div>
+          <div>
+            <div class="material-name">Dashboard Web Interface</div>
+            <div class="material-spec">Real-time WebSocket data &bull; Playlist Mode for guided testing &bull; CSV export</div>
+          </div>
+        </div>
+        <div class="material-item">
+          <div class="material-icon">&#128247;</div>
+          <div>
+            <div class="material-name">Evidence Camera</div>
+            <div class="material-spec">iPhone &bull; Photographic evidence of scale readings and test setup</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 05: PROCEDURE ==================== -->
+  <section class="section" id="sec-procedure">
+    <div class="section-header">
+      <span class="section-number">05</span>
+      <span class="section-title">Procedure</span>
+    </div>
+    <div class="section-body">
+      <div class="procedure-list">
+        <div class="procedure-step">
+          <div class="text">
+            <strong>Weigh test vehicles</strong> using the milligram scale. Record the bare mass of each
+            vehicle to &plusmn;0.001g. Photograph the scale reading as evidence.
+            <div class="note">F-150 Control: 38.000g &bull; F-150 Test: 31.521g</div>
+          </div>
+        </div>
+        <div class="procedure-step">
+          <div class="text">
+            <strong>Weigh and apply NFC evidence tags.</strong> Weigh each NTAG213 sticker individually
+            (0.025g each). Apply to vehicle undercarriage. Record as-tested weight (bare + tag).
+            <div class="note">Chain of custody: weigh bare &rarr; weigh tag &rarr; apply &rarr; record total</div>
+          </div>
+        </div>
+        <div class="procedure-step">
+          <div class="text">
+            <strong>Write NFC tag data</strong> using iPhone NFC writer. Each tag contains a URL that
+            auto-identifies the vehicle in the M.A.S.S. Trap system when scanned.
+          </div>
+        </div>
+        <div class="procedure-step">
+          <div class="text">
+            <strong>Set up the M.A.S.S. Trap track.</strong> Assemble 6.01 meters of Hot Wheels track
+            from the elevated start point to the finish gate sensor. Verify start and finish gate
+            connectivity via the dashboard (WebSocket status: CONNECTED).
+          </div>
+        </div>
+        <div class="procedure-step">
+          <div class="text">
+            <strong>Weigh tungsten weights</strong> individually on the milligram scale. Record exact
+            mass of each weight. Plan weight conditions:
+            <div class="note">Condition 1: No added weight (baseline) &bull; Condition 2: +3.5g &bull; Condition 3: +7.0g &bull; Condition 4: +14.0g</div>
+          </div>
+        </div>
+        <div class="procedure-step">
+          <div class="text">
+            <strong>Configure Playlist Mode</strong> in the M.A.S.S. Trap dashboard. Select test vehicles,
+            define weight conditions with exact scale readings, set 3 trials per condition. Generate the
+            test matrix.
+            <div class="note">Matrix uses Locard&rsquo;s Exchange Principle ordering: cycle cars within each trial round to prevent systematic bias</div>
+          </div>
+        </div>
+        <div class="procedure-step">
+          <div class="text">
+            <strong>Start Playlist Mode.</strong> The system auto-arms and announces which car to run next.
+            Place the announced vehicle at the top of the track and release with no push (gravity only).
+            The system records time, calculates speed, and auto-advances to the next trial.
+          </div>
+        </div>
+        <div class="procedure-step">
+          <div class="text">
+            <strong>When the system announces a weight condition change,</strong> attach or remove the specified
+            tungsten weight to/from the vehicle. Continue running trials as directed by the playlist.
+            <div class="note">Audio prompt: &ldquo;ATTENTION: New weight condition! Add [X] gram tungsten weight.&rdquo;</div>
+          </div>
+        </div>
+        <div class="procedure-step">
+          <div class="text">
+            <strong>Continue until all trials are complete.</strong> The system announces &ldquo;All tests
+            complete!&rdquo; and displays the summary table with averages per condition.
+          </div>
+        </div>
+        <div class="procedure-step">
+          <div class="text">
+            <strong>Export data.</strong> Click &ldquo;Export CSV&rdquo; for raw data and &ldquo;Export Summary&rdquo;
+            for the formatted results table. Photograph the summary screen as additional evidence.
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 06: EVIDENCE INVENTORY ==================== -->
+  <section class="section" id="sec-evidence">
+    <div class="section-header">
+      <span class="section-number">06</span>
+      <span class="section-title">Evidence Inventory &amp; Chain of Custody</span>
+    </div>
+    <div class="section-body">
+      <p>
+        All test subjects are tagged with NFC evidence stickers containing unique identifiers.
+        The chain of custody protocol ensures every measurement is traceable from scale reading
+        to final data table.
+      </p>
+
+      <h3 style="color: var(--gold); margin: 1.5rem 0 1rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;">
+        Test Subject Registry
+      </h3>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Item ID</th>
+              <th>Description</th>
+              <th>Color</th>
+              <th>Bare Mass (g)</th>
+              <th>NFC Tag Mass (g)</th>
+              <th>As-Tested Mass (g)</th>
+              <th>Role</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>ITEM-A</td>
+              <td>Hot Wheels Ford F-150</td>
+              <td>White</td>
+              <td class="numeric">38.000</td>
+              <td class="numeric">0.025</td>
+              <td class="numeric">38.025</td>
+              <td>Control</td>
+            </tr>
+            <tr>
+              <td>ITEM-B</td>
+              <td>Hot Wheels Ford F-150</td>
+              <td>Blue</td>
+              <td class="numeric">31.521</td>
+              <td class="numeric">0.025</td>
+              <td class="numeric">31.546</td>
+              <td>Test Subject</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warning-box">
+        <div class="label">Manufacturing Variance Noted</div>
+        <div class="detail" style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+          Two vehicles sold as the same model (Hot Wheels Ford F-150) differ in mass by
+          <strong>6.479g</strong> (20.5% variance). This is significant for a mass-vs-speed experiment
+          and must be controlled for. Each vehicle is tested independently across all weight conditions
+          rather than compared directly against each other.
+        </div>
+      </div>
+
+      <h3 style="color: var(--gold); margin: 1.5rem 0 1rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;">
+        Tungsten Weight Inventory
+      </h3>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Weight ID</th>
+              <th>Material</th>
+              <th>Nominal Mass</th>
+              <th>Measured Mass (g)</th>
+              <th>Used In Conditions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>W-LG</td>
+              <td>Tungsten</td>
+              <td>~14g</td>
+              <td class="numeric" id="wLg">&mdash;</td>
+              <td>Condition 4</td>
+            </tr>
+            <tr>
+              <td>W-MD</td>
+              <td>Tungsten</td>
+              <td>~7g</td>
+              <td class="numeric" id="wMd">&mdash;</td>
+              <td>Condition 3</td>
+            </tr>
+            <tr>
+              <td>W-SM</td>
+              <td>Tungsten</td>
+              <td>~3.5g</td>
+              <td class="numeric" id="wSm">&mdash;</td>
+              <td>Condition 2</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size: 0.85rem; color: var(--gray); font-style: italic;">
+        Exact measured masses to be recorded from scale during testing session and entered into the
+        Playlist Mode configuration. The system calculates total mass (vehicle + NFC tag + added weight)
+        for every run automatically.
+      </p>
+
+      <!-- Photo Evidence Gallery — auto-populated from uploaded photos -->
+      <div id="photoGallery" style="display:none;">
+        <h3 style="color: var(--gold); margin: 1.5rem 0 1rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;">
+          Photographic Evidence
+        </h3>
+        <p style="font-size: 0.85rem; color: var(--gray); margin-bottom: 1rem;">
+          Photos were taken during testing to document scale readings, test setup, and vehicle conditions.
+          Each photo is linked to its corresponding evidence case number.
+        </p>
+        <div id="photoGalleryGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 07: QUANTITATIVE DATA ==================== -->
+  <section class="section" id="sec-data">
+    <div class="section-header">
+      <span class="section-number">07</span>
+      <span class="section-title">Quantitative Data</span>
+    </div>
+    <div class="section-body">
+      <p>
+        All data is recorded automatically by the M.A.S.S. Trap electronic timing system.
+        Times are measured in seconds to microsecond precision. Speeds are calculated from the
+        measured track length of 6.01 meters. All units are metric (SI).
+      </p>
+
+      <div class="placeholder-note" id="dataPlaceholder">
+        <div class="icon">&#128202;</div>
+        <div>Data tables will be populated after testing is complete.</div>
+        <div>The M.A.S.S. Trap Playlist Mode automatically records all trial data.</div>
+        <div class="instruction">
+          To populate: Export CSV from Playlist Mode, then load into this report.
+        </div>
+      </div>
+
+      <div id="dataTablesContainer" style="display:none;">
+        <!-- Populated by JS when data is loaded -->
+      </div>
+
+      <h3 style="color: var(--gold); margin: 1.5rem 0 1rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;">
+        Expected Data Table Format
+      </h3>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Run</th>
+              <th>Vehicle</th>
+              <th>Base Mass (g)</th>
+              <th>Added Mass (g)</th>
+              <th>Total Mass (g)</th>
+              <th>Condition</th>
+              <th>Trial</th>
+              <th>Time (s)</th>
+              <th>Speed (m/s)</th>
+              <th>Speed (mph)</th>
+              <th>Momentum (kg&middot;m/s)</th>
+              <th>KE (J)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td>F-150 Control</td>
+              <td class="numeric">38.025</td>
+              <td class="numeric">0.000</td>
+              <td class="numeric">38.025</td>
+              <td>Baseline</td>
+              <td>1 of 3</td>
+              <td class="numeric">&mdash;</td>
+              <td class="numeric">&mdash;</td>
+              <td class="numeric">&mdash;</td>
+              <td class="numeric">&mdash;</td>
+              <td class="numeric">&mdash;</td>
+            </tr>
+            <tr>
+              <td colspan="12" style="text-align:center; color:var(--gray); font-style:italic; padding:0.5rem;">
+                &hellip; data rows populated by Playlist Mode export &hellip;
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="color: var(--gold); margin: 1.5rem 0 1rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;">
+        Summary Table Format (Averages by Condition)
+      </h3>
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Vehicle</th>
+              <th>Condition</th>
+              <th>Added (g)</th>
+              <th>Total (g)</th>
+              <th>Trial 1 (s)</th>
+              <th>Trial 2 (s)</th>
+              <th>Trial 3 (s)</th>
+              <th>Avg Time (s)</th>
+              <th>Avg Speed (m/s)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>F-150 Control</td>
+              <td>Baseline (0g)</td>
+              <td class="numeric">0.000</td>
+              <td class="numeric">38.025</td>
+              <td class="numeric">&mdash;</td>
+              <td class="numeric">&mdash;</td>
+              <td class="numeric">&mdash;</td>
+              <td class="numeric">&mdash;</td>
+              <td class="numeric">&mdash;</td>
+            </tr>
+            <tr>
+              <td>F-150 Control</td>
+              <td>+3.5g</td>
+              <td class="numeric">3.500</td>
+              <td class="numeric">41.525</td>
+              <td class="numeric">&mdash;</td>
+              <td class="numeric">&mdash;</td>
+              <td class="numeric">&mdash;</td>
+              <td class="numeric">&mdash;</td>
+              <td class="numeric">&mdash;</td>
+            </tr>
+            <tr>
+              <td colspan="9" style="text-align:center; color:var(--gray); font-style:italic; padding:0.5rem;">
+                &hellip; additional conditions &hellip;
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 08: PHYSICS CALCULATIONS ==================== -->
+  <section class="section" id="sec-physics">
+    <div class="section-header">
+      <span class="section-number">08</span>
+      <span class="section-title">Physics Calculations</span>
+    </div>
+    <div class="section-body">
+      <p>
+        The M.A.S.S. Trap automatically calculates the following physics values for every run.
+        All calculations use SI units (meters, kilograms, seconds).
+      </p>
+
+      <div class="equation-block">
+        <div class="equation-label">Average Velocity</div>
+        v = d / t &nbsp;&nbsp;&nbsp; where d = 6.01 m, t = elapsed time (s)
+      </div>
+
+      <div class="equation-block">
+        <div class="equation-label">Momentum</div>
+        p = m &times; v &nbsp;&nbsp;&nbsp; where m = total mass (kg), v = average velocity (m/s)
+      </div>
+
+      <div class="equation-block">
+        <div class="equation-label">Kinetic Energy</div>
+        KE = &frac12; &times; m &times; v&sup2; &nbsp;&nbsp;&nbsp; where m = total mass (kg), v = average velocity (m/s)
+      </div>
+
+      <div class="equation-block">
+        <div class="equation-label">Gravitational Potential Energy (at start)</div>
+        PE = m &times; g &times; h &nbsp;&nbsp;&nbsp; where g = 9.81 m/s&sup2;, h = track elevation (m)
+      </div>
+
+      <div class="equation-block">
+        <div class="equation-label">Speed Conversion</div>
+        mph = m/s &times; 2.23694
+      </div>
+
+      <div class="metric-row">
+        <div class="metric-box">
+          <div class="metric-value">6.01<span class="metric-unit">m</span></div>
+          <div class="metric-label">Track Distance</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value">9.81<span class="metric-unit">m/s&sup2;</span></div>
+          <div class="metric-label">Gravitational Acceleration</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value">1<span class="metric-unit">&micro;s</span></div>
+          <div class="metric-label">Timer Resolution</div>
+        </div>
+        <div class="metric-box">
+          <div class="metric-value">&lt;5<span class="metric-unit">ms</span></div>
+          <div class="metric-label">Clock Drift (24h)</div>
+        </div>
+      </div>
+
+      <div class="analysis-highlight">
+        <div class="finding">Why Microsecond Precision Matters</div>
+        <div class="detail">
+          At typical model car speeds (~3&ndash;5 m/s), a 1-millisecond timing error produces a
+          speed error of &plusmn;0.01 m/s. The M.A.S.S. Trap measures to &plusmn;1 microsecond
+          (1,000&times; more precise), meaning speed measurement error is less than &plusmn;0.00001 m/s
+          &mdash; effectively zero for this experiment. Human stopwatch reaction time (~200ms)
+          would produce &plusmn;1.5 m/s error, making manual timing scientifically useless for
+          detecting the small speed differences caused by mass changes.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 09: ANALYSIS ==================== -->
+  <section class="section" id="sec-analysis">
+    <div class="section-header">
+      <span class="section-number">09</span>
+      <span class="section-title">Analysis &amp; Trends</span>
+    </div>
+    <div class="section-body">
+      <div class="placeholder-note" id="analysisPlaceholder">
+        <div class="icon">&#128200;</div>
+        <div>Analysis will be written after testing data is collected.</div>
+        <div class="instruction">
+          Look for: Does average speed increase as mass increases?<br>
+          Is the trend consistent across both test vehicles?<br>
+          How much variation exists between trials of the same condition?
+        </div>
+      </div>
+
+      <div id="analysisContent" style="display:none;">
+        <!-- Populated after data entry -->
+      </div>
+
+      <h3 style="color: var(--gold); margin: 1.5rem 0 1rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;">
+        Analysis Framework
+      </h3>
+
+      <p>The following questions will be answered by the data:</p>
+      <ol style="margin: 1rem 0 1rem 1.5rem; color: rgba(255,255,255,0.9);">
+        <li style="margin-bottom: 0.5rem;"><strong>Trend identification:</strong> Does speed increase, decrease, or stay the same as mass increases?</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Magnitude of effect:</strong> How much faster (or slower) is the heaviest condition vs. baseline?</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Consistency:</strong> Is the trend the same for both vehicles, or does the lighter vehicle respond differently?</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Trial-to-trial variation:</strong> How close are the 3 trials for each condition? Large variation suggests uncontrolled factors.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Momentum and KE analysis:</strong> Even if speed changes are small, momentum and kinetic energy changes may be significant since they depend on mass.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ==================== 10: CONCLUSION ==================== -->
+  <section class="section" id="sec-conclusion">
+    <div class="section-header">
+      <span class="section-number">10</span>
+      <span class="section-title">Conclusion</span>
+    </div>
+    <div class="section-body">
+      <div class="placeholder-note" id="conclusionPlaceholder">
+        <div class="icon">&#9989;</div>
+        <div>Conclusion will be written after data analysis is complete.</div>
+        <div class="instruction">
+          Must address: Was the hypothesis supported or not?<br>
+          What did the data show? What does it mean for real-world physics?
+        </div>
+      </div>
+
+      <div id="conclusionContent" style="display:none;">
+        <!-- Populated after analysis -->
+      </div>
+
+      <h3 style="color: var(--gold); margin: 1.5rem 0 1rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;">
+        Conclusion Framework
+      </h3>
+      <p>The conclusion will follow this structure:</p>
+      <ol style="margin: 1rem 0 1rem 1.5rem; color: rgba(255,255,255,0.9);">
+        <li style="margin-bottom: 0.5rem;"><strong>Restate the hypothesis</strong> and whether it was supported or rejected by the data.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Cite specific evidence</strong> from the data tables (exact numbers, averages, trends).</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Explain the physics:</strong> Why did mass affect (or not affect) speed? Connect to gravitational force, friction, and energy conservation.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Real-world application:</strong> How does this relate to full-size vehicles, roller coasters, or other gravity-driven systems?</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ==================== 11: SOURCES OF ERROR ==================== -->
+  <section class="section" id="sec-sources">
+    <div class="section-header">
+      <span class="section-number">11</span>
+      <span class="section-title">Sources of Error &amp; Future Work</span>
+    </div>
+    <div class="section-body">
+      <h3 style="color: var(--gold); margin: 0 0 1rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;">
+        Known Sources of Error
+      </h3>
+
+      <div class="data-table-wrapper">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Source</th>
+              <th>Type</th>
+              <th>Magnitude</th>
+              <th>Mitigation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Release consistency</td>
+              <td>Random</td>
+              <td>Low</td>
+              <td>Gravity start (no push), multiple trials averaged</td>
+            </tr>
+            <tr>
+              <td>Track surface variation</td>
+              <td>Systematic</td>
+              <td>Low</td>
+              <td>Same track for all trials, cleaned between conditions</td>
+            </tr>
+            <tr>
+              <td>Wheel alignment/friction</td>
+              <td>Random</td>
+              <td>Medium</td>
+              <td>Same vehicle per condition group, Locard ordering reduces bias</td>
+            </tr>
+            <tr>
+              <td>Air resistance</td>
+              <td>Systematic</td>
+              <td>Very Low</td>
+              <td>Indoor, calm air. Same vehicle shape = same drag coefficient</td>
+            </tr>
+            <tr>
+              <td>Weight placement on vehicle</td>
+              <td>Random</td>
+              <td>Low</td>
+              <td>Tungsten placed in same position each time (cargo bed)</td>
+            </tr>
+            <tr>
+              <td>Manufacturing variance</td>
+              <td>Systematic</td>
+              <td>High</td>
+              <td>6.479g difference between &ldquo;identical&rdquo; vehicles. Each tested independently.</td>
+            </tr>
+            <tr>
+              <td>NFC tag mass</td>
+              <td>Systematic</td>
+              <td>Very Low</td>
+              <td>0.025g per tag, weighed and recorded. Same tag on all runs.</td>
+            </tr>
+            <tr>
+              <td>Timer precision</td>
+              <td>Systematic</td>
+              <td>Negligible</td>
+              <td>&plusmn;1&micro;s resolution. Clock drift &lt;5ms/24h with NTP sync.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 style="color: var(--gold); margin: 1.5rem 0 1rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;">
+        Future Work
+      </h3>
+      <ol style="margin: 1rem 0 1rem 1.5rem; color: rgba(255,255,255,0.9);">
+        <li style="margin-bottom: 0.5rem;"><strong>Onboard accelerometer:</strong> Mount an ESP32-S3 with IMU sensor directly on the car to measure real-time G-forces, acceleration curves, and deceleration during the run.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Speed trap sensor:</strong> Add a mid-track velocity measurement point to compare entry speed vs. exit speed and calculate acceleration.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Different vehicle shapes:</strong> Test aerodynamic (F1 cars, 14&ndash;17g) vs. boxy (trucks, 31&ndash;38g) vs. stock (sedans) to isolate the effect of drag coefficient from mass.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Surface modifications:</strong> Test graphite lubricant on wheels, rubber tires vs. stock plastic, and different track surfaces to quantify friction&rsquo;s role.</li>
+        <li style="margin-bottom: 0.5rem;"><strong>Track angle variation:</strong> Measure speed at different incline angles to map the relationship between potential energy input and final velocity.</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ==================== 12: ATTESTATION ==================== -->
+  <section class="section" id="sec-attestation">
+    <div class="section-header">
+      <span class="section-number">12</span>
+      <span class="section-title">Attestation &amp; Integrity Statement</span>
+    </div>
+    <div class="section-body">
+      <div class="attestation">
+        <div class="attestation-header">Statement of Scientific Integrity</div>
+        <p>
+          I, <strong>Ben Massfeller</strong>, affirm that this laboratory report represents my own
+          scientific investigation. The M.A.S.S. Trap system was designed and built as a family project
+          with my father, Ryan Massfeller. I conducted all physical experiments, operated the testing
+          equipment, recorded observations, and analyzed the data presented in this report.
+        </p>
+        <p>
+          All timing measurements were captured electronically by the M.A.S.S. Trap system without
+          human intervention in the measurement process. All mass measurements were taken using a
+          calibrated digital scale and photographed as evidence. No data points were altered,
+          fabricated, or selectively excluded from this report.
+        </p>
+        <p>
+          The M.A.S.S. Trap Playlist Mode testing workflow ensured systematic data collection using
+          randomized trial ordering (Locard&rsquo;s Exchange Principle) to prevent unconscious bias.
+          Each vehicle was identified by NFC evidence tag to prevent misidentification. All data
+          was exported directly from the system to prevent transcription errors.
+        </p>
+        <p style="margin-bottom:0;">
+          This report was prepared with formatting assistance but all scientific conclusions
+          are based solely on the experimental data collected through this investigation.
+        </p>
+
+        <div class="sig-line">
+          <div class="sig-block">
+            <div class="name">Ben Massfeller</div>
+            <div class="role">Primary Investigator &bull; Grade 5</div>
+          </div>
+          <div class="sig-block">
+            <div class="name">Ryan Massfeller</div>
+            <div class="role">Technical Advisor &bull; System Designer</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== FOOTER ==================== -->
+  <div class="report-footer">
+    <div class="system-name">M.A.S.S. Trap</div>
+    <div class="version">Motion Analysis &amp; Speed System &bull; v2.5.0 &bull; ESP32-S3</div>
+    <div class="version" style="margin-top:0.5rem;">
+      Report generated <span id="footerDate"></span>
+    </div>
+    <div class="disclaimer">
+      This document was generated by the M.A.S.S. Trap forensic evidence reporting system.
+      All timing data was captured by ESP32-S3 microcontrollers using infrared break-beam sensors
+      with microsecond precision. The system source code is publicly available at
+      <a href="https://github.com/Ryan4n6/MASS-Trap" style="color: var(--gold);">github.com/Ryan4n6/MASS-Trap</a>.
+    </div>
+  </div>
+
+</div><!-- /report-container -->
+
+<script>
+/* === M.A.S.S. TRAP — SCIENCE FAIR REPORT SCRIPT === */
+/* ES5 for embedded browser compatibility */
+
+(function() {
+  // Helper: safe number formatting
+  function sf(val, digits) {
+    var n = parseFloat(val);
+    return isNaN(n) ? '&mdash;' : n.toFixed(digits);
+  }
+  function escH(s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+
+  // Set all date fields
+  var now = new Date();
+  var dateStr = now.toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+  });
+  var shortDate = now.toLocaleDateString('en-US', {
+    year: 'numeric', month: '2-digit', day: '2-digit'
+  });
+  var timeStr = now.toLocaleTimeString('en-US', {
+    hour: '2-digit', minute: '2-digit', second: '2-digit'
+  });
+
+  var els = {
+    reportDate: document.getElementById('reportDate'),
+    coverDate: document.getElementById('coverDate'),
+    footerDate: document.getElementById('footerDate')
+  };
+  if (els.reportDate) els.reportDate.textContent = shortDate + ' ' + timeStr;
+  if (els.coverDate) els.coverDate.textContent = dateStr;
+  if (els.footerDate) els.footerDate.textContent = dateStr + ' at ' + timeStr;
+
+  // === AUTO-POPULATE FROM PLAYLIST MODE ===
+  // plGenerateReport() in dashboard.html stores structured JSON in localStorage.
+  // This script reads it and populates all data tables, analysis, and conclusion.
+
+  function loadReportData(data) {
+    if (!data || !data.tests || data.tests.length === 0) return;
+
+    var tests = data.tests;
+    var cars = data.cars;
+    var trackLen = data.trackLength || 6.01;
+
+    // --- Update exec summary ---
+    var execTrials = document.getElementById('execTrials');
+    if (execTrials) execTrials.textContent = tests.length;
+
+    // --- Build RAW DATA table ---
+    var container = document.getElementById('dataTablesContainer');
+    if (!container) return;
+
+    var html = '<h3 style="color: var(--gold); margin: 0 0 1rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;">Raw Data &mdash; All Trials</h3>';
+    html += '<div class="data-table-wrapper"><table class="data-table"><thead><tr>';
+    html += '<th>Run</th><th>Vehicle</th><th>Base Mass (g)</th><th>Added Mass (g)</th><th>Total Mass (g)</th>';
+    html += '<th>Condition</th><th>Trial</th><th>Time (s)</th><th>Speed (m/s)</th>';
+    html += '<th>Speed (mph)</th><th>Momentum (kg&middot;m/s)</th><th>KE (J)</th>';
+    html += '</tr></thead><tbody>';
+
+    for (var i = 0; i < tests.length; i++) {
+      var t = tests[i];
+      html += '<tr>';
+      html += '<td>' + t.run + '</td>';
+      html += '<td>' + escH(t.car) + '</td>';
+      html += '<td class="numeric">' + sf(t.baseWeight, 3) + '</td>';
+      html += '<td class="numeric">' + sf(t.addedWeight, 3) + '</td>';
+      html += '<td class="numeric">' + sf(t.totalWeight, 3) + '</td>';
+      html += '<td>' + escH(t.condition) + '</td>';
+      html += '<td>' + t.trial + '</td>';
+      html += '<td class="numeric">' + sf(t.time_s, 4) + '</td>';
+      html += '<td class="numeric">' + sf(t.speed_mps, 3) + '</td>';
+      html += '<td class="numeric">' + sf(t.speed_mph, 2) + '</td>';
+      html += '<td class="numeric">' + sf(t.momentum, 4) + '</td>';
+      html += '<td class="numeric">' + sf(t.ke, 4) + '</td>';
+      html += '</tr>';
+    }
+    html += '</tbody></table></div>';
+
+    // --- Build SUMMARY table ---
+    html += '<h3 style="color: var(--gold); margin: 1.5rem 0 1rem; font-size: 1rem; text-transform: uppercase; letter-spacing: 2px;">Summary Table &mdash; Averages by Condition</h3>';
+    html += '<div class="data-table-wrapper"><table class="data-table"><thead><tr>';
+    html += '<th>Vehicle</th><th>Condition</th><th>Added (g)</th><th>Total (g)</th>';
+
+    // Figure out max trials
+    var maxTrials = data.trialsPerCondition || 3;
+    for (var ti = 1; ti <= maxTrials; ti++) html += '<th>Trial ' + ti + ' (s)</th>';
+    html += '<th>Avg Time (s)</th><th>Avg Speed (m/s)</th><th>&Delta; vs Baseline</th>';
+    html += '</tr></thead><tbody>';
+
+    var carNames = Object.keys(cars);
+    var baselineSpeeds = {}; // per car
+    // First pass: compute averages
+    for (var ci = 0; ci < carNames.length; ci++) {
+      var carName = carNames[ci];
+      var carData = cars[carName];
+      var condLabels = Object.keys(carData.conditions);
+
+      for (var cdi = 0; cdi < condLabels.length; cdi++) {
+        var condLabel = condLabels[cdi];
+        var cond = carData.conditions[condLabel];
+        var times = [];
+        var speeds = [];
+        for (var j = 0; j < cond.trials.length; j++) {
+          times.push(cond.trials[j].time_s);
+          speeds.push(cond.trials[j].speed_mps);
+        }
+        var avgTime = times.reduce(function(a, b) { return a + b; }, 0) / times.length;
+        var avgSpeed = speeds.reduce(function(a, b) { return a + b; }, 0) / speeds.length;
+
+        // Track baseline for delta
+        if (cond.addedWeight === 0 || condLabel.toLowerCase().indexOf('baseline') !== -1) {
+          baselineSpeeds[carName] = avgSpeed;
+        }
+
+        var delta = '&mdash;';
+        if (baselineSpeeds[carName] && baselineSpeeds[carName] !== avgSpeed) {
+          var diff = avgSpeed - baselineSpeeds[carName];
+          var pct = (diff / baselineSpeeds[carName]) * 100;
+          delta = (diff >= 0 ? '+' : '') + diff.toFixed(3) + ' m/s (' + (pct >= 0 ? '+' : '') + pct.toFixed(1) + '%)';
+        } else if (baselineSpeeds[carName]) {
+          delta = 'BASELINE';
+        }
+
+        html += '<tr>';
+        html += '<td>' + escH(carName) + '</td>';
+        html += '<td>' + escH(condLabel) + '</td>';
+        html += '<td class="numeric">' + sf(cond.addedWeight, 3) + '</td>';
+        html += '<td class="numeric">' + sf(cond.totalWeight, 3) + '</td>';
+        for (var k = 0; k < maxTrials; k++) {
+          html += '<td class="numeric">' + (times[k] !== undefined ? sf(times[k], 4) : '&mdash;') + '</td>';
+        }
+        html += '<td class="numeric" style="font-weight:700;">' + sf(avgTime, 4) + '</td>';
+        html += '<td class="numeric" style="font-weight:700;">' + sf(avgSpeed, 3) + '</td>';
+        html += '<td class="numeric">' + delta + '</td>';
+        html += '</tr>';
+      }
+      // Visual separator between cars
+      if (ci < carNames.length - 1) {
+        html += '<tr><td colspan="' + (7 + maxTrials) + '" style="padding:2px; background:var(--navy-mid);"></td></tr>';
+      }
+    }
+    html += '</tbody></table></div>';
+
+    container.innerHTML = html;
+    container.style.display = 'block';
+
+    // Hide data placeholder
+    var ph = document.getElementById('dataPlaceholder');
+    if (ph) ph.style.display = 'none';
+
+    // --- AUTO-GENERATE ANALYSIS ---
+    var analysisEl = document.getElementById('analysisContent');
+    var analysisPh = document.getElementById('analysisPlaceholder');
+    if (analysisEl && carNames.length > 0) {
+      var aHtml = '';
+      for (var ai = 0; ai < carNames.length; ai++) {
+        var cn = carNames[ai];
+        var cd = cars[cn];
+        var conds = Object.keys(cd.conditions);
+        var allAvgs = [];
+        for (var aci = 0; aci < conds.length; aci++) {
+          var c = cd.conditions[conds[aci]];
+          var spds = [];
+          for (var si = 0; si < c.trials.length; si++) spds.push(c.trials[si].speed_mps);
+          var avg = spds.reduce(function(a, b) { return a + b; }, 0) / spds.length;
+          allAvgs.push({ label: conds[aci], added: c.addedWeight, total: c.totalWeight, avgSpeed: avg, speeds: spds });
+        }
+
+        // Trend detection
+        var increasing = true;
+        var decreasing = true;
+        for (var ti2 = 1; ti2 < allAvgs.length; ti2++) {
+          if (allAvgs[ti2].avgSpeed <= allAvgs[ti2 - 1].avgSpeed) increasing = false;
+          if (allAvgs[ti2].avgSpeed >= allAvgs[ti2 - 1].avgSpeed) decreasing = false;
+        }
+
+        var fastest = allAvgs[0];
+        var slowest = allAvgs[0];
+        for (var fi = 1; fi < allAvgs.length; fi++) {
+          if (allAvgs[fi].avgSpeed > fastest.avgSpeed) fastest = allAvgs[fi];
+          if (allAvgs[fi].avgSpeed < slowest.avgSpeed) slowest = allAvgs[fi];
+        }
+
+        var speedRange = fastest.avgSpeed - slowest.avgSpeed;
+        var pctRange = slowest.avgSpeed > 0 ? (speedRange / slowest.avgSpeed * 100) : 0;
+
+        aHtml += '<h3 style="color:var(--gold); margin:1.5rem 0 0.8rem; font-size:1rem; text-transform:uppercase; letter-spacing:2px;">' + escH(cn) + '</h3>';
+
+        // Trend finding
+        var trendText = '';
+        if (increasing) {
+          trendText = 'Speed <strong style="color:var(--green);">increased</strong> consistently as mass was added.';
+        } else if (decreasing) {
+          trendText = 'Speed <strong style="color:var(--red);">decreased</strong> consistently as mass was added.';
+        } else {
+          trendText = 'Speed showed <strong style="color:var(--cyan);">no clear linear trend</strong> as mass was added.';
+        }
+
+        aHtml += '<div class="analysis-highlight"><div class="finding">Trend: ' + trendText + '</div>';
+        aHtml += '<div class="detail">';
+        aHtml += 'Fastest condition: <strong>' + escH(fastest.label) + '</strong> at ' + fastest.avgSpeed.toFixed(3) + ' m/s (total mass: ' + sf(fastest.total, 1) + 'g). ';
+        aHtml += 'Slowest condition: <strong>' + escH(slowest.label) + '</strong> at ' + slowest.avgSpeed.toFixed(3) + ' m/s (total mass: ' + sf(slowest.total, 1) + 'g). ';
+        aHtml += 'Speed range across all conditions: ' + speedRange.toFixed(3) + ' m/s (' + pctRange.toFixed(1) + '% difference).';
+        aHtml += '</div></div>';
+
+        // Trial consistency
+        var maxSpread = 0;
+        var maxSpreadCond = '';
+        for (var ci2 = 0; ci2 < allAvgs.length; ci2++) {
+          var sMin = Math.min.apply(null, allAvgs[ci2].speeds);
+          var sMax = Math.max.apply(null, allAvgs[ci2].speeds);
+          var spread = sMax - sMin;
+          if (spread > maxSpread) { maxSpread = spread; maxSpreadCond = allAvgs[ci2].label; }
+        }
+        aHtml += '<p style="font-size:0.9rem;">Trial-to-trial consistency: Maximum speed spread within a single condition was <strong>' + maxSpread.toFixed(3) + ' m/s</strong>';
+        aHtml += ' (' + escH(maxSpreadCond) + '), indicating ';
+        if (maxSpread < 0.05) aHtml += '<strong style="color:var(--green);">excellent repeatability</strong>.';
+        else if (maxSpread < 0.15) aHtml += '<strong style="color:var(--gold);">good repeatability</strong>.';
+        else aHtml += '<strong style="color:var(--orange);">moderate variation</strong> between trials.';
+        aHtml += '</p>';
+      }
+
+      // Cross-vehicle comparison if multiple cars
+      if (carNames.length > 1) {
+        aHtml += '<h3 style="color:var(--gold); margin:1.5rem 0 0.8rem; font-size:1rem; text-transform:uppercase; letter-spacing:2px;">Cross-Vehicle Comparison</h3>';
+        aHtml += '<p>Two vehicles of the same model but different base mass were tested independently. ';
+        aHtml += 'This controls for vehicle-specific factors (wheel friction, alignment) and allows comparison of how mass affects speed across different starting weights.</p>';
+      }
+
+      analysisEl.innerHTML = aHtml;
+      analysisEl.style.display = 'block';
+      if (analysisPh) analysisPh.style.display = 'none';
+    }
+
+    // --- AUTO-GENERATE CONCLUSION ---
+    var conclusionEl = document.getElementById('conclusionContent');
+    var conclusionPh = document.getElementById('conclusionPlaceholder');
+    if (conclusionEl && carNames.length > 0) {
+      var cHtml = '';
+
+      // Determine overall trend across all cars
+      var overallIncrease = 0;
+      var overallDecrease = 0;
+      var overallFlat = 0;
+      for (var cci = 0; cci < carNames.length; cci++) {
+        var ccData = cars[carNames[cci]];
+        var ccConds = Object.keys(ccData.conditions);
+        var ccAvgs = [];
+        for (var ccj = 0; ccj < ccConds.length; ccj++) {
+          var ccTrials = ccData.conditions[ccConds[ccj]].trials;
+          var ccSum = 0;
+          for (var cck = 0; cck < ccTrials.length; cck++) ccSum += ccTrials[cck].speed_mps;
+          ccAvgs.push(ccSum / ccTrials.length);
+        }
+        if (ccAvgs.length >= 2) {
+          if (ccAvgs[ccAvgs.length - 1] > ccAvgs[0] + 0.01) overallIncrease++;
+          else if (ccAvgs[ccAvgs.length - 1] < ccAvgs[0] - 0.01) overallDecrease++;
+          else overallFlat++;
+        }
+      }
+
+      var supported = overallIncrease > overallDecrease;
+      cHtml += '<div class="hypothesis-box" style="border-color: ' + (supported ? 'var(--green)' : 'var(--red)') + ';">';
+      cHtml += '<div class="hypothesis-label" style="color: ' + (supported ? 'var(--green)' : 'var(--red)') + ';">Hypothesis ' + (supported ? 'SUPPORTED' : 'NOT SUPPORTED') + '</div>';
+      cHtml += '<div class="hypothesis-text">';
+      if (supported) {
+        cHtml += 'The experimental data supports the hypothesis. Heavier vehicles traveled faster (lower elapsed time) down the track, suggesting that added mass helps overcome friction and drag.';
+      } else if (overallDecrease > overallIncrease) {
+        cHtml += 'The experimental data does not support the hypothesis. Heavier vehicles traveled slower, suggesting that increased friction from added weight outweighs the gravitational advantage.';
+      } else {
+        cHtml += 'The experimental data shows no clear relationship between mass and speed, suggesting that gravitational advantage and friction increases approximately cancel out in this system.';
+      }
+      cHtml += '</div></div>';
+
+      cHtml += '<p>This experiment tested whether adding mass to a 1:64 scale model vehicle changes its speed on a ' + trackLen + '-meter gravity-driven track. ';
+      cHtml += 'Using the M.A.S.S. Trap electronic timing system with microsecond precision, ' + tests.length + ' total trials were conducted across ';
+      cHtml += carNames.length + ' vehicle(s) and multiple weight conditions.</p>';
+
+      cHtml += '<p><strong>Real-world connection:</strong> In full-size vehicles, this same physics applies. ';
+      cHtml += 'A loaded truck rolling downhill accelerates at the same rate as an empty one in a vacuum, ';
+      cHtml += 'but in the real world, heavier vehicles have more momentum to push through air resistance and rolling friction. ';
+      cHtml += 'This is why roller coasters are designed with minimum rider weight requirements and why race cars optimize their weight-to-power ratio.</p>';
+
+      conclusionEl.innerHTML = cHtml;
+      conclusionEl.style.display = 'block';
+      if (conclusionPh) conclusionPh.style.display = 'none';
+    }
+
+    // --- PHOTO EVIDENCE GALLERY ---
+    if (data.photos && data.photos.length > 0) {
+      var gallery = document.getElementById('photoGallery');
+      var grid = document.getElementById('photoGalleryGrid');
+      if (gallery && grid) {
+        var gHtml = '';
+        for (var pi = 0; pi < data.photos.length; pi++) {
+          var photo = data.photos[pi];
+          gHtml += '<div style="border:1px solid rgba(212,175,55,0.3);border-radius:8px;overflow:hidden;background:rgba(9,27,47,0.5);">';
+          gHtml += '<a href="' + escH(photo.url) + '" target="_blank" style="display:block;">';
+          gHtml += '<img src="' + escH(photo.thumb) + '" alt="Evidence ' + escH(photo.caseNumber) + '" ' +
+            'style="width:100%;height:150px;object-fit:cover;display:block;">';
+          gHtml += '</a>';
+          gHtml += '<div style="padding:8px;font-size:0.75rem;">';
+          gHtml += '<div style="color:var(--gold);font-weight:900;font-size:0.8rem;">' + escH(photo.caseNumber) + '</div>';
+          gHtml += '<div style="color:var(--text);">' + escH(photo.car);
+          if (photo.condition) gHtml += ' &bull; ' + escH(photo.condition);
+          if (photo.trial) gHtml += ' &bull; Trial ' + photo.trial;
+          gHtml += '</div>';
+          gHtml += '<div style="color:var(--gray);font-size:0.65rem;">' + new Date(photo.timestamp).toLocaleString() + '</div>';
+          gHtml += '</div></div>';
+        }
+        grid.innerHTML = gHtml;
+        gallery.style.display = 'block';
+
+        // Update exec summary with photo count
+        var execEl = document.getElementById('execTrials');
+        if (execEl) {
+          var existing = execEl.parentElement;
+          if (existing) {
+            var photoStat = document.createElement('div');
+            photoStat.className = 'exec-stat';
+            photoStat.innerHTML = '<div class="exec-value" style="color:var(--cyan);">' + data.photos.length + '</div><div class="exec-label">Photos</div>';
+            existing.parentElement.appendChild(photoStat);
+          }
+        }
+      }
+    }
+  }
+
+  // === CHECK FOR DATA IN LOCALSTORAGE ===
+  // plGenerateReport() in dashboard.html stores JSON at 'mass_report_data'
+  try {
+    var stored = localStorage.getItem('mass_report_data');
+    if (stored) {
+      var parsed = JSON.parse(stored);
+      loadReportData(parsed);
+    }
+  } catch (e) {
+    /* no data yet — show placeholders */
+  }
+
+  // === PRINT BUTTON (screen only) ===
+  var footer = document.querySelector('.report-footer');
+  if (footer) {
+    var printBtn = document.createElement('button');
+    printBtn.textContent = 'PRINT / SAVE AS PDF';
+    printBtn.className = 'no-print';
+    printBtn.style.cssText = 'margin-top:1.5rem;padding:12px 32px;background:var(--gold);color:var(--navy);border:none;border-radius:8px;font-weight:700;font-size:1rem;cursor:pointer;letter-spacing:2px;';
+    printBtn.onclick = function() { window.print(); };
+    footer.appendChild(printBtn);
+  }
+
+})();
+</script>
+
+</body>
+</html>

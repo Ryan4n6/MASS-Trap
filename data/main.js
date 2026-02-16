@@ -252,16 +252,16 @@ function applyVersionBadge(badge, currentFw, releaseInfo) {
   if (releaseInfo && releaseInfo.tag_name) {
     var latest = releaseInfo.tag_name.replace(/^v/i, '');
     if (compareSemver(latest, currentFw) > 0) {
-      // Update available — breathing red badge links to firmware update page
+      // Update available — breathing red badge links to About page (update info shown there)
       badge.classList.add('update-available');
-      badge.innerHTML = '<a href="/config#firmware-update" title="Update available! Click to install.">' +
+      badge.innerHTML = '<a href="/about.html" title="Update available! v' + latest + '">' +
         'v' + currentFw + ' → v' + latest + ' ⬆</a>';
       return;
     }
   }
-  // Current or check failed — link to firmware update page
+  // Current or check failed — link to About page
   badge.classList.remove('update-available');
-  badge.innerHTML = '<a href="/config#firmware-update" title="Firmware info">' +
+  badge.innerHTML = '<a href="/about.html" title="About M.A.S.S. Trap">' +
     'FW v' + currentFw + '</a>';
 }
 
@@ -301,9 +301,9 @@ function loadVersion() {
     var badge = document.getElementById('versionBadge');
     var currentFw = v.firmware || '0.0.0';
 
-    // Start with basic version display immediately
+    // Start with basic version display immediately — links to About page
     if (badge) {
-      badge.innerHTML = '<a href="' + GITHUB_RELEASES_URL + '" target="_blank" rel="noopener">' +
+      badge.innerHTML = '<a href="/about.html" title="About M.A.S.S. Trap">' +
         'FW v' + currentFw + '</a>';
     }
 
