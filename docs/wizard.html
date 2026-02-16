@@ -111,6 +111,8 @@ a:hover{color:#e8c84a;text-decoration:underline}
 .wd-wire.wire-black{background:var(--wire-black);border:1px solid #555}.wd-wire.wire-black::before{color:#999}
 .wd-wire.wire-blue{background:var(--wire-blue)}.wd-wire.wire-blue::before{color:var(--wire-blue)}
 .wd-wire.wire-yellow{background:var(--wire-yellow)}.wd-wire.wire-yellow::before{color:var(--wire-yellow)}
+.wd-wire.wire-green{background:var(--wire-green)}.wd-wire.wire-green::before{color:var(--wire-green)}
+.wd-wire.wire-orange{background:var(--wire-orange)}.wd-wire.wire-orange::before{color:var(--wire-orange)}
 
 /* --- CONNECTION TABLE --- */
 .conn-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin:12px 0}
@@ -169,11 +171,11 @@ a:hover{color:#e8c84a;text-decoration:underline}
       <div class="module-desc">XIAO ESP32-S3 + BNO055 IMU strapped to a Hot Wheels car. Measures g-force, tilt, and acceleration.</div>
       <div class="module-tag ready">GUIDE READY</div>
     </div>
-    <div class="module-card coming-soon">
+    <div class="module-card" onclick="showModule('finish')">
       <div class="module-emoji">&#127937;</div>
       <div class="module-name">Finish Gate</div>
       <div class="module-desc">ESP32-S3 + IR sensor + speaker. The main dashboard and race timer.</div>
-      <div class="module-tag soon">COMING SOON</div>
+      <div class="module-tag ready">GUIDE READY</div>
     </div>
     <div class="module-card coming-soon">
       <div class="module-emoji">&#128681;</div>
@@ -440,6 +442,354 @@ a:hover{color:#e8c84a;text-decoration:underline}
   </div>
 </div>
 
+<!-- ==================== FINISH GATE WIRING GUIDE ==================== -->
+<div id="guide-finish" class="wiring-guide">
+  <div class="container">
+    <div class="wg-title">
+      <h2>Finish Gate: ESP32-S3 + IR Sensor + Audio</h2>
+      <p>The brain of the operation. Hosts the dashboard, records race times, calculates physics, and announces results.</p>
+    </div>
+
+    <!-- Wiring Tier Toggle -->
+    <div class="parts-list" style="margin-bottom:24px;text-align:center">
+      <h3>Choose Your Wiring Method</h3>
+      <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:12px">Both methods produce the same result. The terminal block shield is an upgrade, not a necessity.</p>
+      <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap">
+        <button onclick="setFinishTier('dupont')" id="btnDupont" class="tier-btn tier-active" style="background:var(--navy-light);color:var(--gold);border:2px solid var(--gold);padding:10px 20px;border-radius:8px;cursor:pointer;font-family:var(--font);font-weight:700;font-size:0.8rem;transition:all 0.2s">
+          &#128268; Dupont Wires<br><span style="font-size:0.65rem;font-weight:400;color:var(--text-muted)">Starter &mdash; Quick &amp; Easy</span>
+        </button>
+        <button onclick="setFinishTier('terminal')" id="btnTerminal" class="tier-btn" style="background:var(--navy-card);color:var(--text-muted);border:2px solid var(--gold-dim);padding:10px 20px;border-radius:8px;cursor:pointer;font-family:var(--font);font-weight:700;font-size:0.8rem;transition:all 0.2s">
+          &#128297; Terminal Block Shield<br><span style="font-size:0.65rem;font-weight:400;color:var(--text-muted)">Upgrade &mdash; Permanent &amp; Clean</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="wg-progress">
+      <div class="wg-progress-label">WIRING PROGRESS</div>
+      <div class="wg-progress-bar">
+        <div class="wg-progress-fill" id="fgProgressFill" style="width:0%"></div>
+      </div>
+      <div class="wg-progress-text" id="fgProgressText">0 of 3 connections</div>
+    </div>
+
+    <!-- DUPONT PARTS LIST -->
+    <div id="fgPartsDupont" class="parts-list">
+      <h3>Parts Needed &mdash; Dupont Wire Method</h3>
+      <div class="part-row">
+        <div class="part-icon">&#128187;</div>
+        <div>
+          <div class="part-name">ESP32-S3 N16R8 Dev Board (38-pin)</div>
+          <div class="part-detail">16MB Flash / 8MB PSRAM. The purple AITEXM or any ESP32-S3-WROOM-1 dev board with pin headers.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128308;</div>
+        <div>
+          <div class="part-name">IR Break-Beam Sensor Pair</div>
+          <div class="part-detail">Photoelectric transmitter + receiver (3-wire: VCC, GND, Signal). The car breaks the beam &rarr; race stops.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128266;</div>
+        <div>
+          <div class="part-name">MAX98357A I2S Amplifier + Speaker (optional)</div>
+          <div class="part-detail">3W class-D amp. Announces race results, car names, and speed records. Skip this for a silent build.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128268;</div>
+        <div>
+          <div class="part-name">Dupont Jumper Wires (Female-Female)</div>
+          <div class="part-detail">3 wires minimum (IR sensor). 6 wires if adding audio. Color-coded recommended.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128267;</div>
+        <div>
+          <div class="part-name">USB-C Cable + 5V Power Supply</div>
+          <div class="part-detail">USB-C for initial flash. 5V/2A supply for permanent installation (barrel jack or USB).</div>
+        </div>
+      </div>
+      <div class="wg-tip" style="margin-top:12px">
+        <div class="wg-tip-label">Dupont Wires Are Fine!</div>
+        <strong>Dupont jumper wires are how every prototype starts.</strong> They're quick to connect, easy to rearrange, and free with most sensor kits. The only downside: they can wiggle loose if bumped. If your track lives on stairs and gets kicked by kids, consider upgrading to the terminal block shield later.
+      </div>
+    </div>
+
+    <!-- TERMINAL BLOCK PARTS LIST -->
+    <div id="fgPartsTerminal" class="parts-list" style="display:none">
+      <h3>Parts Needed &mdash; Terminal Block Shield</h3>
+      <div class="part-row">
+        <div class="part-icon">&#128187;</div>
+        <div>
+          <div class="part-name">ESP32-S3 N16R8 Dev Board (38-pin)</div>
+          <div class="part-detail">Same board as Dupont method. Must be the 38-pin variant with standard 2.54mm pin headers.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128296;</div>
+        <div>
+          <div class="part-name">Meshnology ESP32/ESP32-S3 Terminal Block Shield</div>
+          <div class="part-detail">Breakout board with screw terminals for every GPIO. 7-12V barrel jack input with onboard regulator. <a href="https://www.amazon.com/dp/B0FLK4MDDW?tag=ryanmassfelle-20" target="_blank" style="color:var(--gold)">Amazon &rarr;</a></div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128308;</div>
+        <div>
+          <div class="part-name">IR Break-Beam Sensor Pair</div>
+          <div class="part-detail">Same sensor. The screw terminals accept the bare wire ends directly &mdash; strip 5mm of insulation.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128266;</div>
+        <div>
+          <div class="part-name">MAX98357A I2S Amplifier + Speaker (optional)</div>
+          <div class="part-detail">Same amp. Connect via screw terminals instead of Dupont wires.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128268;</div>
+        <div>
+          <div class="part-name">Solid-Core Wire or Stripped Jumpers</div>
+          <div class="part-detail">22AWG solid-core is ideal for screw terminals. Or strip the ends of regular jumper wires.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128295;</div>
+        <div>
+          <div class="part-name">Small Flathead Screwdriver</div>
+          <div class="part-detail">For tightening the screw terminals. A precision/jeweler's screwdriver works best.</div>
+        </div>
+      </div>
+      <div class="wg-tip" style="margin-top:12px">
+        <div class="wg-tip-label">The Upgrade Path</div>
+        <strong>The terminal block shield is the "production" upgrade.</strong> Your ESP32-S3 plugs into the center socket. Every GPIO breaks out to a labeled screw terminal on the sides. Connections are vibration-proof &mdash; you can literally shake the board and nothing comes loose. It also adds a 7-12V barrel jack so you can power the whole thing from a wall adapter instead of USB.<br><br>
+        <strong>You don't need this to get started.</strong> Build with Dupont wires first. Migrate to the shield when you're done prototyping and ready to make it permanent.
+      </div>
+    </div>
+
+    <!-- Connection Table (adapts to tier) -->
+    <div class="parts-list" style="margin-bottom:24px">
+      <h3>Connection Map &mdash; IR Sensor</h3>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">The IR sensor has 3 wires. This is the minimum to get a working finish gate.</p>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Wire</th><th>ESP32-S3 Pin</th><th>IR Sensor Pin</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+            <td><strong id="fgPinVCC">3.3V</strong></td>
+            <td><strong>VCC</strong></td>
+            <td>Sensor power (3.3V or 5V)</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+            <td><strong id="fgPinGND">GND</strong></td>
+            <td><strong>GND</strong></td>
+            <td>Ground</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-green)"></span>Green</td>
+            <td><strong id="fgPinSig">GPIO 4</strong></td>
+            <td><strong>OUT / SIG</strong></td>
+            <td>Signal &mdash; goes LOW when beam is broken</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="wg-tip" style="margin-top:8px">
+        <div class="wg-tip-label" id="fgPinNote">Dupont Method</div>
+        <span id="fgPinDesc">Plug the female Dupont connector directly onto the ESP32-S3 header pins. Match the colors: red to 3.3V, black to GND, green (or white) to GPIO 4.</span>
+      </div>
+    </div>
+
+    <!-- Audio Table (shown for both tiers) -->
+    <div class="parts-list" style="margin-bottom:24px">
+      <h3>Connection Map &mdash; Audio (Optional)</h3>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">Skip this section if you want a silent build. You can always add audio later.</p>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Wire</th><th>ESP32-S3 Pin</th><th>MAX98357A Pin</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+            <td><strong>3.3V</strong></td>
+            <td><strong>VIN</strong></td>
+            <td>Amplifier power</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+            <td><strong>GND</strong></td>
+            <td><strong>GND</strong></td>
+            <td>Ground</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-orange)"></span>Orange</td>
+            <td><strong>GPIO 15</strong></td>
+            <td><strong>BCLK</strong></td>
+            <td>I2S Bit Clock</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-yellow)"></span>Yellow</td>
+            <td><strong>GPIO 16</strong></td>
+            <td><strong>LRC</strong></td>
+            <td>I2S Left/Right Clock</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-blue)"></span>Blue</td>
+            <td><strong>GPIO 17</strong></td>
+            <td><strong>DIN</strong></td>
+            <td>I2S Data</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="wg-tip" style="margin-top:8px">
+        <div class="wg-tip-label">Speaker Connection</div>
+        The MAX98357A has two speaker terminals (<strong>+</strong> and <strong>&minus;</strong>). Connect your speaker wires there. Any 4&ohm; or 8&ohm; speaker 1-3W works. The audio system is disabled by default in firmware &mdash; enable it in the System tab after first boot.
+      </div>
+    </div>
+
+    <!-- STEP 1: Power -->
+    <div class="step-card active" id="fg-step1" data-step="1">
+      <div class="step-header" onclick="fgToggleStep(1)">
+        <div class="step-number">1</div>
+        <div class="step-info">
+          <div class="step-title">Connect IR Sensor Power</div>
+          <div class="step-subtitle">Red wire: ESP32-S3 3.3V &rarr; IR Sensor VCC</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();fgCompleteStep(1)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">Find the Pin</div>
+          On the <strong>ESP32-S3 dev board</strong>: Look for the pin labeled <em>3V3</em> (sometimes <em>3.3V</em>). It&rsquo;s typically in the top-left corner of the pin header.<br>
+          On the <strong>IR sensor</strong>: The <em>VCC</em> wire is usually <strong>red</strong> (or brown on some sensors). Check the label on the sensor PCB if unsure.
+        </div>
+        <div id="fgStep1Tip" class="wg-tip">
+          <div class="wg-tip-label">Dupont Method</div>
+          Slide the female Dupont connector onto the <em>3V3</em> header pin. It should click gently. Don&rsquo;t force it &mdash; if it&rsquo;s hard to push, you might be on the wrong pin.
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-red" data-label="3.3V POWER" style="width:80%;margin:16px auto"></div>
+        </div>
+        <div class="wg-tip">
+          <div class="wg-tip-label">3.3V vs 5V</div>
+          Most IR break-beam sensors work at both 3.3V and 5V. Using <strong>3.3V is safer</strong> because the ESP32-S3 GPIO pins are 3.3V logic. If your sensor requires 5V power, use the 5V pin for VCC but be aware the signal pin may need a voltage divider. <em>When in doubt, start with 3.3V.</em>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Ground -->
+    <div class="step-card" id="fg-step2" data-step="2">
+      <div class="step-header" onclick="fgToggleStep(2)">
+        <div class="step-number">2</div>
+        <div class="step-info">
+          <div class="step-title">Connect IR Sensor Ground</div>
+          <div class="step-subtitle">Black wire: ESP32-S3 GND &rarr; IR Sensor GND</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();fgCompleteStep(2)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">Find the Pin</div>
+          On the <strong>ESP32-S3</strong>: Multiple <em>GND</em> pins exist on most dev boards (usually 2-3). Use any one of them &mdash; they&rsquo;re all connected internally.<br>
+          On the <strong>IR sensor</strong>: The <em>GND</em> wire is usually <strong>black</strong> (or blue on some sensors).
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-black" data-label="GROUND" style="width:80%;margin:16px auto"></div>
+        </div>
+        <div class="wg-tip">
+          <div class="wg-tip-label">Safety Check</div>
+          <strong>Power + Ground done!</strong> Before connecting the signal wire, double-check: red goes to 3.3V/VCC, black goes to GND/GND. <em>Swapping these will fry the sensor instantly.</em> There is no undo.
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Signal -->
+    <div class="step-card" id="fg-step3" data-step="3">
+      <div class="step-header" onclick="fgToggleStep(3)">
+        <div class="step-number">3</div>
+        <div class="step-info">
+          <div class="step-title">Connect IR Signal Wire</div>
+          <div class="step-subtitle">Green wire: ESP32-S3 GPIO 4 &rarr; IR Sensor OUT</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();fgCompleteStep(3)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">How It Works</div>
+          The IR break-beam sensor has two parts: a <strong>transmitter</strong> (emits invisible infrared light) and a <strong>receiver</strong> (detects it). When a car rolls between them, the beam is broken and the signal pin goes <em>LOW</em>. The ESP32 ISR (Interrupt Service Routine) catches this at microsecond precision &mdash; that&rsquo;s your race time.
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-green" data-label="SIGNAL (GPIO 4)" style="width:80%;margin:16px auto"></div>
+        </div>
+        <div class="wg-tip">
+          <div class="wg-tip-label">GPIO 4 is the Default</div>
+          The firmware defaults to <em>GPIO 4</em> for the primary IR sensor. This is configurable in the dashboard under System &rarr; Pin Configuration. <strong>You can change it later</strong> if GPIO 4 is inconvenient for your wiring layout &mdash; any free GPIO works.
+        </div>
+        <div class="wg-tip">
+          <div class="wg-tip-label">Sensor Placement</div>
+          Mount the transmitter and receiver on <strong>opposite sides of the track</strong>, at car-height (~15mm above the track surface). The beam should cross the track perpendicular to the direction of travel. The finish line is wherever you place these sensors.
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Banner -->
+    <div class="wg-success" id="fgSuccessBanner">
+      <h3>&#10003; FINISH GATE WIRED!</h3>
+      <p>Core wiring complete. Flash the firmware and you have a working race timer.</p>
+      <div style="margin-top:16px">
+        <div class="wg-tip" style="text-align:left;margin:0">
+          <div class="wg-tip-label">First Boot Checklist</div>
+          <strong>1.</strong> Plug ESP32-S3 into your computer via USB-C<br>
+          <strong>2.</strong> Flash the M.A.S.S. Trap firmware via PlatformIO: <code style="background:var(--navy);padding:2px 6px;border-radius:3px;font-size:0.75rem">pio run -t upload</code><br>
+          <strong>3.</strong> The device creates a WiFi hotspot: <em>MASS-Trap-Setup</em><br>
+          <strong>4.</strong> Connect and configure at <em>192.168.4.1</em> &mdash; set role to <strong>Finish Gate</strong><br>
+          <strong>5.</strong> After reboot, open the dashboard at the device&rsquo;s IP address<br>
+          <strong>6.</strong> Wave your hand through the IR beam &mdash; you should see FINISHED!
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="wg-tip" style="text-align:left;margin:0">
+          <div class="wg-tip-label">Optional: Add Audio Later</div>
+          The audio connections (MAX98357A) in the table above can be added anytime. Just wire 5 more connections, enable audio in System settings, and upload WAV files. The finish gate works perfectly without audio.
+        </div>
+      </div>
+    </div>
+
+    <!-- Meshnology Terminal Block Reference -->
+    <div class="parts-list" style="margin-top:24px">
+      <h3>Quick Reference: Meshnology Shield Pin Map</h3>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">Screw terminal numbers match GPIO numbers. Find your GPIO, find the terminal.</p>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Terminal #</th><th>GPIO</th><th>M.A.S.S. Trap Use</th><th>Wire Color</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>4</td><td>GPIO 4</td><td style="color:var(--wire-green)">IR Sensor (Finish)</td><td><span class="wire-dot" style="background:var(--wire-green)"></span>Green</td></tr>
+          <tr><td>5</td><td>GPIO 5</td><td style="color:var(--text-dim)">IR Sensor 2 (Speed Trap)</td><td><span class="wire-dot" style="background:#777"></span>Optional</td></tr>
+          <tr><td>15</td><td>GPIO 15</td><td style="color:var(--wire-orange)">I2S BCLK (Audio)</td><td><span class="wire-dot" style="background:var(--wire-orange)"></span>Orange</td></tr>
+          <tr><td>16</td><td>GPIO 16</td><td style="color:var(--wire-yellow)">I2S LRC (Audio)</td><td><span class="wire-dot" style="background:var(--wire-yellow)"></span>Yellow</td></tr>
+          <tr><td>17</td><td>GPIO 17</td><td style="color:var(--wire-blue)">I2S DIN (Audio)</td><td><span class="wire-dot" style="background:var(--wire-blue)"></span>Blue</td></tr>
+          <tr><td>38</td><td>GPIO 38</td><td style="color:var(--cyan)">LiDAR TX (Start Gate)</td><td><span class="wire-dot" style="background:var(--cyan)"></span>Teal</td></tr>
+          <tr><td>39</td><td>GPIO 39</td><td style="color:var(--cyan)">LiDAR RX (Start Gate)</td><td><span class="wire-dot" style="background:var(--cyan)"></span>Teal</td></tr>
+          <tr><td>2</td><td>GPIO 2</td><td style="color:var(--text-dim)">Status LED</td><td><span class="wire-dot" style="background:#777"></span>Optional</td></tr>
+          <tr style="color:var(--text-dim)"><td>3V3</td><td>&mdash;</td><td>Sensor power</td><td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td></tr>
+          <tr style="color:var(--text-dim)"><td>GND</td><td>&mdash;</td><td>Ground</td><td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td></tr>
+          <tr style="color:var(--text-dim)"><td>5V</td><td>&mdash;</td><td>5V power (barrel jack)</td><td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td></tr>
+        </tbody>
+      </table>
+      <div class="wg-tip" style="margin-top:8px">
+        <div class="wg-tip-label">Terminal Block Advantage</div>
+        <strong>The terminal numbers match the GPIO numbers.</strong> GPIO 4 &rarr; Terminal 4. GPIO 15 &rarr; Terminal 15. No translation needed. Tighten with a small flathead screwdriver &mdash; connections are vibration-proof and won&rsquo;t wiggle loose when a 10-year-old crashes into the track at full speed.
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- ==================== FOOTER ==================== -->
 <div class="wiz-footer">
   <div class="container">
@@ -453,73 +803,125 @@ a:hover{color:#e8c84a;text-decoration:underline}
 /* =============================================================
    M.A.S.S. Trap Build Wizard — Interactive Wiring Guide
    ES5 compatible (var only)
+   Supports multiple modules with independent progress tracking
    ============================================================= */
 (function() {
   'use strict';
 
-  var totalSteps = 4;
-  var completedSteps = {};
+  /* ---- Module definitions ---- */
+  var modules = {
+    telemetry: { totalSteps: 4, prefix: 'step', progressFill: 'progressFill', progressText: 'progressText', successBanner: 'successBanner', storageKey: 'mass_wizard_telemetry' },
+    finish:    { totalSteps: 3, prefix: 'fg-step', progressFill: 'fgProgressFill', progressText: 'fgProgressText', successBanner: 'fgSuccessBanner', storageKey: 'mass_wizard_finish' }
+  };
+  var state = {}; // { telemetry: {1:true,2:true}, finish: {1:true} }
+  var activeModule = 'telemetry';
+  var finishTier = 'dupont';
 
-  function updateProgress() {
-    var count = Object.keys(completedSteps).length;
-    var pct = Math.round((count / totalSteps) * 100);
-    var fill = document.getElementById('progressFill');
-    var text = document.getElementById('progressText');
+  /* ---- Progress update for a given module ---- */
+  function updateModuleProgress(modId) {
+    var mod = modules[modId];
+    if (!mod) return;
+    var completed = state[modId] || {};
+    var count = Object.keys(completed).length;
+    var pct = Math.round((count / mod.totalSteps) * 100);
+    var fill = document.getElementById(mod.progressFill);
+    var text = document.getElementById(mod.progressText);
     if (fill) fill.style.width = pct + '%';
-    if (text) text.textContent = count + ' of ' + totalSteps + ' connections';
+    if (text) text.textContent = count + ' of ' + mod.totalSteps + ' connections';
 
-    // Show success banner when all done
-    var banner = document.getElementById('successBanner');
+    var banner = document.getElementById(mod.successBanner);
     if (banner) {
-      if (count >= totalSteps) {
+      if (count >= mod.totalSteps) {
         banner.classList.add('visible');
         banner.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } else {
         banner.classList.remove('visible');
       }
     }
-
-    // Save state
-    try { localStorage.setItem('mass_wizard_telemetry', JSON.stringify(completedSteps)); } catch(e) {}
+    try { localStorage.setItem(mod.storageKey, JSON.stringify(completed)); } catch(e) {}
   }
 
-  window.toggleStep = function(n) {
-    var card = document.getElementById('step' + n);
+  /* ---- Generic toggle/complete for any module ---- */
+  function toggleStepGeneric(modId, n) {
+    var mod = modules[modId];
+    if (!mod) return;
+    var card = document.getElementById(mod.prefix + n);
     if (!card) return;
     var wasActive = card.classList.contains('active');
-    // Close all
-    for (var i = 1; i <= totalSteps; i++) {
-      var c = document.getElementById('step' + i);
+    for (var i = 1; i <= mod.totalSteps; i++) {
+      var c = document.getElementById(mod.prefix + i);
       if (c) c.classList.remove('active');
     }
-    // Toggle this one
     if (!wasActive) card.classList.add('active');
-  };
+  }
 
-  window.completeStep = function(n) {
-    var card = document.getElementById('step' + n);
+  function completeStepGeneric(modId, n) {
+    var mod = modules[modId];
+    if (!mod) return;
+    if (!state[modId]) state[modId] = {};
+    var card = document.getElementById(mod.prefix + n);
     if (!card) return;
-    if (completedSteps[n]) {
-      delete completedSteps[n];
+    if (state[modId][n]) {
+      delete state[modId][n];
       card.classList.remove('completed');
     } else {
-      completedSteps[n] = true;
+      state[modId][n] = true;
       card.classList.add('completed');
       card.classList.remove('active');
-      // Auto-open next step
-      var next = document.getElementById('step' + (n + 1));
-      if (next && !completedSteps[n + 1]) {
+      var next = document.getElementById(mod.prefix + (n + 1));
+      if (next && !state[modId][n + 1]) {
         next.classList.add('active');
         next.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     }
-    // Update number display
     var num = card.querySelector('.step-number');
-    if (num) num.textContent = completedSteps[n] ? '\u2713' : n;
-    updateProgress();
+    if (num) num.textContent = state[modId][n] ? '\u2713' : n;
+    updateModuleProgress(modId);
+  }
+
+  /* ---- Telemetry module wrappers (backward compat) ---- */
+  window.toggleStep = function(n) { toggleStepGeneric('telemetry', n); };
+  window.completeStep = function(n) { completeStepGeneric('telemetry', n); };
+
+  /* ---- Finish Gate module wrappers ---- */
+  window.fgToggleStep = function(n) { toggleStepGeneric('finish', n); };
+  window.fgCompleteStep = function(n) { completeStepGeneric('finish', n); };
+
+  /* ---- Finish Gate tier toggle ---- */
+  window.setFinishTier = function(tier) {
+    finishTier = tier;
+    var dParts = document.getElementById('fgPartsDupont');
+    var tParts = document.getElementById('fgPartsTerminal');
+    var btnD = document.getElementById('btnDupont');
+    var btnT = document.getElementById('btnTerminal');
+    var pinNote = document.getElementById('fgPinNote');
+    var pinDesc = document.getElementById('fgPinDesc');
+    var step1Tip = document.getElementById('fgStep1Tip');
+
+    if (tier === 'terminal') {
+      if (dParts) dParts.style.display = 'none';
+      if (tParts) tParts.style.display = '';
+      if (btnD) { btnD.style.borderColor = 'var(--gold-dim)'; btnD.style.color = 'var(--text-muted)'; btnD.style.background = 'var(--navy-card)'; }
+      if (btnT) { btnT.style.borderColor = 'var(--gold)'; btnT.style.color = 'var(--gold)'; btnT.style.background = 'var(--navy-light)'; }
+      if (pinNote) pinNote.textContent = 'Terminal Block Method';
+      if (pinDesc) pinDesc.innerHTML = 'Strip 5mm of wire insulation. Insert the bare wire into the screw terminal matching the GPIO number. Terminal <strong>4</strong> = GPIO 4. Tighten with a small flathead screwdriver until the wire doesn\'t pull out. Power and ground use the dedicated <strong>3V3</strong> and <strong>GND</strong> terminals on the board edges.';
+      if (step1Tip) { step1Tip.querySelector('.wg-tip-label').textContent = 'Terminal Block Method'; step1Tip.querySelector('.wg-tip-label').nextSibling.textContent = ''; step1Tip.innerHTML = '<div class="wg-tip-label">Terminal Block Method</div>Find the <strong>3V3</strong> screw terminal on the Meshnology board edge (green block, labeled). Strip 5mm of insulation from your red wire, insert, and tighten. Give it a gentle tug to confirm it\'s secure.'; }
+    } else {
+      if (dParts) dParts.style.display = '';
+      if (tParts) tParts.style.display = 'none';
+      if (btnT) { btnT.style.borderColor = 'var(--gold-dim)'; btnT.style.color = 'var(--text-muted)'; btnT.style.background = 'var(--navy-card)'; }
+      if (btnD) { btnD.style.borderColor = 'var(--gold)'; btnD.style.color = 'var(--gold)'; btnD.style.background = 'var(--navy-light)'; }
+      if (pinNote) pinNote.textContent = 'Dupont Method';
+      if (pinDesc) pinDesc.textContent = 'Plug the female Dupont connector directly onto the ESP32-S3 header pins. Match the colors: red to 3.3V, black to GND, green (or white) to GPIO 4.';
+      if (step1Tip) { step1Tip.innerHTML = '<div class="wg-tip-label">Dupont Method</div>Slide the female Dupont connector onto the <em>3V3</em> header pin. It should click gently. Don\'t force it \u2014 if it\'s hard to push, you might be on the wrong pin.'; }
+    }
+    try { localStorage.setItem('mass_wizard_finish_tier', tier); } catch(e) {}
   };
 
+  /* ---- Module switcher ---- */
   window.showModule = function(moduleId) {
+    if (!modules[moduleId]) return;
+    activeModule = moduleId;
     // Hide all guides
     var guides = document.querySelectorAll('.wiring-guide');
     for (var i = 0; i < guides.length; i++) {
@@ -529,27 +931,34 @@ a:hover{color:#e8c84a;text-decoration:underline}
     var guide = document.getElementById('guide-' + moduleId);
     if (guide) {
       guide.classList.add('visible');
-      guide.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setTimeout(function() { guide.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
     }
     // Update module cards
-    var cards = document.querySelectorAll('.module-card');
-    for (var j = 0; j < cards.length; j++) {
-      cards[j].classList.remove('active');
+    var allCards = document.querySelectorAll('.module-card');
+    for (var j = 0; j < allCards.length; j++) {
+      allCards[j].classList.remove('active');
     }
-    // Mark clicked one active (only if not coming-soon)
-    // We can't easily get the clicked card here, so just find the one with matching onclick
-    // For now, this works with the telemetry card
+    // Find the card that has onclick matching this module
+    var cards = document.querySelectorAll('.module-card');
+    for (var k = 0; k < cards.length; k++) {
+      var onclick = cards[k].getAttribute('onclick') || '';
+      if (onclick.indexOf("'" + moduleId + "'") !== -1) {
+        cards[k].classList.add('active');
+      }
+    }
   };
 
-  // Restore state on load
-  function init() {
+  /* ---- Restore saved state ---- */
+  function restoreModule(modId) {
+    var mod = modules[modId];
+    if (!mod) return;
     try {
-      var saved = localStorage.getItem('mass_wizard_telemetry');
+      var saved = localStorage.getItem(mod.storageKey);
       if (saved) {
-        completedSteps = JSON.parse(saved);
-        for (var n in completedSteps) {
-          if (completedSteps.hasOwnProperty(n)) {
-            var card = document.getElementById('step' + n);
+        state[modId] = JSON.parse(saved);
+        for (var n in state[modId]) {
+          if (state[modId].hasOwnProperty(n)) {
+            var card = document.getElementById(mod.prefix + n);
             if (card) {
               card.classList.add('completed');
               card.classList.remove('active');
@@ -558,8 +967,23 @@ a:hover{color:#e8c84a;text-decoration:underline}
             }
           }
         }
-        updateProgress();
+        updateModuleProgress(modId);
       }
+    } catch(e) {}
+  }
+
+  function init() {
+    // Restore all modules
+    for (var modId in modules) {
+      if (modules.hasOwnProperty(modId)) {
+        if (!state[modId]) state[modId] = {};
+        restoreModule(modId);
+      }
+    }
+    // Restore finish gate tier
+    try {
+      var savedTier = localStorage.getItem('mass_wizard_finish_tier');
+      if (savedTier) setFinishTier(savedTier);
     } catch(e) {}
   }
 
