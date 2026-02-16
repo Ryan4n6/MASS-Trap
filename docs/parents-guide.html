@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-61YKX0133N"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-61YKX0133N');</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.A.S.S. Trap — Parent's Wiring Guide</title>
+<meta name="description" content="Step-by-step guide for parents helping kids migrate M.A.S.S. Trap wiring from Dupont jumpers to terminal block shields. Kid-friendly, no experience needed.">
+<style>
+/* ============================================================
+   M.A.S.S. Trap Parent's Wiring Guide
+   Same design language as wizard.html (Navy + Gold)
+   Written for a parent + kid team. Tone: encouraging, clear, safe.
+   ============================================================ */
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#091B2F;--navy-light:#0d2847;--navy-mid:#112d4e;--navy-card:#0f2340;
+  --gold:#D4AF37;--gold-dim:rgba(212,175,55,0.25);--gold-glow:rgba(212,175,55,0.08);
+  --orange:#FF4500;--orange-dim:rgba(255,69,0,0.15);
+  --text:#E8E8E8;--text-muted:#8899AA;--text-dim:#556677;
+  --green:#28a745;--red:#dc3545;--cyan:#17a2b8;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --mono:"SF Mono",Monaco,"Cascadia Code","Fira Code",monospace;
+  --max-w:800px;
+  --radius:12px;
+  --wire-red:#ff3333;--wire-black:#333;--wire-blue:#4488ff;--wire-yellow:#ffcc00;
+  --wire-green:#33cc33;--wire-orange:#ff8800;--wire-white:#eeeeee;
+}
+html{scroll-behavior:smooth}
+body{background:var(--navy);color:var(--text);font-family:var(--font);line-height:1.8;-webkit-font-smoothing:antialiased}
+a{color:var(--gold);text-decoration:none}
+a:hover{color:#e8c84a;text-decoration:underline}
+.container{max-width:var(--max-w);margin:0 auto;padding:0 20px}
+
+/* === HEADER === */
+.pg-header{text-align:center;padding:40px 20px 24px;border-bottom:1px solid var(--gold-dim)}
+.pg-header h1{font-size:1.8rem;color:var(--gold);letter-spacing:2px;font-weight:900}
+.pg-header .pg-subtitle{color:var(--text-muted);font-size:1rem;margin-top:6px}
+.pg-header .pg-audience{display:inline-block;background:rgba(40,167,69,0.15);color:var(--green);border:1px solid var(--green);font-size:0.65rem;font-weight:900;padding:3px 12px;border-radius:4px;letter-spacing:1px;text-transform:uppercase;margin-top:10px}
+.pg-back{display:inline-block;margin-bottom:12px;font-size:0.8rem;color:var(--text-muted)}
+.pg-back:hover{color:var(--gold)}
+
+/* === HERO / OVERVIEW === */
+.pg-hero{background:linear-gradient(135deg,var(--navy-card),var(--navy-light));border:1px solid var(--gold-dim);border-radius:var(--radius);padding:28px 24px;margin:28px auto;max-width:var(--max-w)}
+.pg-hero h2{font-size:1.2rem;color:var(--gold);letter-spacing:1px;margin-bottom:12px}
+.pg-hero p{font-size:0.9rem;color:var(--text-muted);margin-bottom:8px}
+.pg-hero ul{list-style:none;margin:12px 0}
+.pg-hero li{padding:6px 0;font-size:0.9rem;color:var(--text);border-bottom:1px solid rgba(255,255,255,0.04)}
+.pg-hero li:last-child{border:none}
+.pg-hero li::before{content:'';display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:10px;vertical-align:middle}
+.pg-hero li.time::before{background:var(--gold)}
+.pg-hero li.skill::before{background:var(--green)}
+.pg-hero li.tools::before{background:var(--cyan)}
+.pg-hero li.age::before{background:var(--orange)}
+
+/* === SAFETY BOX === */
+.safety-box{background:rgba(220,53,69,0.08);border:2px solid var(--red);border-radius:var(--radius);padding:20px 24px;margin:24px auto;max-width:var(--max-w)}
+.safety-box h3{color:var(--red);font-size:0.85rem;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px}
+.safety-box ul{list-style:none;margin:0}
+.safety-box li{padding:5px 0;font-size:0.85rem;color:var(--text)}
+.safety-box li::before{content:'&#9888;';margin-right:8px}
+.safety-box .magic-smoke{margin-top:12px;padding:12px 16px;background:rgba(255,69,0,0.1);border:1px solid var(--orange);border-radius:8px;font-size:0.85rem;color:var(--orange)}
+
+/* === TIMELINE === */
+.timeline{max-width:var(--max-w);margin:32px auto;padding:0 20px}
+.timeline h2{font-size:1.2rem;color:var(--gold);letter-spacing:1px;text-align:center;margin-bottom:20px}
+.tl-track{position:relative;padding-left:40px}
+.tl-track::before{content:'';position:absolute;left:15px;top:0;bottom:0;width:2px;background:var(--gold-dim)}
+.tl-phase{position:relative;margin-bottom:20px;background:var(--navy-card);border:1px solid var(--gold-dim);border-radius:var(--radius);padding:16px 20px;transition:all 0.3s}
+.tl-phase.active-phase{border-color:var(--gold);box-shadow:0 0 12px rgba(212,175,55,0.08)}
+.tl-phase.completed-phase{border-color:var(--green)}
+.tl-dot{position:absolute;left:-33px;top:18px;width:18px;height:18px;border-radius:50%;border:2px solid var(--gold-dim);background:var(--navy);display:flex;align-items:center;justify-content:center;font-size:0.55rem;font-weight:900;color:var(--gold);z-index:1}
+.tl-phase.completed-phase .tl-dot{background:var(--green);border-color:var(--green);color:#fff}
+.tl-phase.active-phase .tl-dot{border-color:var(--gold);background:var(--gold);color:var(--navy)}
+.tl-time{font-size:0.65rem;font-weight:700;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.tl-title{font-size:1rem;font-weight:700;color:var(--text)}
+.tl-desc{font-size:0.8rem;color:var(--text-muted);margin-top:4px}
+.tl-checklist{margin-top:10px;list-style:none}
+.tl-checklist li{padding:3px 0;font-size:0.8rem;color:var(--text-muted)}
+.tl-checklist li::before{content:'\25A1';margin-right:8px;color:var(--gold)}
+
+/* === PHASE CARDS (expandable) === */
+.phase-section{max-width:var(--max-w);margin:0 auto;padding:0 20px 32px}
+.phase-card{background:var(--navy-card);border:2px solid var(--gold-dim);border-radius:var(--radius);margin-bottom:16px;overflow:hidden;transition:border-color 0.3s}
+.phase-card.open{border-color:var(--gold)}
+.phase-card.done{border-color:var(--green)}
+.phase-header{display:flex;align-items:center;gap:12px;padding:16px 20px;cursor:pointer;user-select:none}
+.phase-num{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.85rem;font-weight:900;flex-shrink:0;background:rgba(212,175,55,0.15);color:var(--gold);border:2px solid var(--gold)}
+.phase-card.done .phase-num{background:var(--green);color:#fff;border-color:var(--green)}
+.phase-info{flex:1;min-width:0}
+.phase-title{font-size:1rem;font-weight:700;color:var(--text)}
+.phase-est{font-size:0.7rem;color:var(--text-dim);margin-top:2px}
+.phase-toggle{width:24px;height:24px;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-size:1rem;transition:transform 0.2s}
+.phase-card.open .phase-toggle{transform:rotate(180deg);color:var(--gold)}
+.phase-body{display:none;padding:0 20px 20px}
+.phase-card.open .phase-body{display:block}
+
+/* === STEP ROWS === */
+.step-row{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.04)}
+.step-row:last-child{border:none}
+.step-icon{font-size:1.4rem;flex-shrink:0;width:32px;text-align:center;margin-top:2px}
+.step-content{flex:1}
+.step-content h4{font-size:0.9rem;font-weight:700;color:var(--text);margin-bottom:4px}
+.step-content p{font-size:0.8rem;color:var(--text-muted);line-height:1.6}
+.step-content .kid-say{display:inline-block;background:rgba(212,175,55,0.08);border:1px solid var(--gold-dim);border-radius:6px;padding:4px 10px;margin-top:6px;font-size:0.75rem;color:var(--gold);font-style:italic}
+.step-content .parent-note{display:inline-block;background:rgba(23,162,184,0.08);border:1px solid rgba(23,162,184,0.3);border-radius:6px;padding:4px 10px;margin-top:6px;font-size:0.75rem;color:var(--cyan)}
+
+/* === WIRE COLOR LEGEND === */
+.wire-legend{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.wire-chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:6px;font-size:0.75rem;font-weight:700;background:var(--navy-light);border:1px solid rgba(255,255,255,0.06)}
+.wire-chip .dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
+
+/* === CONNECTION TABLE === */
+.conn-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin:12px 0}
+.conn-table th{font-weight:700;color:var(--gold);font-size:0.65rem;letter-spacing:1px;text-transform:uppercase;padding:8px 6px;border-bottom:2px solid var(--gold-dim);text-align:left}
+.conn-table td{padding:6px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text)}
+.conn-table .wire-dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px;vertical-align:middle}
+
+/* === TIP / WARNING BOXES === */
+.tip-box{border-radius:8px;padding:12px 16px;margin:12px 0;font-size:0.8rem;line-height:1.6}
+.tip-box strong{color:var(--text)}
+.tip-box em{font-style:normal}
+.tip-box.tip-info{background:var(--navy-light);border:1px solid var(--gold-dim);color:var(--text-muted)}
+.tip-box.tip-info em{color:var(--cyan)}
+.tip-box.tip-warn{background:rgba(255,204,0,0.06);border:1px solid rgba(255,204,0,0.2);color:var(--wire-yellow)}
+.tip-box.tip-good{background:rgba(40,167,69,0.06);border:1px solid rgba(40,167,69,0.2);color:var(--green)}
+.tip-box.tip-danger{background:rgba(220,53,69,0.06);border:1px solid rgba(220,53,69,0.2);color:var(--red)}
+.tip-label{display:inline-block;font-size:0.5rem;font-weight:900;padding:1px 6px;border-radius:3px;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.tip-label.label-parent{background:var(--cyan);color:var(--navy)}
+.tip-label.label-kid{background:var(--gold);color:var(--navy)}
+.tip-label.label-safety{background:var(--red);color:#fff}
+.tip-label.label-why{background:var(--navy-light);color:var(--gold);border:1px solid var(--gold-dim)}
+
+/* === NIGHT OWL BADGE === */
+.night-owl{text-align:center;margin:20px 0;padding:12px;background:linear-gradient(135deg,rgba(75,0,130,0.1),rgba(0,0,80,0.15));border:1px solid rgba(100,50,150,0.3);border-radius:var(--radius)}
+.night-owl .owl-emoji{font-size:1.5rem}
+.night-owl .owl-label{font-size:0.65rem;font-weight:900;letter-spacing:1.5px;text-transform:uppercase;color:rgba(180,140,255,0.8);margin-top:4px}
+.night-owl .owl-time{font-size:1.8rem;font-weight:900;color:rgba(180,140,255,0.9);font-family:var(--mono)}
+
+/* === PROGRESS TRACKER === */
+.pg-progress{background:var(--navy-card);border:1px solid var(--gold-dim);border-radius:var(--radius);padding:16px 20px;margin:24px auto;max-width:var(--max-w);text-align:center}
+.pg-progress-label{font-size:0.7rem;color:var(--gold);font-weight:700;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.pg-progress-bar{height:10px;background:var(--navy);border-radius:5px;overflow:hidden;border:1px solid var(--gold-dim)}
+.pg-progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--green));border-radius:5px;transition:width 0.5s ease;width:0%}
+.pg-progress-text{font-size:0.75rem;color:var(--text-muted);margin-top:6px;font-family:var(--mono)}
+
+/* === FINAL SUCCESS === */
+.final-success{background:linear-gradient(135deg,rgba(40,167,69,0.1),rgba(40,167,69,0.05));border:2px solid var(--green);border-radius:var(--radius);padding:28px;text-align:center;margin:32px auto;max-width:var(--max-w);display:none}
+.final-success.visible{display:block}
+.final-success h3{font-size:1.3rem;color:var(--green);margin-bottom:8px}
+.final-success p{font-size:0.9rem;color:var(--text-muted)}
+
+/* === FOOTER === */
+.pg-footer{border-top:1px solid var(--gold-dim);padding:24px 0;text-align:center;margin-top:48px}
+.pg-footer a{color:var(--text-muted);font-size:0.8rem}
+
+/* === RESPONSIVE === */
+@media(max-width:600px){
+  .pg-header h1{font-size:1.4rem;letter-spacing:1px}
+  .phase-header{padding:12px 16px}
+  .phase-body{padding:0 16px 16px}
+  .step-row{flex-direction:column;gap:6px}
+  .step-icon{width:auto}
+  .tl-track{padding-left:32px}
+}
+</style>
+</head>
+<body>
+
+<div class="pg-header">
+  <a href="wizard.html" class="pg-back">&larr; Back to Build Wizard</a>
+  <h1>PARENT'S WIRING GUIDE</h1>
+  <div class="pg-subtitle">Migrating from Dupont spaghetti to the terminal block shield</div>
+  <div class="pg-audience">Ages 8+ with parent supervision</div>
+</div>
+
+<!-- ==================== OVERVIEW ==================== -->
+<div class="pg-hero">
+  <h2>What Are We Doing?</h2>
+  <p>Your kid built a M.A.S.S. Trap with jumper wires and it works great. But those little Dupont connectors wiggle loose every time someone bumps the track. Today we're upgrading to <strong>screw terminals</strong> &mdash; the same connections, but permanent and vibration-proof.</p>
+  <p style="color:var(--text);margin-top:8px"><strong>Think of it like this:</strong> We're moving from alligator clips to bolted connections. Same circuit. Same wires. Just tighter.</p>
+  <ul>
+    <li class="time"><strong>Time:</strong> 30&ndash;45 minutes for the first device (20 min for each additional)</li>
+    <li class="skill"><strong>Skill level:</strong> Can use a screwdriver? You're good.</li>
+    <li class="tools"><strong>Tools needed:</strong> Small flathead screwdriver, wire strippers (or scissors + careful hands)</li>
+    <li class="age"><strong>Ages:</strong> 8+ can do the actual wiring. Younger kids can hand you wires and check colors.</li>
+  </ul>
+</div>
+
+<!-- ==================== SAFETY ==================== -->
+<div class="safety-box">
+  <h3>&#9888; Safety First &mdash; Read This Together</h3>
+  <ul>
+    <li><strong>Unplug EVERYTHING before touching wires.</strong> USB cable out. Power supply disconnected. No exceptions.</li>
+    <li><strong>One wire at a time.</strong> Remove one Dupont wire, connect it to the terminal, move to the next. Never disconnect everything at once.</li>
+    <li><strong>Red = Power, Black = Ground.</strong> Say it out loud together. If your kid connects red where black goes, components can fry instantly.</li>
+    <li><strong>No metal tools near powered boards.</strong> A screwdriver touching the wrong two pins at the same time = short circuit.</li>
+    <li><strong>If something smells hot or looks smoky, UNPLUG IMMEDIATELY.</strong> Don't panic. Just pull the power. We can fix it.</li>
+  </ul>
+  <div class="magic-smoke">
+    <strong>&#128168; The Magic Smoke Rule:</strong> All electronics run on magic smoke. Once you let the smoke out, it stops working. Keeping wires in the right place keeps the smoke in. This is a real thing &mdash; not just a joke. Reversed power = released smoke = dead board.
+  </div>
+</div>
+
+<!-- ==================== TIMELINE ==================== -->
+<div class="timeline">
+  <h2>The Game Plan</h2>
+  <p style="text-align:center;color:var(--text-muted);font-size:0.85rem;margin-bottom:20px">Here's the full migration, phase by phase. Each device takes one sitting.</p>
+
+  <div class="tl-track">
+    <div class="tl-phase active-phase" data-phase="1">
+      <div class="tl-dot">1</div>
+      <div class="tl-time">Phase 1 &mdash; 5 minutes</div>
+      <div class="tl-title">Prep &amp; Photo</div>
+      <div class="tl-desc">Photograph the current wiring. Label each wire with tape. Gather tools. This is your safety net &mdash; if anything goes wrong, the photo is your map back.</div>
+    </div>
+
+    <div class="tl-phase" data-phase="2">
+      <div class="tl-dot">2</div>
+      <div class="tl-time">Phase 2 &mdash; 5 minutes</div>
+      <div class="tl-title">Seat the Shield</div>
+      <div class="tl-desc">Unplug the ESP32 from power. Push it into the Meshnology terminal block shield. All 38 pins must seat evenly &mdash; no bent pins, no gaps.</div>
+    </div>
+
+    <div class="tl-phase" data-phase="3">
+      <div class="tl-dot">3</div>
+      <div class="tl-time">Phase 3 &mdash; 15 minutes</div>
+      <div class="tl-title">Migrate Wires</div>
+      <div class="tl-desc">One wire at a time: pull the Dupont connector, strip the wire tip (if needed), insert into the matching screw terminal, tighten. The terminal numbers match the GPIO numbers.</div>
+    </div>
+
+    <div class="tl-phase" data-phase="4">
+      <div class="tl-dot">4</div>
+      <div class="tl-time">Phase 4 &mdash; 5 minutes</div>
+      <div class="tl-title">Verify &amp; Power On</div>
+      <div class="tl-desc">Double-check every connection against the photo. Then power up and run diagnostics from the Build Wizard to confirm everything works.</div>
+    </div>
+
+    <div class="tl-phase" data-phase="5">
+      <div class="tl-dot">5</div>
+      <div class="tl-time">Phase 5 &mdash; 5 minutes</div>
+      <div class="tl-title">The Shake Test</div>
+      <div class="tl-desc">Pick up the whole assembly and shake it. Gently at first, then with intent. Nothing should come loose. That's the whole point of screw terminals. If a wire falls out, it wasn't tight enough &mdash; redo it.</div>
+    </div>
+  </div>
+
+  <div class="night-owl">
+    <div class="owl-emoji">&#129417;</div>
+    <div class="owl-label">Night Owl Estimated Finish</div>
+    <div class="owl-time">~11:30 PM</div>
+    <p style="font-size:0.7rem;color:var(--text-dim);margin-top:4px">Based on a 10:45 PM start with 3 devices. Adjust if starting earlier. Coffee optional but recommended.</p>
+  </div>
+</div>
+
+<!-- ==================== PROGRESS ==================== -->
+<div class="pg-progress">
+  <div class="pg-progress-label">MIGRATION PROGRESS</div>
+  <div class="pg-progress-bar">
+    <div class="pg-progress-fill" id="pgProgressFill"></div>
+  </div>
+  <div class="pg-progress-text" id="pgProgressText">0 of 5 phases complete</div>
+</div>
+
+<!-- ==================== PHASE DETAILS ==================== -->
+<div class="phase-section">
+
+  <!-- PHASE 1: PREP -->
+  <div class="phase-card open" id="phase1">
+    <div class="phase-header" onclick="togglePhase(1)">
+      <div class="phase-num">1</div>
+      <div class="phase-info">
+        <div class="phase-title">Prep &amp; Photo Documentation</div>
+        <div class="phase-est">~5 minutes &bull; No tools needed</div>
+      </div>
+      <div class="phase-toggle">&#9660;</div>
+    </div>
+    <div class="phase-body">
+
+      <div class="step-row">
+        <div class="step-icon">&#128247;</div>
+        <div class="step-content">
+          <h4>Take a Photo of the Current Wiring</h4>
+          <p>Grab your phone. Take a clear, well-lit photo of every wire connection on the current board. Get a shot from directly above so you can see which color wire goes to which pin. This photo is your lifeline &mdash; if you get confused during migration, look at the photo.</p>
+          <div class="kid-say">&#127918; "Hey kid &mdash; you're the photographer. Get a good shot of every wire."</div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">&#128221;</div>
+        <div class="step-content">
+          <h4>Label Your Wires (Optional but Smart)</h4>
+          <p>If your wires aren't color-coded, wrap a small piece of masking tape around each one and write what it connects to: "IR SIG", "GND", "3V3", "BCLK", etc. Takes 2 minutes now, saves 10 minutes of confusion later.</p>
+          <div class="parent-note">&#128101; Parent tip: Even if wires ARE color-coded, labels help your kid learn what each wire does. Make it a quiz.</div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">&#128295;</div>
+        <div class="step-content">
+          <h4>Gather Your Tools</h4>
+          <p>You need exactly two things:</p>
+          <ul style="margin:8px 0;padding-left:20px;font-size:0.85rem;color:var(--text-muted)">
+            <li><strong>Small flathead screwdriver</strong> &mdash; precision/jeweler's size. The screw terminals are tiny.</li>
+            <li><strong>Wire strippers or scissors</strong> &mdash; to strip 5mm of insulation from wire tips (if using pre-made jumpers, they may already be stripped)</li>
+          </ul>
+          <div class="tip-box tip-info">
+            <span class="tip-label label-why">Why strip?</span><br>
+            Dupont jumpers have <em>connectors</em> on the ends (those little plastic housings). Screw terminals need <em>bare wire</em>. You have two choices: (1) cut off the Dupont connector and strip 5mm of insulation, or (2) use new solid-core wire and keep the Dupont jumpers intact for future prototyping.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">&#128268;</div>
+        <div class="step-content">
+          <h4>Unplug Everything</h4>
+          <p><strong>Pull the USB cable. Disconnect the power supply. Unplug everything.</strong> The board should have zero power before you touch any wires. Confirm the LED on the ESP32 is off. No lights = no power = safe to work.</p>
+          <div class="tip-box tip-danger">
+            <span class="tip-label label-safety">Zero Power Rule</span><br>
+            <strong>Never rearrange wires with power connected.</strong> Even 3.3V can fry a sensor if you accidentally short two pins. Always unplug first, wire second, power last.
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:16px">
+        <button onclick="completePhase(1)" class="phase-done-btn" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 28px;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:var(--font)">&#10003; Phase 1 Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 2: SEAT SHIELD -->
+  <div class="phase-card" id="phase2">
+    <div class="phase-header" onclick="togglePhase(2)">
+      <div class="phase-num">2</div>
+      <div class="phase-info">
+        <div class="phase-title">Seat the ESP32 in the Shield</div>
+        <div class="phase-est">~5 minutes &bull; Steady hands</div>
+      </div>
+      <div class="phase-toggle">&#9660;</div>
+    </div>
+    <div class="phase-body">
+
+      <div class="step-row">
+        <div class="step-icon">&#128268;</div>
+        <div class="step-content">
+          <h4>Remove All Dupont Wires from the ESP32</h4>
+          <p>Gently pull each Dupont connector straight off the pin headers. Don't yank sideways &mdash; you can bend pins. Set the wires aside in order (your photo is the reference if they get mixed up).</p>
+          <div class="kid-say">&#127918; "Pull them straight off &mdash; like unplugging headphones, not pulling out a splinter."</div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">&#128187;</div>
+        <div class="step-content">
+          <h4>Inspect the Shield</h4>
+          <p>Look at the Meshnology terminal block shield. It has two long rows of pin sockets in the center (where the ESP32 plugs in) and screw terminals around the edges. Each screw terminal is labeled with a GPIO number.</p>
+          <div class="tip-box tip-info">
+            <span class="tip-label label-why">How it works</span><br>
+            The shield is a breakout board. Your ESP32 plugs into the center. Every GPIO pin on the ESP32 routes to a labeled screw terminal on the edge. <em>Terminal 4 = GPIO 4. Terminal 15 = GPIO 15.</em> No translation needed.
+          </div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">&#128073;</div>
+        <div class="step-content">
+          <h4>Align and Press the ESP32 Into the Shield</h4>
+          <p>Line up the ESP32's pin headers with the shield's pin sockets. <strong>The USB-C port should face outward</strong> (accessible for programming and power). Press firmly and evenly &mdash; both sides at the same time. You'll feel the pins seat.</p>
+          <div class="tip-box tip-warn">
+            <span class="tip-label label-safety">Check for bent pins</span><br>
+            <strong>Look at both sides before pressing.</strong> If any pin on the ESP32 is bent outward, carefully straighten it with needle-nose pliers first. A bent pin won't seat &mdash; and forcing it will break the pin.
+          </div>
+          <div class="parent-note">&#128101; Parent tip: This step requires real force. If your kid can't seat it evenly, press it yourself. It's better to do it right than to bend 3 pins.</div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">&#128270;</div>
+        <div class="step-content">
+          <h4>Verify the Seating</h4>
+          <p>Look at the gap between the ESP32 board and the shield on both sides. It should be even &mdash; same height left and right. If one side is higher, the pins aren't fully seated on that side. Press down on the high side.</p>
+          <div class="tip-box tip-good">
+            <span class="tip-label label-kid">Success check</span><br>
+            When properly seated: (1) No pin tips visible between the boards, (2) The gap is even on both sides, (3) The ESP32 doesn't wobble when you gently push it side to side.
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:16px">
+        <button onclick="completePhase(2)" class="phase-done-btn" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 28px;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:var(--font)">&#10003; Phase 2 Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 3: MIGRATE WIRES -->
+  <div class="phase-card" id="phase3">
+    <div class="phase-header" onclick="togglePhase(3)">
+      <div class="phase-num">3</div>
+      <div class="phase-info">
+        <div class="phase-title">Migrate the Wires</div>
+        <div class="phase-est">~15 minutes &bull; Screwdriver required</div>
+      </div>
+      <div class="phase-toggle">&#9660;</div>
+    </div>
+    <div class="phase-body">
+
+      <div class="tip-box tip-info" style="margin-bottom:16px">
+        <span class="tip-label label-parent">The One-Wire Rule</span><br>
+        <strong>Do one wire at a time.</strong> Pick up the old Dupont wire, look at what it connects to (from your photo/labels), find the matching screw terminal, strip the tip if needed, insert, tighten. Don't move to the next wire until this one is solid.
+      </div>
+
+      <!-- FINISH GATE WIRE MAP -->
+      <h4 style="color:var(--gold);font-size:0.85rem;letter-spacing:1px;margin-bottom:12px;text-transform:uppercase">Finish Gate Connections</h4>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Wire</th><th>From (Old Dupont)</th><th>To (Screw Terminal)</th><th>Component</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+            <td>3.3V header pin</td>
+            <td><strong>3V3 terminal</strong></td>
+            <td>IR Sensor VCC</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+            <td>GND header pin</td>
+            <td><strong>GND terminal</strong></td>
+            <td>IR Sensor GND</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-green)"></span>Green</td>
+            <td>GPIO 4 header pin</td>
+            <td><strong>Terminal 4</strong></td>
+            <td>IR Sensor Signal</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="tip-box tip-info" style="margin-top:12px">
+        <span class="tip-label label-kid">Terminal numbers = GPIO numbers</span><br>
+        The best thing about this shield: <strong>Terminal 4 = GPIO 4.</strong> No math. No translation table. Just find the number and screw in the wire.
+      </div>
+
+      <!-- Audio connections (if applicable) -->
+      <h4 style="color:var(--gold);font-size:0.85rem;letter-spacing:1px;margin:20px 0 12px;text-transform:uppercase">Audio Connections (if your build has a speaker)</h4>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Wire</th><th>From (Old Dupont)</th><th>To (Screw Terminal)</th><th>Component</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+            <td>3.3V header pin</td>
+            <td><strong>3V3 terminal</strong></td>
+            <td>MAX98357A VIN</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+            <td>GND header pin</td>
+            <td><strong>GND terminal</strong></td>
+            <td>MAX98357A GND</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-orange)"></span>Orange</td>
+            <td>GPIO 15 header pin</td>
+            <td><strong>Terminal 15</strong></td>
+            <td>I2S BCLK</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-yellow)"></span>Yellow</td>
+            <td>GPIO 16 header pin</td>
+            <td><strong>Terminal 16</strong></td>
+            <td>I2S LRC</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-blue)"></span>Blue</td>
+            <td>GPIO 17 header pin</td>
+            <td><strong>Terminal 17</strong></td>
+            <td>I2S DIN</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Start Gate connections -->
+      <h4 style="color:var(--gold);font-size:0.85rem;letter-spacing:1px;margin:20px 0 12px;text-transform:uppercase">Start Gate Connections</h4>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Wire</th><th>To (Screw Terminal)</th><th>Component</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+            <td><strong>3V3 terminal</strong></td>
+            <td>IR Sensor VCC</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+            <td><strong>GND terminal</strong></td>
+            <td>IR Sensor GND</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-green)"></span>Green</td>
+            <td><strong>Terminal 4</strong></td>
+            <td>IR Sensor Signal</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--cyan)"></span>Teal</td>
+            <td><strong>Terminal 38</strong></td>
+            <td>LiDAR TX (if equipped)</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--cyan)"></span>Teal</td>
+            <td><strong>Terminal 39</strong></td>
+            <td>LiDAR RX (if equipped)</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- HOW TO DO IT -->
+      <h4 style="color:var(--gold);font-size:0.85rem;letter-spacing:1px;margin:20px 0 12px;text-transform:uppercase">How to Connect a Screw Terminal</h4>
+
+      <div class="step-row">
+        <div class="step-icon">1&#65039;&#8419;</div>
+        <div class="step-content">
+          <h4>Strip the Wire</h4>
+          <p>If using existing Dupont jumper wires: cut off the plastic Dupont connector, then strip about 5mm (&#188; inch) of insulation from the end. The bare copper should be visible. If using new solid-core wire, strip the same length.</p>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">2&#65039;&#8419;</div>
+        <div class="step-content">
+          <h4>Open the Terminal</h4>
+          <p>Use your small flathead screwdriver to turn the terminal screw <strong>counterclockwise</strong> until the slot is open wide enough for the wire. Don't unscrew it all the way &mdash; just loosen it.</p>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">3&#65039;&#8419;</div>
+        <div class="step-content">
+          <h4>Insert the Wire</h4>
+          <p>Push the stripped end into the terminal slot. <strong>Only bare copper should go in</strong> &mdash; no insulation inside the terminal. If you see colored plastic in the slot, pull out and strip more.</p>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">4&#65039;&#8419;</div>
+        <div class="step-content">
+          <h4>Tighten the Screw</h4>
+          <p>Turn the screw <strong>clockwise</strong> until the wire is firmly clamped. Give the wire a gentle tug &mdash; it should NOT pull out. If it does, tighten more.</p>
+          <div class="kid-say">&#127918; "If you can pull it out, the bad guys can shake it out. Tighten it like you mean it."</div>
+        </div>
+      </div>
+
+      <div class="tip-box tip-warn" style="margin-top:12px">
+        <span class="tip-label label-safety">Common Mistake</span><br>
+        <strong>Don't overtighten.</strong> Screw terminals are small and the screws are tiny. If you feel strong resistance, stop &mdash; the wire is secure. Overtightening can strip the screw threads or break the terminal. Firm but not gorilla-grip.
+      </div>
+
+      <div style="text-align:center;margin-top:16px">
+        <button onclick="completePhase(3)" class="phase-done-btn" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 28px;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:var(--font)">&#10003; Phase 3 Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 4: VERIFY -->
+  <div class="phase-card" id="phase4">
+    <div class="phase-header" onclick="togglePhase(4)">
+      <div class="phase-num">4</div>
+      <div class="phase-info">
+        <div class="phase-title">Verify &amp; Power On</div>
+        <div class="phase-est">~5 minutes &bull; Moment of truth</div>
+      </div>
+      <div class="phase-toggle">&#9660;</div>
+    </div>
+    <div class="phase-body">
+
+      <div class="step-row">
+        <div class="step-icon">&#128247;</div>
+        <div class="step-content">
+          <h4>Compare to Your Photo</h4>
+          <p>Pull up the photo you took in Phase 1. Go wire by wire: <strong>red to 3V3? Check. Black to GND? Check. Green to Terminal 4? Check.</strong> Every wire must match. If something's different, fix it now &mdash; this is your last check before power.</p>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">&#128270;</div>
+        <div class="step-content">
+          <h4>Visual Inspection</h4>
+          <p>Look for: bare wire touching another terminal (short circuit risk), loose wires that didn't get tightened, insulation stuffed into a terminal (no contact). Fix anything suspicious.</p>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">&#9889;</div>
+        <div class="step-content">
+          <h4>Power Up</h4>
+          <p>Plug in the USB-C cable (or barrel jack power supply). Watch the ESP32 &mdash; the onboard LED should light up and start blinking. <strong>If you smell something burning or see smoke, UNPLUG IMMEDIATELY.</strong> No smoke? Great. Wait 10 seconds for it to boot.</p>
+          <div class="tip-box tip-good">
+            <span class="tip-label label-kid">Good signs</span><br>
+            &#10003; LED blinks or turns solid<br>
+            &#10003; WiFi network appears on your phone (if in AP mode)<br>
+            &#10003; No unusual heat from any component<br>
+            &#10003; Dashboard loads at the device's IP address
+          </div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">&#128269;</div>
+        <div class="step-content">
+          <h4>Run Diagnostics</h4>
+          <p>Open the <a href="wizard.html">Build Wizard</a>, select <strong>Finish Gate</strong>, scroll down to <strong>Verify Connection</strong>, enter the device IP, and hit <strong>RUN DIAGNOSTICS</strong>. You should see all green badges.</p>
+          <div class="parent-note">&#128101; Parent tip: If diagnostics show the IR sensor as "LOW" when nothing is blocking it, the signal wire might be in the wrong terminal. Check Terminal 4.</div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:16px">
+        <button onclick="completePhase(4)" class="phase-done-btn" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 28px;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:var(--font)">&#10003; Phase 4 Complete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PHASE 5: SHAKE TEST -->
+  <div class="phase-card" id="phase5">
+    <div class="phase-header" onclick="togglePhase(5)">
+      <div class="phase-num">5</div>
+      <div class="phase-info">
+        <div class="phase-title">The Shake Test</div>
+        <div class="phase-est">~5 minutes &bull; The fun part</div>
+      </div>
+      <div class="phase-toggle">&#9660;</div>
+    </div>
+    <div class="phase-body">
+
+      <div class="step-row">
+        <div class="step-icon">&#129306;</div>
+        <div class="step-content">
+          <h4>The Gentle Shake</h4>
+          <p>With the device powered on and working, pick up the whole shield assembly (carefully, holding the shield edges &mdash; not the wires). Give it a gentle shake. Look at the dashboard &mdash; still connected? Still showing data? Good.</p>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">&#128170;</div>
+        <div class="step-content">
+          <h4>The Real Shake</h4>
+          <p>Now shake it like a 10-year-old accidentally kicked the table the track is sitting on. Because that <em>will</em> happen. Multiple times. During the most important race of the day. If the dashboard drops connection or a wire comes loose, tighten that terminal and try again.</p>
+          <div class="kid-say">&#127918; "Shake it like you're trying to wake up a sleeping cat. If nothing falls off, you win."</div>
+        </div>
+      </div>
+
+      <div class="step-row">
+        <div class="step-icon">&#127937;</div>
+        <div class="step-content">
+          <h4>Run a Test Race</h4>
+          <p>The ultimate test: arm the track, roll a car through the beam, and confirm the race timer works. If you get a time reading, <strong>congratulations &mdash; migration complete!</strong></p>
+          <div class="tip-box tip-good">
+            <span class="tip-label label-kid">Victory Lap</span><br>
+            <strong>You just upgraded your M.A.S.S. Trap from prototype to production-grade.</strong> The screw terminals won't wiggle loose. The barrel jack means no USB cable dangling. This thing is built to survive science fairs, staircase races, and siblings.
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:16px">
+        <button onclick="completePhase(5)" class="phase-done-btn" style="background:var(--green);color:#fff;border:none;border-radius:8px;padding:10px 28px;font-weight:700;font-size:0.85rem;cursor:pointer;font-family:var(--font)">&#10003; Phase 5 Complete &mdash; Device Done!</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== TROUBLESHOOTING ==================== -->
+<div class="container" style="margin-bottom:32px">
+  <div style="background:var(--navy-card);border:1px solid var(--gold-dim);border-radius:var(--radius);padding:20px 24px">
+    <h3 style="color:var(--gold);font-size:0.85rem;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px">&#128295; Troubleshooting</h3>
+
+    <div class="step-row" style="border-bottom:1px solid rgba(255,255,255,0.04)">
+      <div class="step-icon">&#128308;</div>
+      <div class="step-content">
+        <h4>"The ESP32 doesn't turn on after seating in the shield"</h4>
+        <p>Check that all 38 pins are fully seated. Remove the ESP32 from the shield, inspect for bent pins, re-seat. Also verify your power source &mdash; USB cable plugged in? Barrel jack connected?</p>
+      </div>
+    </div>
+
+    <div class="step-row" style="border-bottom:1px solid rgba(255,255,255,0.04)">
+      <div class="step-icon">&#128308;</div>
+      <div class="step-content">
+        <h4>"IR sensor shows LOW when nothing is blocking the beam"</h4>
+        <p>The signal wire is probably in the wrong terminal. Verify it's in <strong>Terminal 4</strong> (not terminal 3 or 5). Also check that the IR emitter and receiver are actually facing each other and powered (red wire to 3V3, black to GND).</p>
+      </div>
+    </div>
+
+    <div class="step-row" style="border-bottom:1px solid rgba(255,255,255,0.04)">
+      <div class="step-icon">&#128308;</div>
+      <div class="step-content">
+        <h4>"The device boots but WiFi doesn't connect"</h4>
+        <p>The shield doesn't affect WiFi. This is the same behavior the device had before migration. If WiFi was working before and isn't now, check that the ESP32 is fully seated (poor contact on antenna pins can weaken the signal). Also check that no wire is touching the ESP32's WiFi antenna area (the part that overhangs the PCB edge).</p>
+      </div>
+    </div>
+
+    <div class="step-row" style="border-bottom:1px solid rgba(255,255,255,0.04)">
+      <div class="step-icon">&#128308;</div>
+      <div class="step-content">
+        <h4>"A wire keeps falling out of the screw terminal"</h4>
+        <p>Either not enough bare copper is exposed (strip more insulation) or the wire gauge is too thin. Try folding the stripped tip in half to make it thicker, then re-insert and tighten. Solid-core wire holds better than stranded in screw terminals.</p>
+      </div>
+    </div>
+
+    <div class="step-row">
+      <div class="step-icon">&#128308;</div>
+      <div class="step-content">
+        <h4>"I smelled something burning!"</h4>
+        <p><strong>Unplug immediately.</strong> Don't panic. Common causes: (1) power and ground swapped (red/black in wrong terminals), (2) bare wire touching an adjacent terminal (short circuit), (3) wrong voltage (5V where 3.3V expected). Check every connection against the table. Fix the mistake. Components may or may not have survived &mdash; power up again after fixing and check diagnostics.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SUCCESS BANNER ==================== -->
+<div class="final-success" id="finalSuccess">
+  <h3>&#127942; ALL DEVICES MIGRATED!</h3>
+  <p>Every wire is locked down. Every terminal is tightened. The M.A.S.S. Trap fleet is production-grade.</p>
+  <p style="margin-top:12px;font-size:0.8rem;color:var(--text-dim)">The Dupont wires are now spare parts. Keep them &mdash; they're perfect for prototyping the next module.</p>
+</div>
+
+<!-- ==================== FOOTER ==================== -->
+<div class="pg-footer">
+  <div class="container">
+    <a href="wizard.html">Build Wizard</a> &bull;
+    <a href="index.html">M.A.S.S. Trap</a> &bull;
+    <a href="https://github.com/Ryan4n6/MASS-Trap" target="_blank">GitHub</a> &bull;
+    <a href="store.html">Parts Store</a>
+  </div>
+</div>
+
+<script>
+/* =============================================================
+   M.A.S.S. Trap Parent's Wiring Guide — Interactive Progress
+   ES5 compatible (var only)
+   ============================================================= */
+(function() {
+  'use strict';
+
+  var TOTAL_PHASES = 5;
+  var STORAGE_KEY = 'mass_parents_guide';
+  var completed = {};
+
+  function save() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(completed)); } catch(e) {}
+  }
+
+  function updateProgress() {
+    var count = Object.keys(completed).length;
+    var pct = Math.round((count / TOTAL_PHASES) * 100);
+    var fill = document.getElementById('pgProgressFill');
+    var text = document.getElementById('pgProgressText');
+    if (fill) fill.style.width = pct + '%';
+    if (text) text.textContent = count + ' of ' + TOTAL_PHASES + ' phases complete';
+
+    // Update timeline dots
+    for (var i = 1; i <= TOTAL_PHASES; i++) {
+      var tlPhase = document.querySelector('.tl-phase[data-phase="' + i + '"]');
+      if (tlPhase) {
+        tlPhase.classList.remove('completed-phase', 'active-phase');
+        if (completed[i]) {
+          tlPhase.classList.add('completed-phase');
+        } else if (i === count + 1) {
+          tlPhase.classList.add('active-phase');
+        }
+      }
+    }
+
+    // Final success
+    var success = document.getElementById('finalSuccess');
+    if (success) {
+      if (count >= TOTAL_PHASES) {
+        success.classList.add('visible');
+        success.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        success.classList.remove('visible');
+      }
+    }
+  }
+
+  window.togglePhase = function(n) {
+    var card = document.getElementById('phase' + n);
+    if (!card) return;
+    var wasOpen = card.classList.contains('open');
+    // Close all
+    for (var i = 1; i <= TOTAL_PHASES; i++) {
+      var c = document.getElementById('phase' + i);
+      if (c) c.classList.remove('open');
+    }
+    // Toggle
+    if (!wasOpen) card.classList.add('open');
+  };
+
+  window.completePhase = function(n) {
+    var card = document.getElementById('phase' + n);
+    if (!card) return;
+
+    if (completed[n]) {
+      // Un-complete
+      delete completed[n];
+      card.classList.remove('done');
+      var num = card.querySelector('.phase-num');
+      if (num) num.textContent = n;
+    } else {
+      // Complete
+      completed[n] = true;
+      card.classList.add('done');
+      card.classList.remove('open');
+      var num2 = card.querySelector('.phase-num');
+      if (num2) num2.textContent = '\u2713';
+
+      // Open next phase
+      var next = document.getElementById('phase' + (n + 1));
+      if (next && !completed[n + 1]) {
+        next.classList.add('open');
+        setTimeout(function() {
+          next.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
+    }
+    save();
+    updateProgress();
+  };
+
+  // Restore
+  function init() {
+    try {
+      var saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        completed = JSON.parse(saved);
+        for (var n in completed) {
+          if (completed.hasOwnProperty(n)) {
+            var card = document.getElementById('phase' + n);
+            if (card) {
+              card.classList.add('done');
+              card.classList.remove('open');
+              var num = card.querySelector('.phase-num');
+              if (num) num.textContent = '\u2713';
+            }
+          }
+        }
+        // Open first incomplete phase
+        var firstOpen = false;
+        for (var i = 1; i <= TOTAL_PHASES; i++) {
+          var c = document.getElementById('phase' + i);
+          if (c) c.classList.remove('open');
+          if (!completed[i] && !firstOpen) {
+            if (c) c.classList.add('open');
+            firstOpen = true;
+          }
+        }
+        updateProgress();
+      }
+    } catch(e) {}
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+})();
+</script>
+
+</body>
+</html>

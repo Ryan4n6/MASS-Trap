@@ -152,6 +152,39 @@ a:hover{color:#e8c84a;text-decoration:underline}
 .diag-badge.fail{background:rgba(220,53,69,0.1);color:var(--red);border:1px solid rgba(220,53,69,0.2)}
 .wg-success p{font-size:0.85rem;color:var(--text-muted)}
 
+/* --- BATTERY CALCULATOR --- */
+.batt-calc{background:var(--navy-card);border:1px solid var(--gold-dim);border-radius:var(--radius);padding:20px;margin-top:24px}
+.batt-calc h3{font-size:0.85rem;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
+.batt-form{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.batt-field{display:flex;flex-direction:column;gap:4px}
+.batt-field label{font-size:0.65rem;font-weight:700;color:var(--text-muted);letter-spacing:0.5px;text-transform:uppercase}
+.batt-field input,.batt-field select{background:var(--navy);color:var(--gold);border:1px solid var(--gold-dim);border-radius:6px;padding:8px 10px;font-family:var(--mono);font-size:0.85rem;width:100%}
+.batt-field input:focus,.batt-field select:focus{outline:none;border-color:var(--gold)}
+.batt-field .batt-unit{font-size:0.6rem;color:var(--text-dim);margin-top:2px}
+.batt-results{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:10px;margin-top:16px}
+.batt-card{background:var(--navy);border:1px solid var(--gold-dim);border-radius:8px;padding:12px;text-align:center}
+.batt-card-label{font-size:0.55rem;font-weight:700;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.batt-card-value{font-size:1.5rem;font-weight:900;font-family:var(--mono);line-height:1.2}
+.batt-card-sub{font-size:0.65rem;color:var(--text-muted);margin-top:2px}
+.batt-card.good .batt-card-value{color:var(--green)}
+.batt-card.warn .batt-card-value{color:var(--wire-yellow)}
+.batt-card.bad .batt-card-value{color:var(--red)}
+.batt-bar{height:10px;background:var(--navy);border:1px solid var(--gold-dim);border-radius:5px;overflow:hidden;margin:4px 0}
+.batt-bar-fill{height:100%;border-radius:5px;transition:width 0.4s ease,background 0.4s ease}
+.batt-weight-grid{margin-top:12px;font-size:0.8rem}
+.batt-weight-grid .bw-label{color:var(--text-muted)}.batt-weight-grid .bw-value{color:var(--text);font-family:var(--mono);text-align:right;font-weight:600}
+.batt-weight-row{display:flex;justify-content:space-between;padding:4px 0;font-size:0.8rem;color:var(--text-muted)}
+.batt-weight-row span:last-child{font-family:var(--mono);font-weight:600;color:var(--text)}
+.batt-verdict{margin-top:16px;padding:12px 16px;border-radius:8px;font-size:0.85rem;font-weight:700;text-align:center;background:var(--navy);border:1px solid var(--border);color:var(--text-muted)}
+.batt-verdict.good{background:rgba(40,167,69,0.12);border-color:var(--green);color:var(--green)}
+.batt-verdict.warn{background:rgba(245,166,35,0.12);border-color:#f5a623;color:#f5a623}
+.batt-verdict.bad{background:rgba(231,76,60,0.12);border-color:#e74c3c;color:#e74c3c}
+.batt-presets{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.batt-preset{background:var(--navy-light);border:1px solid var(--gold-dim);border-radius:6px;padding:4px 10px;font-size:0.7rem;color:var(--text-muted);cursor:pointer;font-family:var(--font);transition:all 0.2s}
+.batt-preset:hover{border-color:var(--gold);color:var(--gold)}
+.batt-preset.selected{background:var(--gold);color:var(--navy);border-color:var(--gold);font-weight:700}
+@media(max-width:600px){.batt-form{grid-template-columns:1fr}.batt-results{grid-template-columns:1fr 1fr}}
+
 /* === FOOTER === */
 .wiz-footer{border-top:1px solid var(--gold-dim);padding:24px 0;text-align:center;margin-top:48px}
 .wiz-footer a{color:var(--text-muted);font-size:0.8rem}
@@ -172,6 +205,7 @@ a:hover{color:#e8c84a;text-decoration:underline}
   <a href="index.html" class="wiz-back">&larr; Back to M.A.S.S. Trap</a>
   <h1>BUILD WIZARD</h1>
   <p>Pick a module. Follow the wires. Flash the firmware. Done.</p>
+  <p style="margin-top:8px"><a href="parents-guide.html" style="font-size:0.8rem;color:var(--text-muted)">&#128101; Migrating to terminal block shields? See the <strong style="color:var(--gold)">Parent's Wiring Guide</strong></a></p>
 </div>
 
 <!-- ==================== MODULE SELECTOR ==================== -->
@@ -450,6 +484,119 @@ a:hover{color:#e8c84a;text-decoration:underline}
           <tr><td>D10</td><td>GPIO 9</td><td>Digital I/O</td><td style="color:var(--text-dim)">&mdash;</td></tr>
         </tbody>
       </table>
+    </div>
+
+    <!-- ==================== BATTERY POWER PLANNER ==================== -->
+    <div class="batt-calc" id="batteryCalc">
+      <h3>&#128267; Battery Power Planner</h3>
+      <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:16px">Select your MCU, pick a battery (or enter custom specs), and see your runtime, weight budget, and discharge safety at a glance.</p>
+
+      <!-- MCU selector -->
+      <div style="margin-bottom:14px">
+        <div style="font-size:0.65rem;font-weight:700;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">MCU Board</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.8rem">
+            <input type="radio" name="battMcuRadio" value="xiao-s3" checked onchange="document.getElementById('battMcu').value='xiao-s3';calcBattery()">
+            <span><strong>XIAO ESP32-S3</strong> + BNO055</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 14px;background:var(--card-bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;font-size:0.8rem">
+            <input type="radio" name="battMcuRadio" value="xiao-mg24" onchange="document.getElementById('battMcu').value='xiao-mg24';calcBattery()">
+            <span><strong>XIAO MG24 Sense</strong> <em style="color:var(--gold);font-size:0.7rem">(built-in IMU)</em></span>
+          </label>
+        </div>
+        <input type="hidden" id="battMcu" value="xiao-s3">
+      </div>
+
+      <div style="font-size:0.65rem;font-weight:700;color:var(--text-dim);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">Battery Quick Pick</div>
+      <div class="batt-presets" id="battPresets">
+        <button class="batt-preset selected" onclick="setBattPreset(120,'521521','2*15*23mm',3.5,0.12)">120mAh 521521</button>
+        <button class="batt-preset" onclick="setBattPreset(150,'501230','5*12*30mm',4.0,0.15)">150mAh 501230</button>
+        <button class="batt-preset" onclick="setBattPreset(200,'502030','5*20*30mm',5.5,0.20)">200mAh 502030</button>
+        <button class="batt-preset" onclick="setBattPreset(300,'602030','6*20*30mm',7.5,0.30)">300mAh 602030</button>
+        <button class="batt-preset" onclick="setBattPreset(0,'custom','—',0,0)">Custom</button>
+      </div>
+
+      <!-- Input form -->
+      <div class="batt-form">
+        <div class="batt-field">
+          <label>Battery Capacity</label>
+          <input type="number" id="battCap" value="120" min="50" max="5000" step="10" oninput="calcBattery()">
+          <div class="batt-unit">milliamp-hours (mAh)</div>
+        </div>
+        <div class="batt-field">
+          <label>Max Discharge</label>
+          <input type="number" id="battMaxDis" value="0.12" min="0.05" max="10" step="0.01" oninput="calcBattery()">
+          <div class="batt-unit">amps (A) &mdash; from battery datasheet</div>
+        </div>
+        <div class="batt-field">
+          <label>Battery Weight</label>
+          <input type="number" id="battWeight" value="3.5" min="0" max="100" step="0.1" oninput="calcBattery()">
+          <div class="batt-unit">grams</div>
+        </div>
+        <div class="batt-field">
+          <label>Car Weight (without battery)</label>
+          <input type="number" id="battCarWeight" value="35" min="0" max="200" step="0.1" oninput="calcBattery()">
+          <div class="batt-unit">grams &mdash; weigh your car naked</div>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div class="batt-results" id="battResults">
+        <div class="batt-card" id="battResSF">
+          <div class="batt-card-label">Science Fair Runtime</div>
+          <div class="batt-card-value">--</div>
+          <div class="batt-card-sub">calculating&hellip;</div>
+        </div>
+        <div class="batt-card" id="battResCont">
+          <div class="batt-card-label">Continuous Logging</div>
+          <div class="batt-card-value">--</div>
+          <div class="batt-card-sub">calculating&hellip;</div>
+        </div>
+        <div class="batt-card" id="battResSleep">
+          <div class="batt-card-label">Deep Sleep Standby</div>
+          <div class="batt-card-value">--</div>
+          <div class="batt-card-sub">calculating&hellip;</div>
+        </div>
+        <div class="batt-card" id="battResDis">
+          <div class="batt-card-label">Discharge Safety</div>
+          <div class="batt-card-value">--</div>
+          <div class="batt-card-sub">calculating&hellip;</div>
+        </div>
+      </div>
+
+      <!-- Weight budget breakdown -->
+      <div style="margin-top:20px">
+        <div style="font-size:0.65rem;font-weight:700;color:var(--gold);letter-spacing:1px;text-transform:uppercase;margin-bottom:8px">Weight Budget</div>
+        <div class="batt-weight-grid" id="battWeightGrid">
+          <!-- Populated by calcBattery() -->
+        </div>
+        <div id="battWeightBar" style="margin-top:8px">
+          <div class="batt-bar"><div class="batt-bar-fill" style="width:0%"></div></div>
+          <div class="batt-bar-label" style="text-align:center;font-size:0.6rem;color:var(--text-dim);margin-top:2px"></div>
+        </div>
+      </div>
+
+      <!-- Verdict -->
+      <div class="batt-verdict" id="battVerdict">
+        &#9889; Enter battery specs above to see your verdict
+      </div>
+
+      <!-- Power design tips -->
+      <div class="wg-tip" style="margin-top:16px">
+        <div class="wg-tip-label">Firmware Power Tips</div>
+        <strong>Use ESP-NOW (ESP32-S3) or BLE (MG24), not full WiFi.</strong> Short radio bursts (1-2ms) vs sustained 150mA+ WiFi draw. The firmware should:<br>
+        &#8226; <strong>ESP32-S3:</strong> Use ESP-NOW only &mdash; never call <em>WiFi.begin()</em><br>
+        &#8226; <strong>MG24 Sense:</strong> Use BLE 5.3 advertisements &mdash; 1.95&micro;A deep sleep<br>
+        &#8226; Log IMU data to local flash during the run (no radio needed)<br>
+        &#8226; Send one summary packet after the run ends<br>
+        &#8226; Use deep sleep with accelerometer wake-on-motion between runs<br>
+        &#8226; Disable WiFi/BLE scanning entirely &mdash; biggest current hog
+      </div>
+
+      <div class="wg-tip">
+        <div class="wg-tip-label">Discharge Rate Warning</div>
+        Small LiPo cells (under 200mAh) often have <strong>max discharge = 1C</strong> (capacity in amps). A 120mAh cell maxes at 120mA sustained. The XIAO ESP32-S3 can spike to ~150mA during radio TX bursts, but those are &lt;2ms &mdash; well within what any LiPo tolerates. The MG24 Sense peaks at ~42mA TX &mdash; much more battery-friendly. <strong>Avoid sustained WiFi scans</strong> regardless of MCU.
+      </div>
     </div>
 
   </div>
@@ -831,6 +978,7 @@ a:hover{color:#e8c84a;text-decoration:underline}
 <div class="wiz-footer">
   <div class="container">
     <a href="index.html">M.A.S.S. Trap</a> &bull;
+    <a href="parents-guide.html">Parent's Guide</a> &bull;
     <a href="https://github.com/Ryan4n6/MASS-Trap" target="_blank">GitHub</a> &bull;
     <a href="store.html">Parts Store</a>
   </div>
@@ -1185,6 +1333,170 @@ a:hover{color:#e8c84a;text-decoration:underline}
     return Math.floor(ms / 3600000) + 'h ' + Math.floor((ms % 3600000) / 60000) + 'm';
   }
 
+  /* ---- Battery Power Planner ---- */
+  var battPresets = {
+    '521521': { cap: 120, model: '521521', size: '2×15×23mm', weight: 3.5, maxDis: 0.12 },
+    '501230': { cap: 150, model: '501230', size: '5×12×30mm', weight: 4.0, maxDis: 0.15 },
+    '502030': { cap: 200, model: '502030', size: '5×20×30mm', weight: 5.5, maxDis: 0.20 },
+    '602030': { cap: 300, model: '602030', size: '6×20×30mm', weight: 7.5, maxDis: 0.30 }
+  };
+
+  window.setBattPreset = function(cap, model, size, weight, maxDis) {
+    document.getElementById('battCap').value = cap;
+    document.getElementById('battMaxDis').value = maxDis;
+    document.getElementById('battWeight').value = weight;
+    // Highlight active preset
+    var btns = document.querySelectorAll('.batt-preset');
+    for (var i = 0; i < btns.length; i++) btns[i].classList.remove('selected');
+    // Find matching button
+    var all = document.querySelectorAll('.batt-preset');
+    for (var j = 0; j < all.length; j++) {
+      if (all[j].textContent.indexOf(model) !== -1) all[j].classList.add('selected');
+    }
+    calcBattery();
+  };
+
+  window.calcBattery = function() {
+    var cap = parseFloat(document.getElementById('battCap').value) || 0;
+    var maxDis = parseFloat(document.getElementById('battMaxDis').value) || 0;
+    var battW = parseFloat(document.getElementById('battWeight').value) || 0;
+    var carW = parseFloat(document.getElementById('battCarWeight').value) || 0;
+
+    // Power draw constants (mA) — configurable per MCU
+    var mcuSel = document.getElementById('battMcu');
+    var mcuType = mcuSel ? mcuSel.value : 'xiao-s3';
+    var mcu = { active: 150, idle: 20, sleep: 0.5, weight: 2.5, name: 'XIAO ESP32-S3' };
+    if (mcuType === 'xiao-mg24') {
+      mcu = { active: 35, idle: 8, sleep: 0.002, weight: 2.5, name: 'XIAO MG24 Sense' };
+    }
+    var imuDraw = 12;  // BNO055 in NDOF mode (mA)
+    if (mcuType === 'xiao-mg24') imuDraw = 0.9; // LSM6DS3TR-C built-in (mA)
+    var imuWeight = (mcuType === 'xiao-mg24') ? 0 : 3.5; // external BNO055 board weight
+
+    // Calculate runtimes
+    var activeDraw = mcu.active + imuDraw;   // Full logging (mA)
+    var idleDraw = mcu.idle + imuDraw;       // Idle polling (mA)
+    var sleepDraw = mcu.sleep + 0.01;        // Deep sleep + wakeup circuit (mA)
+
+    // Science fair scenario: 30% active (logging), 70% idle (between runs)
+    var scienceFairDraw = (activeDraw * 0.3) + (idleDraw * 0.7);
+
+    var continuousH = cap > 0 ? (cap / activeDraw) : 0;
+    var scienceFairH = cap > 0 ? (cap / scienceFairDraw) : 0;
+    var deepSleepH = cap > 0 ? (cap / sleepDraw) : 0;
+
+    // Format runtime helpers
+    function fmtTime(hours) {
+      if (hours <= 0) return '--';
+      if (hours < 1) return Math.round(hours * 60) + ' min';
+      if (hours < 24) return hours.toFixed(1) + ' hr';
+      return Math.round(hours / 24) + ' days';
+    }
+    function fmtSub(hours) {
+      if (hours <= 0) return '';
+      var mins = Math.round(hours * 60);
+      if (mins < 60) return mins + ' minutes';
+      var h = Math.floor(hours);
+      var m = Math.round((hours - h) * 60);
+      return h + 'h ' + m + 'm';
+    }
+
+    // Discharge safety
+    var peakDraw = mcu.active * 1.2; // WiFi TX burst peak (mA) — conservative
+    var peakDrawA = peakDraw / 1000;
+    var dischargeOk = maxDis > 0 ? (peakDrawA <= maxDis) : false;
+    var dischargeRatio = maxDis > 0 ? (peakDrawA / maxDis * 100) : 0;
+    var dischargeStatus = 'good';
+    if (dischargeRatio > 100) dischargeStatus = 'bad';
+    else if (dischargeRatio > 80) dischargeStatus = 'warn';
+
+    // Fill result cards
+    var els = {
+      sf: document.getElementById('battResSF'),
+      cont: document.getElementById('battResCont'),
+      sleep: document.getElementById('battResSleep'),
+      dis: document.getElementById('battResDis')
+    };
+    if (els.sf) {
+      els.sf.querySelector('.batt-card-value').textContent = fmtTime(scienceFairH);
+      els.sf.querySelector('.batt-card-sub').textContent = fmtSub(scienceFairH) + ' @ ' + scienceFairDraw.toFixed(0) + 'mA avg';
+      els.sf.className = 'batt-card' + (scienceFairH >= 3 ? ' good' : (scienceFairH >= 1 ? ' warn' : ' bad'));
+    }
+    if (els.cont) {
+      els.cont.querySelector('.batt-card-value').textContent = fmtTime(continuousH);
+      els.cont.querySelector('.batt-card-sub').textContent = fmtSub(continuousH) + ' @ ' + activeDraw.toFixed(0) + 'mA';
+      els.cont.className = 'batt-card' + (continuousH >= 1 ? ' good' : (continuousH >= 0.5 ? ' warn' : ' bad'));
+    }
+    if (els.sleep) {
+      els.sleep.querySelector('.batt-card-value').textContent = fmtTime(deepSleepH);
+      els.sleep.querySelector('.batt-card-sub').textContent = sleepDraw.toFixed(2) + 'mA standby';
+      els.sleep.className = 'batt-card good';
+    }
+    if (els.dis) {
+      els.dis.querySelector('.batt-card-value').textContent = dischargeOk ? 'SAFE' : 'RISKY';
+      els.dis.querySelector('.batt-card-sub').textContent = peakDraw.toFixed(0) + 'mA peak / ' + (maxDis * 1000).toFixed(0) + 'mA max';
+      els.dis.className = 'batt-card ' + dischargeStatus;
+    }
+
+    // Weight budget
+    var wiresW = 1.0;
+    var totalW = mcu.weight + imuWeight + battW + wiresW;
+    var totalWithCar = totalW + carW;
+    var scaleLimit = 50;
+    var pct = Math.min(100, (totalWithCar / scaleLimit) * 100);
+
+    var wGrid = document.getElementById('battWeightGrid');
+    if (wGrid) {
+      wGrid.innerHTML =
+        '<div class="batt-weight-row"><span>MCU (' + mcu.name + ')</span><span>' + mcu.weight.toFixed(1) + 'g</span></div>' +
+        (imuWeight > 0 ? '<div class="batt-weight-row"><span>IMU (BNO055 board)</span><span>' + imuWeight.toFixed(1) + 'g</span></div>' : '') +
+        '<div class="batt-weight-row"><span>Battery</span><span>' + battW.toFixed(1) + 'g</span></div>' +
+        '<div class="batt-weight-row"><span>Wires / mount</span><span>' + wiresW.toFixed(1) + 'g</span></div>' +
+        '<div class="batt-weight-row" style="border-top:1px solid var(--border);padding-top:6px;font-weight:700"><span>Telemetry Package</span><span>' + totalW.toFixed(1) + 'g</span></div>' +
+        (carW > 0 ? '<div class="batt-weight-row"><span>+ Car</span><span>' + carW.toFixed(1) + 'g</span></div>' +
+        '<div class="batt-weight-row" style="font-weight:700;color:var(--gold)"><span>Total on Scale</span><span>' + totalWithCar.toFixed(1) + 'g / ' + scaleLimit + 'g</span></div>' : '');
+    }
+
+    // Progress bar
+    var barWrap = document.getElementById('battWeightBar');
+    if (barWrap) {
+      var fill = barWrap.querySelector('.batt-bar-fill');
+      if (fill) {
+        fill.style.width = pct + '%';
+        fill.style.background = pct < 70 ? 'var(--accent)' : (pct < 90 ? '#f5a623' : '#e74c3c');
+      }
+      var label = barWrap.querySelector('.batt-bar-label');
+      if (label) label.textContent = totalWithCar.toFixed(1) + 'g / ' + scaleLimit + 'g (' + pct.toFixed(0) + '%)';
+    }
+
+    // Verdict
+    var verdict = document.getElementById('battVerdict');
+    if (verdict) {
+      var good = scienceFairH >= 2 && dischargeOk && totalWithCar <= scaleLimit;
+      var ok = scienceFairH >= 1 && totalWithCar <= scaleLimit;
+      if (cap <= 0) {
+        verdict.className = 'batt-verdict';
+        verdict.innerHTML = '&#9889; Enter battery specs above to see your verdict';
+      } else if (good) {
+        verdict.className = 'batt-verdict good';
+        verdict.innerHTML = '&#9989; <strong>GO FOR LAUNCH</strong> — ' + fmtTime(scienceFairH) + ' runtime, ' + totalW.toFixed(1) + 'g package weight. This battery works.';
+      } else if (ok) {
+        verdict.className = 'batt-verdict warn';
+        var issues = [];
+        if (!dischargeOk) issues.push('discharge rate is tight — use ESP-NOW only, never WiFi.begin()');
+        if (scienceFairH < 2) issues.push('runtime is short — keep deep sleep aggressive');
+        verdict.innerHTML = '&#9888;&#65039; <strong>PROCEED WITH CAUTION</strong> — ' + issues.join('; ') + '.';
+      } else {
+        verdict.className = 'batt-verdict bad';
+        var problems = [];
+        if (totalWithCar > scaleLimit) problems.push('over 50g scale limit by ' + (totalWithCar - scaleLimit).toFixed(1) + 'g');
+        if (scienceFairH < 1) problems.push('runtime under 1 hour — battery too small');
+        if (!dischargeOk) problems.push('peak draw exceeds max discharge — risk of voltage sag / brownout');
+        verdict.innerHTML = '&#10060; <strong>NO GO</strong> — ' + problems.join('; ') + '.';
+      }
+    }
+  };
+
   /* ---- Module switcher ---- */
   window.showModule = function(moduleId) {
     if (!modules[moduleId]) return;
@@ -1265,6 +1577,8 @@ a:hover{color:#e8c84a;text-decoration:underline}
     if (fgGuide && fgGuide.classList.contains('visible')) {
       document.getElementById('fgDiagnostics').style.display = 'block';
     }
+    // Initialize battery calculator with default values
+    if (typeof calcBattery === 'function') calcBattery();
   }
 
   if (document.readyState === 'loading') {
