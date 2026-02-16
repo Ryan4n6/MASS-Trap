@@ -151,6 +151,7 @@ img{max-width:100%;height:auto}
     All running on a <em>$7 microcontroller</em>.
   </p>
   <div class="hero-cta">
+    <a href="#demo" class="btn btn-orange">&#x1F3AE; Try the Live Demo</a>
     <a href="#build" class="btn btn-gold">Build One</a>
     <a href="https://github.com/Ryan4n6/MASS-Trap" class="btn btn-outline" target="_blank">View on GitHub</a>
     <a href="https://github.com/Ryan4n6/MASS-Trap/releases/latest" class="btn btn-outline" target="_blank">Download Firmware</a>
@@ -224,6 +225,534 @@ img{max-width:100%;height:auto}
     </div>
   </div>
 </div>
+
+<!-- ==================== LIVE DASHBOARD DEMO ==================== -->
+<div class="section" id="demo">
+  <div class="container">
+    <div class="section-header">
+      <h2>Live Dashboard Preview</h2>
+      <p>This is the actual dashboard UI. No hardware needed &mdash; watch it run a simulated race.</p>
+    </div>
+
+    <!-- Dashboard Container (scoped styles) -->
+    <div id="demoFrame" class="demo-frame" data-theme="interceptor">
+
+      <!-- Demo Controls Bar -->
+      <div class="demo-controls">
+        <div class="demo-badge">&#x1F6A8; DEMO MODE</div>
+        <div class="demo-theme-pick">
+          <label for="demoTheme" style="font-size:0.7rem;color:var(--d-muted);">Theme:</label>
+          <select id="demoTheme" onchange="demoSetTheme(this.value)">
+            <option value="interceptor">Interceptor</option>
+            <option value="classic">Classic</option>
+            <option value="daytona">Daytona</option>
+            <option value="casefile">Case File</option>
+            <option value="cyber">Cyber</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Header -->
+      <div class="demo-header">
+        <div class="demo-shield" aria-hidden="true"></div>
+        <h3 id="demoTitle">M.A.S.S. TRAP</h3>
+        <div id="demoSubtitle" class="demo-subtitle">MOTION ANALYSIS &amp; SPEED SYSTEM</div>
+        <div id="demoTagline" class="demo-tagline">COMMAND CENTER</div>
+      </div>
+
+      <!-- Connection Badge -->
+      <div id="demoConn" class="demo-conn connected">LINKED</div>
+
+      <!-- State Banner -->
+      <div id="demoBanner" class="demo-state-banner idle">AWAITING SUSPECTS</div>
+
+      <!-- LED Bar -->
+      <div id="demoLed" class="demo-led-bar idle" aria-hidden="true"></div>
+
+      <!-- Quick Actions -->
+      <div class="demo-grid demo-grid-3">
+        <button id="demoBtnArm" class="demo-btn demo-btn-success" onclick="demoArm()">ARM SYSTEM</button>
+        <button class="demo-btn demo-btn-accent" onclick="demoReset()">RESET</button>
+        <button class="demo-btn demo-btn-primary" onclick="demoSync()">SYNC CLOCK</button>
+      </div>
+
+      <!-- Live Stats -->
+      <div class="demo-grid demo-grid-3">
+        <div class="demo-card">
+          <div class="demo-card-label">Time</div>
+          <div><span id="demoTime" class="demo-card-value">--</span><span class="demo-card-unit">s</span></div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-card-label">Real Speed</div>
+          <div><span id="demoSpeed" class="demo-card-value">--</span><span class="demo-card-unit">mph</span></div>
+        </div>
+        <div class="demo-card demo-card-accent">
+          <div class="demo-card-label">Scale Speed (1:64)</div>
+          <div><span id="demoScale" class="demo-card-value">--</span><span class="demo-card-unit">mph</span></div>
+        </div>
+      </div>
+
+      <!-- Physics -->
+      <div class="demo-grid demo-grid-3">
+        <div class="demo-card">
+          <div class="demo-card-label">Momentum</div>
+          <div><span id="demoMomentum" class="demo-card-value">--</span><span class="demo-card-unit">kg&middot;m/s</span></div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-card-label">Kinetic Energy</div>
+          <div><span id="demoKE" class="demo-card-value">--</span><span class="demo-card-unit">J</span></div>
+        </div>
+        <div class="demo-card">
+          <div class="demo-card-label">Total Runs</div>
+          <div><span id="demoRuns" class="demo-card-value">0</span></div>
+        </div>
+      </div>
+
+      <!-- Most Wanted Leaderboard -->
+      <div class="demo-section">
+        <div class="demo-section-title">MOST WANTED</div>
+        <div id="demoMW" class="demo-mw-board">
+          <div class="demo-mw-empty">Waiting for race data...</div>
+        </div>
+      </div>
+
+      <!-- Case File History -->
+      <div class="demo-section">
+        <div class="demo-section-title">CASE FILE</div>
+        <div style="overflow-x:auto;">
+          <table class="demo-table">
+            <thead><tr><th>Run</th><th>Suspect</th><th>Mass</th><th>Time</th><th>Real MPH</th><th>Scale MPH</th><th>Momentum</th><th>KE</th></tr></thead>
+            <tbody id="demoHistory"><tr><td colspan="8" style="text-align:center;color:var(--d-muted);padding:20px;">No evidence recorded yet</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Version Badge -->
+      <div class="demo-version">FW v2.6.0-beta</div>
+    </div>
+
+    <div class="tip-bubble" style="max-width:700px;margin:32px auto 0">
+      <div class="tip-label">What You're Seeing</div>
+      This is a <strong>fully interactive simulation</strong> of the real dashboard served by the ESP32. The actual system uses WebSocket for real-time data &mdash; this demo runs the same UI with simulated race data. <em>Click ARM to run a race manually, or just watch it auto-cycle.</em>
+    </div>
+  </div>
+</div>
+
+<style>
+/* =============================================================
+   LIVE DASHBOARD DEMO — Scoped inside #demoFrame
+   Each theme sets CSS variables via [data-theme] on #demoFrame
+   ============================================================= */
+#demoFrame{position:relative;border-radius:var(--radius);overflow:hidden;max-width:900px;margin:0 auto;font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif}
+
+/* --- THEME VARIABLES (mirrors firmware style.css) --- */
+#demoFrame[data-theme="interceptor"]{--d-bg:#1a1a2e;--d-card:#16213e;--d-dark:#0f0f1e;--d-border:#2a2a4a;--d-accent:#d4af37;--d-accent-rgb:212,175,55;--d-secondary:#4a90d9;--d-secondary-rgb:74,144,217;--d-success:#28a745;--d-danger:#dc3545;--d-text:#e0e0e0;--d-muted:#8888aa;--d-font-data:'Courier New',monospace;background:var(--d-bg);border:2px solid var(--d-accent);color:var(--d-text)}
+#demoFrame[data-theme="classic"]{--d-bg:#FF4400;--d-card:#ffffff;--d-dark:#f0f0f0;--d-border:#007ACC;--d-accent:#FFCC00;--d-accent-rgb:255,204,0;--d-secondary:#007ACC;--d-secondary-rgb:0,122,204;--d-success:#28a745;--d-danger:#dc3545;--d-text:#333333;--d-muted:#666666;--d-font-data:'Courier New',monospace;background:var(--d-bg);border:2px solid var(--d-accent);color:var(--d-text)}
+#demoFrame[data-theme="daytona"]{--d-bg:#141414;--d-card:#2a2a2a;--d-dark:#0e0e0e;--d-border:#555555;--d-accent:#ffcc00;--d-accent-rgb:255,204,0;--d-secondary:#ff0000;--d-secondary-rgb:255,0,0;--d-success:#00c853;--d-danger:#ff1744;--d-text:#f0f0f0;--d-muted:#999999;--d-font-data:'Courier New',monospace;background:var(--d-bg);border:2px solid var(--d-accent);color:var(--d-text);font-family:Impact,'Arial Narrow','Segoe UI',sans-serif}
+#demoFrame[data-theme="casefile"]{--d-bg:#f4f0e8;--d-card:#fffdf5;--d-dark:#e8e2d4;--d-border:#c4b99a;--d-accent:#8b0000;--d-accent-rgb:139,0,0;--d-secondary:#1a472a;--d-secondary-rgb:26,71,42;--d-success:#28a745;--d-danger:#dc3545;--d-text:#2a2a2a;--d-muted:#666655;--d-font-data:'Courier New',monospace;background:var(--d-bg);border:2px solid var(--d-accent);color:var(--d-text)}
+#demoFrame[data-theme="cyber"]{--d-bg:#0a0a14;--d-card:#111122;--d-dark:#050510;--d-border:#1a3a5a;--d-accent:#00ffcc;--d-accent-rgb:0,255,204;--d-secondary:#ff00ff;--d-secondary-rgb:255,0,255;--d-success:#00ff66;--d-danger:#ff0044;--d-text:#ccddee;--d-muted:#557799;--d-font-data:'Courier New',monospace;background:var(--d-bg);border:2px solid var(--d-accent);color:var(--d-text)}
+
+/* --- CONTROLS BAR --- */
+.demo-controls{display:flex;align-items:center;justify-content:space-between;padding:8px 12px;background:rgba(0,0,0,0.3);border-bottom:1px solid var(--d-border)}
+.demo-badge{font-size:0.65rem;font-weight:900;letter-spacing:1.5px;color:var(--d-danger);text-transform:uppercase;animation:demoPulse 2s ease-in-out infinite}
+@keyframes demoPulse{0%,100%{opacity:1}50%{opacity:0.5}}
+.demo-theme-pick{display:flex;align-items:center;gap:6px}
+.demo-theme-pick select{background:var(--d-dark);color:var(--d-text);border:1px solid var(--d-border);border-radius:4px;padding:3px 6px;font-size:0.75rem}
+
+/* --- HEADER --- */
+.demo-header{text-align:center;padding:16px 12px 8px;position:relative}
+.demo-shield{width:40px;height:40px;background:var(--d-accent);clip-path:polygon(50% 0%,100% 25%,100% 75%,50% 100%,0% 75%,0% 25%);margin:0 auto 8px;opacity:0.25}
+.demo-header h3{font-size:1.6rem;color:var(--d-accent);letter-spacing:3px;font-weight:900;margin:0}
+.demo-subtitle{font-size:0.6rem;color:var(--d-muted);letter-spacing:4px;text-transform:uppercase}
+.demo-tagline{font-size:0.55rem;color:var(--d-accent);letter-spacing:6px;text-transform:uppercase;margin-top:2px;opacity:0.7}
+
+/* --- CONNECTION BADGE --- */
+.demo-conn{position:absolute;top:12px;right:12px;font-size:0.6rem;font-weight:900;padding:3px 10px;border-radius:20px;letter-spacing:1px}
+.demo-conn.connected{background:rgba(40,167,69,0.2);color:var(--d-success);border:1px solid var(--d-success)}
+.demo-conn.disconnected{background:rgba(220,53,69,0.2);color:var(--d-danger);border:1px solid var(--d-danger)}
+
+/* --- STATE BANNER --- */
+.demo-state-banner{text-align:center;font-size:1.3rem;font-weight:900;letter-spacing:4px;padding:12px;margin:8px 12px;border-radius:8px;transition:all 0.3s}
+.demo-state-banner.idle{background:var(--d-card);color:var(--d-muted);border:1px solid var(--d-border)}
+.demo-state-banner.armed{background:rgba(var(--d-accent-rgb),0.15);color:var(--d-accent);border:2px solid var(--d-accent);animation:demoArmedPulse 1.5s ease-in-out infinite}
+@keyframes demoArmedPulse{0%,100%{box-shadow:0 0 0 0 rgba(var(--d-accent-rgb),0.4)}50%{box-shadow:0 0 20px 4px rgba(var(--d-accent-rgb),0.2)}}
+.demo-state-banner.racing{background:rgba(var(--d-secondary-rgb),0.15);color:var(--d-secondary);border:2px solid var(--d-secondary);animation:demoRacePulse 0.5s ease-in-out infinite}
+@keyframes demoRacePulse{0%,100%{opacity:1}50%{opacity:0.7}}
+.demo-state-banner.finished{background:rgba(var(--d-success),0.15);color:var(--d-success);border:2px solid var(--d-success)}
+
+/* --- LED BAR --- */
+.demo-led-bar{height:4px;margin:0 12px;border-radius:2px;transition:all 0.3s}
+.demo-led-bar.idle{background:linear-gradient(90deg,var(--d-border),var(--d-border))}
+.demo-led-bar.armed{background:linear-gradient(90deg,var(--d-accent),transparent,var(--d-accent));animation:demoLedArmed 2s linear infinite}
+@keyframes demoLedArmed{0%{background-position:0}100%{background-position:200px}}
+.demo-led-bar.racing{background:linear-gradient(90deg,var(--d-secondary),var(--d-accent),var(--d-secondary));background-size:200px;animation:demoLedRace 0.4s linear infinite}
+@keyframes demoLedRace{0%{background-position:0}100%{background-position:200px}}
+.demo-led-bar.finished{background:linear-gradient(90deg,var(--d-success),var(--d-accent),var(--d-success));background-size:200px;animation:demoLedFinish 1s linear infinite}
+@keyframes demoLedFinish{0%{background-position:0}100%{background-position:200px}}
+
+/* --- BUTTONS --- */
+.demo-btn{padding:8px 12px;border:none;border-radius:6px;font-weight:900;font-size:0.75rem;letter-spacing:1px;text-transform:uppercase;cursor:pointer;transition:all 0.2s}
+.demo-btn:hover{transform:translateY(-1px);filter:brightness(1.1)}
+.demo-btn:active{transform:translateY(0)}
+.demo-btn-success{background:var(--d-success);color:#fff}
+.demo-btn-accent{background:var(--d-accent);color:#000}
+.demo-btn-primary{background:var(--d-secondary);color:#fff}
+
+/* --- GRID --- */
+.demo-grid{display:grid;gap:8px;padding:8px 12px}
+.demo-grid-3{grid-template-columns:repeat(3,1fr)}
+@media(max-width:500px){.demo-grid-3{grid-template-columns:1fr}}
+
+/* --- CARDS --- */
+.demo-card{background:var(--d-card);border:1px solid var(--d-border);border-radius:8px;padding:10px 12px;text-align:center}
+.demo-card-accent{border-color:var(--d-accent);background:linear-gradient(135deg,var(--d-card),rgba(var(--d-accent-rgb),0.05))}
+.demo-card-label{font-size:0.6rem;font-weight:700;color:var(--d-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.demo-card-value{font-size:1.8rem;font-weight:900;font-family:var(--d-font-data);color:var(--d-text);transition:color 0.3s}
+.demo-card-unit{font-size:0.7rem;color:var(--d-muted);margin-left:4px}
+
+/* --- SECTIONS --- */
+.demo-section{margin:8px 12px;padding:12px;background:var(--d-card);border:1px solid var(--d-border);border-radius:8px}
+.demo-section-title{font-size:0.75rem;font-weight:900;color:var(--d-accent);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;text-align:center}
+
+/* --- MOST WANTED BOARD --- */
+.demo-mw-board{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px}
+.demo-mw-card{background:var(--d-dark);border:1px solid var(--d-border);border-radius:8px;padding:10px;text-align:center;transition:border-color 0.3s}
+.demo-mw-card.rank-1{border-color:var(--d-accent);box-shadow:0 0 12px rgba(var(--d-accent-rgb),0.2)}
+.demo-mw-card.rank-2,.demo-mw-card.rank-3{border-color:var(--d-secondary)}
+.demo-mw-rank{font-size:0.6rem;font-weight:900;letter-spacing:1.5px;color:var(--d-danger);text-transform:uppercase}
+.demo-mw-name{font-size:1rem;font-weight:900;color:var(--d-accent);margin:4px 0}
+.demo-mw-stats{font-size:0.7rem;color:var(--d-muted);line-height:1.6}
+.demo-mw-stats strong{color:var(--d-text)}
+.demo-mw-threat{display:inline-block;font-size:0.55rem;font-weight:900;letter-spacing:1px;padding:2px 8px;border-radius:4px;margin-top:6px;text-transform:uppercase}
+.demo-mw-threat.armed-dangerous{background:rgba(var(--d-danger,220,53,69),0.15);color:var(--d-danger);border:1px solid var(--d-danger)}
+.demo-mw-threat.known-offender{background:rgba(var(--d-accent-rgb),0.1);color:var(--d-accent);border:1px solid rgba(var(--d-accent-rgb),0.3)}
+.demo-mw-threat.person-of-interest{background:rgba(128,128,128,0.1);color:var(--d-muted);border:1px solid var(--d-border)}
+.demo-mw-empty{text-align:center;color:var(--d-muted);font-size:0.8rem;padding:16px}
+
+/* --- CASE FILE TABLE --- */
+.demo-table{width:100%;border-collapse:collapse;font-size:0.72rem}
+.demo-table th{font-weight:700;color:var(--d-accent);text-transform:uppercase;font-size:0.65rem;letter-spacing:0.5px;padding:6px 4px;border-bottom:2px solid var(--d-accent);text-align:left}
+.demo-table td{padding:5px 4px;border-bottom:1px solid var(--d-border);color:var(--d-text);font-family:var(--d-font-data)}
+.demo-table tr:last-child td{border-bottom:none}
+
+/* --- VERSION BADGE --- */
+.demo-version{text-align:center;padding:8px;font-size:0.6rem;color:var(--d-muted);letter-spacing:1px;border-top:1px solid var(--d-border)}
+
+/* --- LEADERBOARD OVERLAY (inside demo) --- */
+.demo-lb-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:10}
+.demo-lb-overlay.show{opacity:1;pointer-events:auto}
+.demo-lb-card{background:var(--d-card);border:2px solid var(--d-accent);border-radius:12px;padding:24px;text-align:center;max-width:300px;animation:demoLbPop 0.3s ease}
+@keyframes demoLbPop{from{transform:scale(0.8);opacity:0}to{transform:scale(1);opacity:1}}
+.demo-lb-verdict{font-size:0.7rem;font-weight:900;letter-spacing:2px;color:var(--d-danger);text-transform:uppercase}
+.demo-lb-rank{font-size:3rem;font-weight:900;color:var(--d-accent)}
+.demo-lb-text{font-size:1.1rem;font-weight:900;color:var(--d-text);margin:4px 0}
+.demo-lb-detail{font-size:0.75rem;color:var(--d-muted)}
+</style>
+
+<script>
+/* =============================================================
+   M.A.S.S. TRAP — Live Dashboard Demo Simulation Engine
+   ES5 compatible (var only, no let/const)
+   ============================================================= */
+(function() {
+  'use strict';
+
+  // ---- MOCK GARAGE ----
+  var demoCars = [
+    { name: 'F-150 Control', color: 'White', weight: 38.025, stats: { runs: 0, bestTime: null, bestSpeed: 0 } },
+    { name: 'F-150 Test', color: 'Blue', weight: 31.546, stats: { runs: 0, bestTime: null, bestSpeed: 0 } },
+    { name: 'Twin Mill', color: 'Chrome', weight: 42.300, stats: { runs: 0, bestTime: null, bestSpeed: 0 } },
+    { name: 'Bone Shaker', color: 'Green', weight: 36.712, stats: { runs: 0, bestTime: null, bestSpeed: 0 } },
+    { name: 'Rodger Dodger', color: 'Purple', weight: 40.150, stats: { runs: 0, bestTime: null, bestSpeed: 0 } },
+    { name: 'Night Shifter', color: 'Black', weight: 35.880, stats: { runs: 0, bestTime: null, bestSpeed: 0 } }
+  ];
+
+  var demoState = 'IDLE';
+  var demoRunCount = 0;
+  var demoHistory = [];
+  var demoCurrentCar = 0;
+  var demoAutoTimer = null;
+  var demoRaceTimer = null;
+  var demoCountTimer = null;
+  var demoTrackLength = 6.01;
+  var MPS_TO_MPH = 2.23694;
+  var demoTheme = 'interceptor';
+
+  // Theme banner text (mirrors real firmware)
+  var themeBannerText = {
+    interceptor: { IDLE: 'AWAITING SUSPECTS', ARMED: 'TRAP SET', RACING: 'IN PURSUIT', FINISHED: 'SUSPECT CLOCKED' },
+    classic:     { IDLE: 'READY TO RACE!', ARMED: 'ON YOUR MARKS...', RACING: 'GO GO GO!', FINISHED: 'FINISH LINE!' },
+    daytona:     { IDLE: 'PIT LANE', ARMED: 'GREEN FLAG', RACING: 'FULL SEND', FINISHED: 'CHECKERED FLAG' },
+    casefile:    { IDLE: 'CASE OPEN', ARMED: 'STAKEOUT ACTIVE', RACING: 'SUSPECT FLEEING', FINISHED: 'EVIDENCE LOGGED' },
+    cyber:       { IDLE: 'SYSTEM IDLE', ARMED: 'ARMED // READY', RACING: 'TRACKING...', FINISHED: 'TARGET ACQUIRED' }
+  };
+
+  var themeHeaders = {
+    interceptor: { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'COMMAND CENTER' },
+    classic:     { title: 'SPEED LAB', subtitle: 'REAL-TIME RACE TIMING SYSTEM', tagline: '' },
+    daytona:     { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'RACE CONTROL' },
+    casefile:    { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'COMMAND CENTER' },
+    cyber:       { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'COMMAND CENTER' }
+  };
+
+  function $(id) { return document.getElementById(id); }
+
+  function updateBanner() {
+    var banner = $('demoBanner');
+    var texts = themeBannerText[demoTheme] || themeBannerText.interceptor;
+    var stateText = texts[demoState] || demoState;
+    var car = demoCars[demoCurrentCar];
+    banner.className = 'demo-state-banner ' + demoState.toLowerCase();
+    banner.textContent = car.name.toUpperCase() + ' \u2014 ' + stateText;
+    $('demoLed').className = 'demo-led-bar ' + demoState.toLowerCase();
+  }
+
+  function clearStats() {
+    $('demoTime').textContent = '--';
+    $('demoSpeed').textContent = '--';
+    $('demoScale').textContent = '--';
+    $('demoMomentum').textContent = '--';
+    $('demoKE').textContent = '--';
+  }
+
+  function showStats(time, speedMps, weight) {
+    var mph = speedMps * MPS_TO_MPH;
+    var scaleMph = mph * 64;
+    var mass_kg = weight / 1000;
+    var momentum = mass_kg * speedMps;
+    var ke = 0.5 * mass_kg * speedMps * speedMps;
+    $('demoTime').textContent = time.toFixed(3);
+    $('demoSpeed').textContent = mph.toFixed(1);
+    $('demoScale').textContent = Math.round(scaleMph);
+    $('demoMomentum').textContent = momentum.toFixed(4);
+    $('demoKE').textContent = ke.toFixed(4);
+    $('demoRuns').textContent = demoRunCount;
+    return { time: time, mph: mph, scaleMph: scaleMph, momentum: momentum, ke: ke, speedMps: speedMps };
+  }
+
+  function addToHistory(car, race) {
+    demoHistory.unshift({ car: car.name, weight: car.weight, time: race.time, mph: race.mph, scaleMph: race.scaleMph, momentum: race.momentum, ke: race.ke });
+    if (demoHistory.length > 8) demoHistory.pop();
+    var tbody = $('demoHistory');
+    tbody.innerHTML = demoHistory.map(function(h, i) {
+      return '<tr>' +
+        '<td>' + (demoRunCount - i) + '</td>' +
+        '<td>' + h.car + '</td>' +
+        '<td>' + h.weight.toFixed(1) + 'g</td>' +
+        '<td>' + h.time.toFixed(3) + '</td>' +
+        '<td>' + h.mph.toFixed(1) + '</td>' +
+        '<td>' + Math.round(h.scaleMph) + '</td>' +
+        '<td>' + h.momentum.toFixed(4) + '</td>' +
+        '<td>' + h.ke.toFixed(4) + '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function renderMostWanted() {
+    var board = $('demoMW');
+    var data = demoCars.filter(function(c) { return c.stats.runs > 0; })
+      .sort(function(a, b) {
+        if (a.stats.bestTime == null) return 1;
+        if (b.stats.bestTime == null) return -1;
+        return a.stats.bestTime - b.stats.bestTime;
+      });
+    if (data.length === 0) {
+      board.innerHTML = '<div class="demo-mw-empty">No suspects in the system. Watch the demo cycle or click ARM to run a race.</div>';
+      return;
+    }
+    board.innerHTML = data.map(function(car, i) {
+      var rank = i + 1;
+      var rankClass = rank <= 3 ? ' rank-' + rank : '';
+      var rankTitle = rank === 1 ? 'PUBLIC ENEMY #1' : rank <= 3 ? 'MOST WANTED' : 'APB #' + rank;
+      var threatCls = rank <= 3 ? 'armed-dangerous' : rank <= Math.max(5, Math.ceil(data.length * 0.5)) ? 'known-offender' : 'person-of-interest';
+      var threatText = rank <= 3 ? 'ARMED & DANGEROUS' : threatCls === 'known-offender' ? 'KNOWN OFFENDER' : 'PERSON OF INTEREST';
+      var bestMph = car.stats.bestSpeed ? (car.stats.bestSpeed * MPS_TO_MPH).toFixed(1) : '--';
+      var bestScale = car.stats.bestSpeed ? Math.round(car.stats.bestSpeed * MPS_TO_MPH * 64) : '--';
+      return '<div class="demo-mw-card' + rankClass + '">' +
+        '<div class="demo-mw-rank">' + rankTitle + '</div>' +
+        '<div class="demo-mw-name">' + car.name + '</div>' +
+        '<div class="demo-mw-stats">' +
+          'Time: <strong>' + (car.stats.bestTime ? car.stats.bestTime.toFixed(3) + 's' : '--') + '</strong><br>' +
+          'Speed: <strong>' + bestMph + ' mph</strong><br>' +
+          'Scale: <strong>' + bestScale + ' mph</strong><br>' +
+          'Mass: <strong>' + car.weight + 'g</strong><br>' +
+          'Offenses: <strong>' + car.stats.runs + '</strong>' +
+        '</div>' +
+        '<div class="demo-mw-threat ' + threatCls + '">' + threatText + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function showLeaderboard(car, race, rank) {
+    var overlay = $('demoLbOverlay');
+    if (!overlay) return;
+    var verdicts = ['', 'ALL POINTS BULLETIN', 'WARRANT ISSUED', 'SUSPECT IDENTIFIED'];
+    var msgs = ['', 'PUBLIC ENEMY #1', 'MOST WANTED #2', 'MOST WANTED #3'];
+    overlay.querySelector('.demo-lb-verdict').textContent = verdicts[Math.min(rank, 3)] || 'BOOKING REPORT';
+    overlay.querySelector('.demo-lb-rank').textContent = '#' + rank;
+    overlay.querySelector('.demo-lb-text').textContent = msgs[Math.min(rank, 3)] || 'KNOWN OFFENDER #' + rank;
+    overlay.querySelector('.demo-lb-detail').textContent = car.name + ' | ' + race.time.toFixed(3) + 's | ' + Math.round(race.scaleMph) + ' scale mph';
+    overlay.classList.add('show');
+    setTimeout(function() { overlay.classList.remove('show'); }, 3500);
+  }
+
+  // ---- RACE SIMULATION ----
+  function simulateRace() {
+    if (demoState !== 'IDLE') return;
+    // ARM
+    demoState = 'ARMED';
+    updateBanner();
+    $('demoBtnArm').disabled = true;
+    $('demoBtnArm').textContent = 'ARMED';
+    clearStats();
+
+    // After 1.5s, start RACING
+    demoRaceTimer = setTimeout(function() {
+      demoState = 'RACING';
+      updateBanner();
+      $('demoBtnArm').textContent = 'RACING';
+
+      // Running timer animation
+      var raceStart = Date.now();
+      var car = demoCars[demoCurrentCar];
+      // Realistic times: lighter cars tend faster, range 1.2-2.8s on 6m track
+      var baseTime = 1.5 + (car.weight - 30) * 0.03;
+      var targetTime = baseTime + (Math.random() * 0.6 - 0.3);
+      targetTime = Math.max(1.2, Math.min(2.8, targetTime));
+
+      demoCountTimer = setInterval(function() {
+        var elapsed = (Date.now() - raceStart) / 1000;
+        $('demoTime').textContent = elapsed.toFixed(3);
+      }, 50);
+
+      // FINISH after simulated time
+      var raceDuration = Math.max(800, targetTime * 400);
+      demoRaceTimer = setTimeout(function() {
+        clearInterval(demoCountTimer);
+        demoState = 'FINISHED';
+        demoRunCount++;
+        updateBanner();
+        $('demoBtnArm').textContent = 'FINISHED';
+
+        var speedMps = demoTrackLength / targetTime;
+        var race = showStats(targetTime, speedMps, car.weight);
+
+        // Update car stats
+        car.stats.runs++;
+        if (car.stats.bestTime == null || targetTime < car.stats.bestTime) {
+          car.stats.bestTime = targetTime;
+        }
+        if (speedMps > car.stats.bestSpeed) {
+          car.stats.bestSpeed = speedMps;
+        }
+
+        addToHistory(car, race);
+        renderMostWanted();
+
+        // Find rank
+        var ranked = demoCars.filter(function(c) { return c.stats.bestTime != null; })
+          .sort(function(a, b) { return a.stats.bestTime - b.stats.bestTime; });
+        var rank = 1;
+        for (var r = 0; r < ranked.length; r++) {
+          if (ranked[r].name === car.name) { rank = r + 1; break; }
+        }
+        if (ranked.length >= 2) showLeaderboard(car, race, rank);
+
+        // Auto-reset after 4s
+        demoRaceTimer = setTimeout(function() {
+          demoState = 'IDLE';
+          demoCurrentCar = (demoCurrentCar + 1) % demoCars.length;
+          updateBanner();
+          $('demoBtnArm').disabled = false;
+          $('demoBtnArm').textContent = 'ARM SYSTEM';
+        }, 4000);
+
+      }, raceDuration);
+    }, 1500);
+  }
+
+  // ---- PUBLIC API (on window for onclick) ----
+  window.demoArm = function() {
+    if (demoState === 'IDLE') {
+      clearTimeout(demoAutoTimer);
+      simulateRace();
+      // Re-schedule auto after this race completes
+      demoAutoTimer = setTimeout(function autoLoop() {
+        simulateRace();
+        demoAutoTimer = setTimeout(autoLoop, 9000);
+      }, 12000);
+    }
+  };
+
+  window.demoReset = function() {
+    clearTimeout(demoRaceTimer);
+    clearTimeout(demoAutoTimer);
+    clearInterval(demoCountTimer);
+    demoState = 'IDLE';
+    updateBanner();
+    clearStats();
+    $('demoBtnArm').disabled = false;
+    $('demoBtnArm').textContent = 'ARM SYSTEM';
+    var overlay = $('demoLbOverlay');
+    if (overlay) overlay.classList.remove('show');
+    // Restart auto-cycle
+    demoAutoTimer = setTimeout(function autoLoop() {
+      simulateRace();
+      demoAutoTimer = setTimeout(autoLoop, 9000);
+    }, 5000);
+  };
+
+  window.demoSync = function() {
+    var conn = $('demoConn');
+    conn.textContent = 'SYNCING...';
+    conn.className = 'demo-conn connected';
+    setTimeout(function() {
+      conn.textContent = 'LINKED';
+    }, 1000);
+  };
+
+  window.demoSetTheme = function(theme) {
+    demoTheme = theme;
+    $('demoFrame').setAttribute('data-theme', theme);
+    var hdr = themeHeaders[theme] || themeHeaders.interceptor;
+    $('demoTitle').textContent = hdr.title;
+    $('demoSubtitle').textContent = hdr.subtitle;
+    $('demoTagline').textContent = hdr.tagline;
+    $('demoTagline').style.display = hdr.tagline ? '' : 'none';
+    updateBanner();
+  };
+
+  // ---- INIT: Add leaderboard overlay to DOM ----
+  function initDemo() {
+    var frame = $('demoFrame');
+    var lbHtml = '<div id="demoLbOverlay" class="demo-lb-overlay">' +
+      '<div class="demo-lb-card">' +
+        '<div class="demo-lb-verdict"></div>' +
+        '<div class="demo-lb-rank">#1</div>' +
+        '<div class="demo-lb-text"></div>' +
+        '<div class="demo-lb-detail"></div>' +
+      '</div>' +
+    '</div>';
+    frame.insertAdjacentHTML('beforeend', lbHtml);
+
+    updateBanner();
+    $('demoRuns').textContent = '0';
+
+    // Start auto-race cycle after 3s (give user time to see the idle state)
+    demoAutoTimer = setTimeout(function autoLoop() {
+      simulateRace();
+      demoAutoTimer = setTimeout(autoLoop, 9000);
+    }, 3000);
+  }
+
+  // Start when DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initDemo);
+  } else {
+    initDemo();
+  }
+})();
+</script>
 
 <!-- ==================== BUILD TIERS ==================== -->
 <div class="section" id="build">
