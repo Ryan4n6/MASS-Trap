@@ -5,8 +5,8 @@
 
 #define CONFIG_FILE "/config.json"
 #define CONFIG_VERSION 2
-#define FIRMWARE_VERSION "2.5.0"
-#define WEB_UI_VERSION  "2.5.0"
+#define FIRMWARE_VERSION "2.6.0-beta"
+#define WEB_UI_VERSION  "2.6.0-beta"
 #define BUILD_DATE      __DATE__
 #define BUILD_TIME      __TIME__
 #define PROJECT_NAME    "M.A.S.S. Trap"
