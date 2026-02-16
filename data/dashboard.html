@@ -7,6 +7,12 @@
   <title>M.A.S.S. Trap Command Center</title>
   <link rel="stylesheet" href="/style.css">
   <style>
+    /* ===== Science Fair Section Invite ===== */
+    #playlistSection > summary::-webkit-details-marker{display:none;}
+    #playlistSection > summary::marker{content:'';}
+    #playlistSection[open] > summary{border-style:solid;border-color:var(--accent);background:var(--card-bg);}
+    #playlistSection[open] > summary .pl-expand-arrow{transform:rotate(90deg);}
+    .pl-expand-arrow{transition:transform 0.2s ease;display:inline-block;}
     /* ===== Playlist Mode Styles ===== */
     .playlist-badge{background:var(--accent);color:var(--bg);font-size:0.7rem;font-weight:900;padding:2px 8px;border-radius:10px;vertical-align:middle;}
     .pl-car-selector{display:flex;flex-wrap:wrap;gap:6px;}
@@ -162,10 +168,10 @@
       <button id="btnReset" class="btn btn-accent" onclick="resetRace()">RESET</button>
       <button id="btnSync" class="btn btn-primary" onclick="syncClock()">SYNC CLOCK</button>
     </div>
-    <!-- Pre-Race Setup Photo (hidden in kiosk mode) -->
+    <!-- Pre-Race Photo (hidden in kiosk mode) -->
     <div class="kiosk-hide" id="setupPhotoBar" style="margin-top:6px;">
-      <button class="btn btn-outline btn-sm" onclick="evCaptureSetupPhoto()" style="width:100%;" id="btnSetupPhoto">
-        &#x1F4F7; SETUP PHOTO <span id="setupPhotoCount" style="display:none;" class="playlist-badge"></span>
+      <button class="btn btn-outline btn-sm" onclick="evCaptureSetupPhoto()" style="width:100%;" id="btnSetupPhoto" title="Take a photo of the car BEFORE the race. The photo links to the evidence tag automatically.">
+        &#x1F4F7; SNAP PHOTO (before race) <span id="setupPhotoCount" style="display:none;" class="playlist-badge"></span>
       </button>
     </div>
 
@@ -176,10 +182,14 @@
 
     <!-- Science Fair Testing (Playlist Mode) — hidden in kiosk mode -->
     <details id="playlistSection" class="section kiosk-hide">
-      <summary class="section-title" style="cursor:pointer; list-style:none; display:flex; align-items:center; gap:8px;">
-        <span aria-hidden="true" style="font-size:1.2em;">&#x1F9EA;</span>
-        SCIENCE FAIR TESTING
-        <span id="playlistBadge" class="playlist-badge" style="display:none;"></span>
+      <summary class="section-title" style="cursor:pointer; list-style:none; display:flex; align-items:center; gap:8px; padding:12px; border:2px dashed var(--accent); border-radius:8px; background:linear-gradient(135deg, var(--card-bg) 0%, transparent 100%); transition:all 0.2s ease;">
+        <span aria-hidden="true" style="font-size:1.4em;">&#x1F9EA;</span>
+        <span style="flex:1;">
+          <span style="font-weight:900;letter-spacing:1px;">SCIENCE FAIR TESTING</span>
+          <span id="playlistBadge" class="playlist-badge" style="display:none;"></span>
+          <br><span style="font-size:0.75rem;font-weight:400;color:var(--secondary);opacity:0.85;">&#x1F50D; Tap to open a new case &mdash; every run gets its own case number!</span>
+        </span>
+        <span class="pl-expand-arrow" style="font-size:1.2em;color:var(--accent);">&#x25B6;</span>
       </summary>
 
       <!-- ===== 6-PHASE STEPPER BAR ===== -->
@@ -192,10 +202,22 @@
         <div class="pl-step" data-phase="6" onclick="plGoToPhase(6)" role="tab"><span class="pl-step-num">6</span>Results</div>
       </div>
 
+      <!-- Parent/Teacher Guide Link -->
+      <div style="text-align:center;margin:6px 0;padding:6px;background:var(--card-bg);border-radius:6px;border:1px solid rgba(255,255,255,0.05);">
+        <a id="parentGuideQrLink" href="https://ryan4n6.github.io/MASS-Trap/parents.html?phase=1" target="_blank" rel="noopener" onclick="window._parentGuideWindow=window.open(this.href,'parentGuide');return false;" style="color:var(--secondary);font-size:0.75rem;text-decoration:none;display:flex;align-items:center;justify-content:center;gap:6px;">
+          <span style="font-size:1.1em;">&#x1F468;&#x200D;&#x1F469;&#x200D;&#x1F466;</span>
+          <span><strong>Parent/Teacher Guide</strong> &mdash; tap to open, or scan QR from another phone</span>
+          <span style="font-size:1.1em;">&#x2197;</span>
+        </a>
+      </div>
+
       <!-- ===== PHASE 1: EXPERIMENT SETUP ===== -->
       <div id="plPhase1" class="pl-phase active" role="tabpanel">
         <h3 style="font-size:1rem;font-weight:900;color:var(--accent);margin:8px 0;">EXPERIMENT SETUP</h3>
-        <p class="text-muted" style="font-size:0.8rem;">Choose a template or define your own experiment. The system will guide you through the forensic evidence chain.</p>
+        <div class="pl-helper-tip" style="background:var(--card-bg);border-left:3px solid var(--accent);padding:8px 10px;margin:8px 0;border-radius:4px;font-size:0.8rem;">
+          <strong>&#x1F4A1; Start here!</strong> Pick a template to auto-fill your experiment, or choose Custom to build your own.
+          The system creates a test plan so you don't miss any runs.
+        </div>
 
         <!-- Template Selector -->
         <div class="pl-templates" id="plTemplates">
@@ -257,6 +279,10 @@
       <!-- ===== PHASE 2: VEHICLE INTAKE ===== -->
       <div id="plPhase2" class="pl-phase" role="tabpanel">
         <h3 style="font-size:1rem;font-weight:900;color:var(--accent);margin:8px 0;">VEHICLE INTAKE</h3>
+        <div class="pl-helper-tip" style="background:var(--card-bg);border-left:3px solid var(--accent);padding:8px 10px;margin:8px 0;border-radius:4px;font-size:0.8rem;">
+          <strong>&#x1F4A1; Pick your test cars.</strong> Check the box next to each car you want to test.
+          Make sure weights are entered &mdash; tap a car name to edit it in the garage.
+        </div>
         <p class="text-muted" style="font-size:0.8rem;">Select and verify your test vehicles. Check NFC tag status and verify weights.</p>
 
         <div style="margin:12px 0;">
@@ -278,7 +304,13 @@
       <!-- ===== PHASE 3: EVIDENCE PREP ===== -->
       <div id="plPhase3" class="pl-phase" role="tabpanel">
         <h3 style="font-size:1rem;font-weight:900;color:var(--accent);margin:8px 0;">&#x1F3F7; EVIDENCE PREP</h3>
-        <p class="text-muted" style="font-size:0.8rem;">Case numbers assigned. Print your evidence tags and photograph your setup <strong>BEFORE</strong> any testing begins.</p>
+
+        <!-- JIT Helper Tip -->
+        <div class="pl-helper-tip" style="background:var(--card-bg);border-left:3px solid var(--accent);padding:8px 10px;margin:8px 0;border-radius:4px;font-size:0.8rem;">
+          <strong>&#x1F4A1; What to do here:</strong> Each test run gets a case number (like a police case file).
+          Print the tags, then snap photos of your cars and setup.
+          Photos link to the case number automatically &mdash; like evidence in a crime scene!
+        </div>
 
         <!-- Case Assignment Table -->
         <div style="overflow-x:auto;margin:8px 0;">
@@ -290,18 +322,18 @@
 
         <!-- Action Buttons -->
         <div class="grid grid-2" style="margin:8px 0;">
-          <button class="btn btn-primary" onclick="plPrintPreTags()" style="font-weight:700;">&#x1F5A8; PRINT EVIDENCE TAGS</button>
-          <button class="btn btn-success" onclick="plCaptureEvidencePhoto()" style="font-weight:700;" id="plPhase3PhotoBtn">&#x1F4F7; CAPTURE SETUP PHOTO</button>
+          <button class="btn btn-primary" onclick="plPrintPreTags()" style="font-weight:700;" title="Print sticker labels with case numbers and QR codes to put on each car">&#x1F5A8; PRINT EVIDENCE TAGS</button>
+          <button class="btn btn-success" onclick="plCaptureEvidencePhoto()" style="font-weight:700;" id="plPhase3PhotoBtn" title="Take a photo of each car on the scale BEFORE testing. Photos auto-link to case numbers.">&#x1F4F7; SNAP EVIDENCE PHOTO</button>
         </div>
 
         <!-- Photo Checklist -->
         <div class="pl-directions" style="margin:8px 0;">
-          <h4>&#x1F4F7; Photo Checklist (advisory)</h4>
+          <h4>&#x1F4F7; Photo Checklist (do these BEFORE racing!)</h4>
           <ol>
-            <li>Photograph scale readings for each vehicle</li>
-            <li>Photograph the test setup and track</li>
-            <li>Photograph weight additions for each condition</li>
-            <li>Photograph printed evidence tags laid out</li>
+            <li>&#x2696; Photograph each car on the scale (proves the weight)</li>
+            <li>&#x1F6E4; Photograph the track from start to finish (proves the setup)</li>
+            <li>&#x1F9F1; Photograph weight additions for each condition (proves what changed)</li>
+            <li>&#x1F3F7; Photograph your printed evidence tags laid out (proves the chain of custody)</li>
           </ol>
         </div>
 
@@ -314,7 +346,11 @@
       <!-- ===== PHASE 4: PRE-FLIGHT CHECK ===== -->
       <div id="plPhase4" class="pl-phase" role="tabpanel">
         <h3 style="font-size:1rem;font-weight:900;color:var(--accent);margin:8px 0;">&#x2705; PRE-FLIGHT CHECK</h3>
-        <p class="text-muted" style="font-size:0.8rem;">Review your test plan. Once data collection begins, case numbers are locked.</p>
+        <div class="pl-helper-tip" style="background:var(--card-bg);border-left:3px solid var(--accent);padding:8px 10px;margin:8px 0;border-radius:4px;font-size:0.8rem;">
+          <strong>&#x1F4A1; Last chance to change anything!</strong> Review your test plan below.
+          Once you hit the big green button, the system takes over and guides you through every run.
+          Read the directions &mdash; they tell you exactly what to do.
+        </div>
 
         <!-- Full test plan table -->
         <div style="overflow-x:auto;margin:8px 0;max-height:250px;">
@@ -326,13 +362,15 @@
 
         <!-- Directions for Ben -->
         <div class="pl-directions" id="plDirections">
-          <h4>&#x1F4CB; Directions for the Forensicator</h4>
+          <h4>&#x1F4CB; How To Run Each Test</h4>
           <ol>
-            <li>Place the correct car at the top of the track</li>
-            <li>Make sure the start gate sensor is clear</li>
-            <li>Release the car when you hear "System Armed"</li>
-            <li>Catch the car at the bottom &mdash; do NOT let it roll back through the sensor</li>
-            <li>Wait for the system to announce the next run</li>
+            <li><strong>Check the screen</strong> &mdash; it tells you which car and weight to use</li>
+            <li><strong>Place the car</strong> at the top of the track behind the start sensor</li>
+            <li><strong>Make sure nothing is blocking</strong> the start or finish sensors</li>
+            <li><strong>Let go of the car</strong> when the screen says ARMED (don't push it!)</li>
+            <li><strong>Catch the car</strong> at the bottom &mdash; do NOT let it roll back through the sensor</li>
+            <li><strong>Wait</strong> &mdash; the system auto-loads the next run. You'll hear an announcement.</li>
+            <li>If the system says something looks wrong, choose <strong>KEEP</strong> (save it) or <strong>RETRY</strong> (do it again)</li>
           </ol>
         </div>
 
@@ -1694,8 +1732,8 @@
         highestPhase: playlistMode.highestPhase,
         savedAt: Date.now()
       }));
-      // Fire-and-forget save to ESP32
-      plSaveToESP();
+      // Fire-and-forget save to ESP32 (skip in dry-run)
+      if (!_dryRunActive) plSaveToESP();
     }
 
     function plSaveToESP() {
@@ -1859,6 +1897,17 @@
       // Open the details element
       var details = document.getElementById('playlistSection');
       if (details) details.open = true;
+
+      // Notify parent guide (if open in another tab/window via postMessage)
+      try {
+        if (window._parentGuideWindow && !window._parentGuideWindow.closed) {
+          window._parentGuideWindow.postMessage({ type: 'massPhaseChange', phase: phase }, '*');
+        }
+      } catch(e) {}
+
+      // Update the parent guide QR link with current phase
+      var qrLink = document.getElementById('parentGuideQrLink');
+      if (qrLink) qrLink.href = 'https://ryan4n6.github.io/MASS-Trap/parents.html?phase=' + phase;
     }
 
     function plValidatePhase1() {
@@ -2052,8 +2101,10 @@
       // Assign case numbers to EVERY test BEFORE any racing
       plAssignCaseNumbers();
 
-      // Create pre-evidence entries
-      plCreatePreEvidenceEntries();
+      // Create pre-evidence entries (skip in dry-run to avoid polluting evidence log)
+      if (!_dryRunActive) {
+        plCreatePreEvidenceEntries();
+      }
 
       plSaveState();
       plSaveConfig();
@@ -2105,8 +2156,17 @@
     }
 
     function plAssignCaseNumbers() {
-      for (var i = 0; i < playlistMode.tests.length; i++) {
-        playlistMode.tests[i].caseNumber = evNextCaseNumber();
+      if (_dryRunActive) {
+        // Dry run: assign DRYRUN-prefixed case numbers WITHOUT consuming the real counter
+        for (var i = 0; i < playlistMode.tests.length; i++) {
+          var year = new Date().getFullYear().toString().slice(-2);
+          var seq = ('0000' + (i + 1)).slice(-4);
+          playlistMode.tests[i].caseNumber = 'DRY' + year + '-' + seq;
+        }
+      } else {
+        for (var i = 0; i < playlistMode.tests.length; i++) {
+          playlistMode.tests[i].caseNumber = evNextCaseNumber();
+        }
       }
     }
 
@@ -2180,6 +2240,10 @@
     }
 
     function plCaptureEvidencePhoto() {
+      if (!IMGBB_API_KEY) {
+        alert('Photo upload not configured.\n\nTo enable: open browser console and run:\nlocalStorage.setItem("mass_imgbb_key", "YOUR_KEY")\nthen reload the page.');
+        return;
+      }
       // Determine target case: explicit selection or next un-photo'd case
       var targetCase = plPhotoTargetCase;
       if (!targetCase) {
@@ -2234,16 +2298,16 @@
                   // Auto-advance target to next un-photo'd case
                   plPhotoTargetCase = null;
                   setTimeout(function() {
-                    if (btn) btn.innerHTML = '&#x1F4F7; CAPTURE SETUP PHOTO';
+                    if (btn) btn.innerHTML = '&#x1F4F7; SNAP EVIDENCE PHOTO';
                   }, 3000);
                 } else { if (btn) { btn.textContent = 'UPLOAD FAILED'; btn.disabled = false; } }
               } catch(err) { if (btn) { btn.textContent = 'ERROR'; btn.disabled = false; } }
             } else { if (btn) { btn.textContent = 'HTTP ' + xhr.status; btn.disabled = false; } }
-            setTimeout(function() { if (btn) btn.innerHTML = '&#x1F4F7; CAPTURE SETUP PHOTO'; }, 3000);
+            setTimeout(function() { if (btn) btn.innerHTML = '&#x1F4F7; SNAP EVIDENCE PHOTO'; }, 3000);
           };
           xhr.onerror = function() {
             if (btn) { btn.textContent = 'OFFLINE'; btn.disabled = false; }
-            setTimeout(function() { if (btn) btn.innerHTML = '&#x1F4F7; CAPTURE SETUP PHOTO'; }, 3000);
+            setTimeout(function() { if (btn) btn.innerHTML = '&#x1F4F7; SNAP EVIDENCE PHOTO'; }, 3000);
           };
           xhr.send(formData);
         };
@@ -3017,6 +3081,10 @@
     var evPendingPhotos = [];
 
     function evCaptureSetupPhoto() {
+      if (!IMGBB_API_KEY) {
+        alert('Photo upload not configured.\n\nTo enable: open browser console and run:\nlocalStorage.setItem("mass_imgbb_key", "YOUR_KEY")\nthen reload the page.');
+        return;
+      }
       var input = document.createElement('input');
       input.type = 'file';
       input.accept = 'image/*';
@@ -3124,12 +3192,12 @@
       var plBtn = document.getElementById('plSetupPhotoBtn');
       if (normalBtn) {
         normalBtn.disabled = false;
-        normalBtn.innerHTML = '&#x1F4F7; SETUP PHOTO' +
+        normalBtn.innerHTML = '&#x1F4F7; SNAP PHOTO (before race)' +
           (count > 0 ? ' <span class="playlist-badge" style="display:inline;">' + count + '</span>' : '');
       }
       if (plBtn) {
         plBtn.disabled = false;
-        plBtn.innerHTML = '&#x1F4F7; SETUP PHOTO \u2014 Snap scale/car BEFORE this run' +
+        plBtn.innerHTML = '&#x1F4F7; SNAP PHOTO \u2014 Snap scale/car BEFORE this run' +
           (count > 0 ? ' <span class="playlist-badge" style="display:inline;">' + count + '</span>' : '');
       }
     }
@@ -3366,10 +3434,36 @@
     }
 
     // ===== ImgBB PHOTO UPLOAD =====
-    var IMGBB_API_KEY = ''; // Removed from source — load from device config at runtime
+    // Load API key from: 1) device config (preferred), 2) localStorage (fallback for testing)
+    var IMGBB_API_KEY = '';
+    (function loadImgbbKey() {
+      // Try localStorage first (instant, no network)
+      var stored = localStorage.getItem('mass_imgbb_key');
+      if (stored) IMGBB_API_KEY = stored;
+      // Then try device config (overrides localStorage if present)
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/api/config', true);
+      xhr.setRequestHeader('X-API-Key', 'admin');
+      xhr.onload = function() {
+        if (xhr.status === 200) {
+          try {
+            var cfg = JSON.parse(xhr.responseText);
+            if (cfg.integrations && cfg.integrations.imgbb_key) {
+              IMGBB_API_KEY = cfg.integrations.imgbb_key;
+              localStorage.setItem('mass_imgbb_key', IMGBB_API_KEY);
+            }
+          } catch(e) {}
+        }
+      };
+      xhr.send();
+    })();
 
     // Upload a photo to ImgBB and link it to an evidence entry
     function evUploadPhoto(caseNumber) {
+      if (!IMGBB_API_KEY) {
+        alert('Photo upload not configured.\n\nTo enable: open browser console and run:\nlocalStorage.setItem("mass_imgbb_key", "YOUR_KEY")\nthen reload the page.');
+        return;
+      }
       // Create hidden file input
       var input = document.createElement('input');
       input.type = 'file';

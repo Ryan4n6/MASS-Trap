@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M.A.S.S. Trap — Parent & Teacher Guide</title>
+<meta name="description" content="A step-by-step guide for parents and teachers helping kids run science fair experiments with M.A.S.S. Trap.">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --navy:#091B2F;--navy-light:#0d2847;--navy-card:#0f2340;
+  --gold:#D4AF37;--gold-dim:rgba(212,175,55,0.2);
+  --orange:#FF4500;--text:#E8E8E8;--text-muted:#8899AA;
+  --green:#28a745;--red:#dc3545;--cyan:#17a2b8;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  --radius:12px;
+}
+body{font-family:var(--font);background:var(--navy);color:var(--text);line-height:1.7;padding:0 0 80px 0;font-size:16px;}
+.container{max-width:680px;margin:0 auto;padding:0 16px;}
+
+/* Header */
+.hero{background:linear-gradient(135deg,var(--navy-light),var(--navy));padding:32px 16px;text-align:center;border-bottom:2px solid var(--gold);}
+.hero h1{font-size:1.6rem;color:var(--gold);font-weight:900;letter-spacing:1px;}
+.hero .subtitle{font-size:0.95rem;color:var(--text-muted);margin-top:4px;}
+.hero .badge{display:inline-block;background:var(--orange);color:#fff;font-size:0.7rem;font-weight:700;padding:3px 10px;border-radius:20px;margin-top:10px;letter-spacing:1px;}
+
+/* Navigation */
+.toc{background:var(--navy-card);border-radius:var(--radius);padding:16px;margin:20px 0;border:1px solid rgba(212,175,55,0.15);}
+.toc h2{font-size:0.85rem;color:var(--gold);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px;}
+.toc a{display:block;color:var(--cyan);text-decoration:none;padding:6px 0;font-size:0.95rem;border-bottom:1px solid rgba(255,255,255,0.05);}
+.toc a:last-child{border-bottom:none;}
+.toc a:hover{color:var(--gold);}
+.toc .toc-emoji{margin-right:8px;}
+
+/* Sections */
+.guide-section{margin:28px 0;padding:20px;background:var(--navy-card);border-radius:var(--radius);border:1px solid rgba(212,175,55,0.1);}
+.guide-section h2{font-size:1.2rem;color:var(--gold);font-weight:900;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.guide-section h3{font-size:1rem;color:var(--orange);font-weight:700;margin:16px 0 8px 0;}
+.guide-section p{margin-bottom:12px;color:var(--text);}
+.guide-section ul,.guide-section ol{margin:8px 0 12px 20px;}
+.guide-section li{margin-bottom:6px;}
+
+/* Step Cards */
+.step-card{background:rgba(212,175,55,0.05);border:1px solid rgba(212,175,55,0.15);border-radius:8px;padding:14px;margin:10px 0;}
+.step-card .step-num{display:inline-block;background:var(--gold);color:var(--navy);font-weight:900;width:28px;height:28px;border-radius:50%;text-align:center;line-height:28px;font-size:0.85rem;margin-right:8px;}
+.step-card .step-title{font-weight:700;font-size:1rem;color:var(--text);}
+.step-card .step-body{margin-top:8px;color:var(--text-muted);font-size:0.9rem;line-height:1.6;}
+.step-card .step-why{margin-top:8px;padding:8px 12px;background:rgba(23,162,184,0.08);border-left:3px solid var(--cyan);border-radius:4px;font-size:0.85rem;color:var(--cyan);}
+
+/* Ask-Your-Kid Boxes */
+.ask-box{background:rgba(255,69,0,0.08);border:1px solid rgba(255,69,0,0.25);border-radius:8px;padding:14px;margin:12px 0;}
+.ask-box .ask-label{font-size:0.75rem;font-weight:900;color:var(--orange);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px;}
+.ask-box .ask-q{font-size:1rem;color:var(--text);font-style:italic;margin:4px 0;}
+.ask-box .ask-hint{font-size:0.8rem;color:var(--text-muted);margin-top:6px;}
+
+/* Vocab Cards */
+.vocab{display:grid;grid-template-columns:1fr;gap:8px;margin:10px 0;}
+.vocab-card{background:rgba(40,167,69,0.08);border:1px solid rgba(40,167,69,0.2);border-radius:8px;padding:10px 14px;}
+.vocab-card .vocab-term{font-weight:900;color:var(--green);font-size:0.95rem;}
+.vocab-card .vocab-def{color:var(--text-muted);font-size:0.85rem;margin-top:2px;}
+.vocab-card .vocab-kid{color:var(--gold);font-size:0.85rem;margin-top:4px;font-style:italic;}
+
+/* Warning/Tip Boxes */
+.tip-box{padding:12px;border-radius:8px;margin:12px 0;font-size:0.9rem;}
+.tip-box.tip-green{background:rgba(40,167,69,0.08);border-left:3px solid var(--green);color:var(--green);}
+.tip-box.tip-orange{background:rgba(255,69,0,0.08);border-left:3px solid var(--orange);color:var(--orange);}
+.tip-box.tip-cyan{background:rgba(23,162,184,0.08);border-left:3px solid var(--cyan);color:var(--cyan);}
+
+/* Phase Timeline */
+.phase-timeline{display:flex;flex-direction:column;gap:0;margin:16px 0;}
+.phase-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+.phase-item:last-child{border-bottom:none;}
+.phase-num{flex-shrink:0;width:36px;height:36px;border-radius:50%;background:var(--gold);color:var(--navy);font-weight:900;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+.phase-info h4{font-size:0.95rem;font-weight:700;color:var(--text);}
+.phase-info p{font-size:0.85rem;color:var(--text-muted);margin-top:2px;}
+
+/* Back link */
+.back-link{display:inline-block;margin:20px 0;color:var(--gold);text-decoration:none;font-size:0.9rem;}
+.back-link:hover{text-decoration:underline;}
+
+/* Footer */
+.footer{text-align:center;padding:24px 16px;color:var(--text-muted);font-size:0.8rem;margin-top:40px;border-top:1px solid rgba(212,175,55,0.1);}
+.footer a{color:var(--gold);text-decoration:none;}
+
+/* Print friendly */
+@media print{body{background:#fff;color:#000;} .guide-section{border:1px solid #ccc;} .hero{border-bottom:2px solid #333;}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>&#x1F9EA; Parent & Teacher Guide</h1>
+  <p class="subtitle">M.A.S.S. Trap &mdash; Science Fair Experiment Helper</p>
+  <span class="badge">SCAN THE QR ON YOUR KID'S DASHBOARD</span>
+</div>
+
+<div class="container">
+
+<a href="index.html" class="back-link">&larr; Back to M.A.S.S. Trap Home</a>
+
+<!-- TABLE OF CONTENTS -->
+<div class="toc">
+  <h2>Quick Jump</h2>
+  <a href="#whatisthis"><span class="toc-emoji">&#x1F914;</span> What Is This Thing?</a>
+  <a href="#overview"><span class="toc-emoji">&#x1F3AF;</span> The 6 Phases (What Your Kid Sees)</a>
+  <a href="#vocab"><span class="toc-emoji">&#x1F4DA;</span> Vocabulary Cheat Sheet</a>
+  <a href="#phase1"><span class="toc-emoji">1&#xFE0F;&#x20E3;</span> Phase 1: Experiment Setup</a>
+  <a href="#phase2"><span class="toc-emoji">2&#xFE0F;&#x20E3;</span> Phase 2: Vehicle Intake</a>
+  <a href="#phase3"><span class="toc-emoji">3&#xFE0F;&#x20E3;</span> Phase 3: Evidence Prep</a>
+  <a href="#phase4"><span class="toc-emoji">4&#xFE0F;&#x20E3;</span> Phase 4: Pre-Flight Check</a>
+  <a href="#phase5"><span class="toc-emoji">5&#xFE0F;&#x20E3;</span> Phase 5: Data Collection (The Racing!)</a>
+  <a href="#phase6"><span class="toc-emoji">6&#xFE0F;&#x20E3;</span> Phase 6: Results & Report</a>
+  <a href="#questions"><span class="toc-emoji">&#x1F4AC;</span> Questions to Ask Your Kid</a>
+  <a href="#troubleshooting"><span class="toc-emoji">&#x1F527;</span> Troubleshooting</a>
+  <a href="#sciencefair"><span class="toc-emoji">&#x1F3C6;</span> What the Judges Want</a>
+</div>
+
+<!-- WHAT IS THIS -->
+<div class="guide-section" id="whatisthis">
+  <h2>&#x1F914; What Is This Thing?</h2>
+  <p>Your kid is using a <strong>M.A.S.S. Trap</strong> (Motion Analysis & Speed System) &mdash; a device built from a $7 microcontroller that turns a Hot Wheels track into a real physics laboratory.</p>
+  <p>It measures how fast toy cars roll down a track with <strong>microsecond precision</strong> (that's millionths of a second). The system then calculates speed, momentum, and kinetic energy &mdash; the same physics NASA uses to plan rocket launches.</p>
+  <p>The science fair experiment uses this to test a question like: <strong>"Does adding weight to a car make it go faster?"</strong></p>
+
+  <div class="tip-box tip-green">
+    <strong>&#x2705; Your job:</strong> You don't need to understand the technology. You just need to ask the right questions and help your kid think about <em>why</em> they're doing each step &mdash; not just <em>what</em> they're doing.
+  </div>
+</div>
+
+<!-- 6 PHASE OVERVIEW -->
+<div class="guide-section" id="overview">
+  <h2>&#x1F3AF; The 6 Phases</h2>
+  <p>The system walks your kid through 6 phases, like a detective processing a crime scene. Here's the big picture:</p>
+
+  <div class="phase-timeline">
+    <div class="phase-item">
+      <div class="phase-num">1</div>
+      <div class="phase-info">
+        <h4>Experiment Setup</h4>
+        <p>Pick what you're testing and define your variables. Like choosing which case to investigate.</p>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-num">2</div>
+      <div class="phase-info">
+        <h4>Vehicle Intake</h4>
+        <p>Select which cars to use and check their weights. Like booking suspects into the precinct.</p>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-num">3</div>
+      <div class="phase-info">
+        <h4>Evidence Prep</h4>
+        <p>Each test run gets a case number. Print tags and take photos BEFORE testing &mdash; like documenting a crime scene before you touch anything.</p>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-num">4</div>
+      <div class="phase-info">
+        <h4>Pre-Flight Check</h4>
+        <p>Review the test plan one last time. Like a pilot's checklist before takeoff &mdash; once data collection starts, you're committed.</p>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-num">5</div>
+      <div class="phase-info">
+        <h4>Data Collection</h4>
+        <p>THE RACING! The system tells your kid which car to use, when to add weight, and records everything automatically.</p>
+      </div>
+    </div>
+    <div class="phase-item">
+      <div class="phase-num">6</div>
+      <div class="phase-info">
+        <h4>Results & Report</h4>
+        <p>Export data, see the summary, and generate the science fair report. The evidence tells the story.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- VOCABULARY -->
+<div class="guide-section" id="vocab">
+  <h2>&#x1F4DA; Vocabulary Cheat Sheet</h2>
+  <p>These are the science words your kid needs to know (and the judges will ask about):</p>
+
+  <div class="vocab">
+    <div class="vocab-card">
+      <div class="vocab-term">Independent Variable (IV)</div>
+      <div class="vocab-def">The ONE thing you change on purpose in the experiment.</div>
+      <div class="vocab-kid">&#x1F4A1; "For us, it's the weight we add to the car."</div>
+    </div>
+    <div class="vocab-card">
+      <div class="vocab-term">Dependent Variable (DV)</div>
+      <div class="vocab-def">What you measure to see if the change made a difference.</div>
+      <div class="vocab-kid">&#x1F4A1; "For us, it's the speed (or time) the car goes down the track."</div>
+    </div>
+    <div class="vocab-card">
+      <div class="vocab-term">Controlled Variables (CV)</div>
+      <div class="vocab-def">Everything you keep the SAME so the test is fair.</div>
+      <div class="vocab-kid">&#x1F4A1; "Same track, same height, same release method, same car model."</div>
+    </div>
+    <div class="vocab-card">
+      <div class="vocab-term">Trial</div>
+      <div class="vocab-def">Running the same test multiple times to make sure the result isn't a fluke.</div>
+      <div class="vocab-kid">&#x1F4A1; "We run each car 3 times with the same weight to be sure."</div>
+    </div>
+    <div class="vocab-card">
+      <div class="vocab-term">Hypothesis</div>
+      <div class="vocab-def">An educated guess about what will happen, written BEFORE you test.</div>
+      <div class="vocab-kid">&#x1F4A1; "I think heavier cars will go faster because gravity pulls them harder."</div>
+    </div>
+    <div class="vocab-card">
+      <div class="vocab-term">Case Number</div>
+      <div class="vocab-def">A unique ID assigned to each test run (like MASS26-0001). Tracks the chain of evidence.</div>
+      <div class="vocab-kid">&#x1F4A1; "Every run is its own case file &mdash; we can trace any data point back to exactly when and how it was collected."</div>
+    </div>
+    <div class="vocab-card">
+      <div class="vocab-term">Momentum</div>
+      <div class="vocab-def">Mass &times; Velocity. How hard something is to stop.</div>
+      <div class="vocab-kid">&#x1F4A1; "A heavier car at the same speed has more momentum &mdash; like how a truck is harder to stop than a bicycle."</div>
+    </div>
+    <div class="vocab-card">
+      <div class="vocab-term">Kinetic Energy (KE)</div>
+      <div class="vocab-def">&frac12; &times; Mass &times; Velocity&sup2;. Energy of motion.</div>
+      <div class="vocab-kid">&#x1F4A1; "Speed matters WAY more than weight for energy &mdash; double the speed = 4x the energy!"</div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASE 1 -->
+<div class="guide-section" id="phase1">
+  <h2>1&#xFE0F;&#x20E3; Phase 1: Experiment Setup</h2>
+
+  <div class="step-card">
+    <span class="step-num">1</span>
+    <span class="step-title">Pick a Template</span>
+    <div class="step-body">
+      Your kid will see three choices: <strong>Mass vs Speed</strong> (recommended for science fair), <strong>Car vs Car</strong>, or <strong>Custom</strong>. The template auto-fills the variables so they don't have to type them.
+    </div>
+    <div class="step-why">&#x1F4A1; <strong>Why this matters:</strong> The template ensures the experiment has properly defined variables &mdash; the #1 thing judges check.</div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">2</span>
+    <span class="step-title">Set Weight Conditions</span>
+    <div class="step-body">
+      "No added weight" (baseline) is already there. Your kid adds conditions like "+14g tungsten" or "+7g tungsten." Each condition is a different amount of weight added to the car.
+    </div>
+    <div class="step-why">&#x1F4A1; <strong>Why this matters:</strong> Multiple conditions let the experiment show a PATTERN, not just a single comparison. Three or more conditions is ideal.</div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">3</span>
+    <span class="step-title">Set Trials Per Condition</span>
+    <div class="step-body">
+      Default is 3 trials. This means each car runs 3 times per weight condition. More trials = more reliable data.
+    </div>
+    <div class="step-why">&#x1F4A1; <strong>Why this matters:</strong> If you only test once, maybe the car hit a bump. Three times proves it wasn't a fluke. Scientists call this <em>reproducibility</em>.</div>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">&#x1F4AC; Ask Your Kid</div>
+    <div class="ask-q">"What do you THINK will happen when we add weight? Will the car go faster, slower, or stay the same?"</div>
+    <div class="ask-hint">This is their <strong>hypothesis</strong>. It's OK if they're wrong &mdash; science is about testing, not guessing right. Write it down BEFORE running any tests.</div>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">&#x1F4AC; Ask Your Kid</div>
+    <div class="ask-q">"What are we keeping the same every time? Why does that matter?"</div>
+    <div class="ask-hint">They should name the controlled variables: same track, same height, same release. If you change two things at once, you can't tell which one caused the result. This is called a <strong>fair test</strong>.</div>
+  </div>
+</div>
+
+<!-- PHASE 2 -->
+<div class="guide-section" id="phase2">
+  <h2>2&#xFE0F;&#x20E3; Phase 2: Vehicle Intake</h2>
+
+  <div class="step-card">
+    <span class="step-num">1</span>
+    <span class="step-title">Select Test Cars</span>
+    <div class="step-body">
+      Check the boxes next to each car that will be part of the experiment. The car's weight should already be in the system from the garage.
+    </div>
+    <div class="step-why">&#x1F4A1; <strong>Why this matters:</strong> The exact weight of each car (measured to the milligram) is recorded in the data. This is real science &mdash; not "about 30 grams," but "34.833 grams."</div>
+  </div>
+
+  <div class="tip-box tip-orange">
+    <strong>&#x26A0; Important:</strong> If a car's weight shows as 0g, it hasn't been weighed yet. Use a scale that reads to at least 0.1 grams (a kitchen scale works). For best results, use a milligram scale (0.001g).
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">&#x1F4AC; Ask Your Kid</div>
+    <div class="ask-q">"Why do we need to know the exact weight of each car?"</div>
+    <div class="ask-hint">Because we're adding weight TO the car. The total weight = car weight + added weight. Without knowing the base weight, we can't calculate anything.</div>
+  </div>
+</div>
+
+<!-- PHASE 3 -->
+<div class="guide-section" id="phase3">
+  <h2>3&#xFE0F;&#x20E3; Phase 3: Evidence Prep</h2>
+  <p>This is where the forensic theme really kicks in. Every test run gets assigned a <strong>case number</strong> (like MASS26-0001).</p>
+
+  <div class="step-card">
+    <span class="step-num">1</span>
+    <span class="step-title">Review the Case Table</span>
+    <div class="step-body">
+      You'll see a table listing every test run with its case number, car, weight condition, and trial number. This is the test matrix &mdash; it tells the system (and your kid) exactly what to do and in what order.
+    </div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">2</span>
+    <span class="step-title">Print Evidence Tags (optional but awesome)</span>
+    <div class="step-body">
+      If you have a label printer, print the evidence tags. Each tag has a QR code, case number, and car info. Stick them on the car or next to it for photos.
+    </div>
+    <div class="step-why">&#x1F4A1; <strong>Why this matters:</strong> Judges LOVE physical evidence. A photo of a car on a scale with an evidence tag next to it screams "this kid takes science seriously."</div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">3</span>
+    <span class="step-title">Snap Evidence Photos</span>
+    <div class="step-body">
+      Take a photo of each car on the scale BEFORE testing begins. The system uploads the photo and links it to the case number automatically. This creates a chain of custody &mdash; proof that the data is legit.
+    </div>
+    <div class="step-why">&#x1F4A1; <strong>Why this matters:</strong> In real forensics, you photograph evidence BEFORE you touch it. Same principle here &mdash; document the setup before collecting data.</div>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">&#x1F4AC; Ask Your Kid</div>
+    <div class="ask-q">"Why do we take photos BEFORE the experiment, not after?"</div>
+    <div class="ask-hint">Because after the experiment, you can't prove what the setup looked like. Photos before = proof. It's the same reason police photograph a crime scene before they move anything.</div>
+  </div>
+</div>
+
+<!-- PHASE 4 -->
+<div class="guide-section" id="phase4">
+  <h2>4&#xFE0F;&#x20E3; Phase 4: Pre-Flight Check</h2>
+
+  <div class="step-card">
+    <span class="step-num">1</span>
+    <span class="step-title">Review the Full Test Plan</span>
+    <div class="step-body">
+      The system shows every run in order. Look it over &mdash; once you start data collection, the plan is locked in.
+    </div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">2</span>
+    <span class="step-title">Read the How-To Steps</span>
+    <div class="step-body">
+      The screen shows step-by-step instructions for what to do during each run. Read through them together so your kid knows the drill.
+    </div>
+    <div class="step-why">&#x1F4A1; <strong>Why this matters:</strong> Consistent procedure is a controlled variable. If your kid pushes the car one time and releases it gently another time, the data is tainted.</div>
+  </div>
+
+  <div class="tip-box tip-green">
+    <strong>&#x2705; Pro tip:</strong> This is a great moment to do a practice run with a car that ISN'T in the experiment. Let your kid get comfortable with the release technique before real data collection begins.
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">&#x1F4AC; Ask Your Kid</div>
+    <div class="ask-q">"How are you going to release the car each time? Show me."</div>
+    <div class="ask-hint">They should place the car at the same spot and let go (NOT push). Consistency matters. If they can describe their procedure, they can write it in their report.</div>
+  </div>
+</div>
+
+<!-- PHASE 5 -->
+<div class="guide-section" id="phase5">
+  <h2>5&#xFE0F;&#x20E3; Phase 5: Data Collection</h2>
+  <p>This is the fun part &mdash; the actual racing! But it's STRUCTURED racing.</p>
+
+  <div class="step-card">
+    <span class="step-num">&#x1F7E2;</span>
+    <span class="step-title">The System Runs the Show</span>
+    <div class="step-body">
+      The screen shows a big banner telling your kid: which car, which weight condition, which trial number. Your kid just follows the instructions. After each run, the system automatically loads the next one.
+    </div>
+  </div>
+
+  <div class="tip-box tip-orange">
+    <strong>&#x26A0; Sanity Checks:</strong> If a run looks weird (too fast, too slow, or suspicious), the system will pop up a yellow alert with two buttons: <strong>KEEP</strong> (save it anyway) or <strong>RETRY</strong> (do it again). Help your kid decide.
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">&#x26A0;</span>
+    <span class="step-title">When to KEEP vs RETRY</span>
+    <div class="step-body">
+      <strong>KEEP</strong> if: the car ran normally and the time just seems unusual. Outliers happen in real experiments and can be analyzed later.<br>
+      <strong>RETRY</strong> if: the car got stuck, your kid pushed it instead of releasing it, something blocked the sensor, or the car went backwards through the finish.
+    </div>
+    <div class="step-why">&#x1F4A1; <strong>Why this matters:</strong> Scientists don't throw away data just because they don't like it. But they DO redo a run if the PROCEDURE was wrong. Teach your kid the difference!</div>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">&#x1F4AC; Ask Your Kid (during testing)</div>
+    <div class="ask-q">"Do you notice any pattern? Are the heavier cars going faster or slower?"</div>
+    <div class="ask-hint">Don't tell them the answer. Let them observe. They might say "I think the heavy ones are faster" or "they all seem the same." Both are valid observations they can write about later.</div>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">&#x1F4AC; Ask Your Kid (when adding weight)</div>
+    <div class="ask-q">"Why do you think weight might change the speed?"</div>
+    <div class="ask-hint">Guide them toward: heavier things have more gravitational pull (more force pulling them down the ramp). But also more friction and inertia. The experiment reveals which effect wins!</div>
+  </div>
+</div>
+
+<!-- PHASE 6 -->
+<div class="guide-section" id="phase6">
+  <h2>6&#xFE0F;&#x20E3; Phase 6: Results & Report</h2>
+
+  <div class="step-card">
+    <span class="step-num">1</span>
+    <span class="step-title">Review the Summary Table</span>
+    <div class="step-body">
+      The system calculates averages for each condition. Look at whether the average speed went up, down, or stayed the same as weight increased.
+    </div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">2</span>
+    <span class="step-title">Export the Data</span>
+    <div class="step-body">
+      Two export buttons: <strong>RAW CSV</strong> (every single run, for spreadsheets) and <strong>SUMMARY</strong> (averages, for the report). The CSV opens in Google Sheets or Excel.
+    </div>
+    <div class="step-why">&#x1F4A1; <strong>Why this matters:</strong> The raw data is your proof. The summary is your story. You need both for a science fair.</div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">3</span>
+    <span class="step-title">Generate the Report</span>
+    <div class="step-body">
+      The <strong>Science Fair Report</strong> button generates a complete lab report with all the right sections: Title, Abstract, Hypothesis, Variables, Materials, Procedure, Data Tables, Analysis, and Conclusion.
+    </div>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">&#x1F4AC; Ask Your Kid</div>
+    <div class="ask-q">"Was your hypothesis right? How do you know?"</div>
+    <div class="ask-hint">They need to point to specific numbers. Not "I think so" but "The car with 14g added went 1.23 m/s versus 1.18 m/s with no weight, so yes, heavier was faster." DATA is the answer.</div>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">&#x1F4AC; Ask Your Kid</div>
+    <div class="ask-q">"If you could do this experiment again, what would you change?"</div>
+    <div class="ask-hint">This is the "Application" section of the report. Maybe: test more weight levels, use a longer track, try different car shapes, or measure acceleration instead of just final speed. There is no wrong answer here &mdash; this shows scientific thinking.</div>
+  </div>
+</div>
+
+<!-- QUESTIONS TO ASK -->
+<div class="guide-section" id="questions">
+  <h2>&#x1F4AC; Quick Questions for Every Phase</h2>
+  <p>Don't know what to say? Pick any of these. They're designed to get your kid THINKING, not just clicking.</p>
+
+  <div class="ask-box">
+    <div class="ask-label">Before Starting</div>
+    <div class="ask-q">"What question are we trying to answer today?"</div>
+    <div class="ask-hint">They should be able to state the testable question: "Does adding weight to a car change its speed?"</div>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">During Setup</div>
+    <div class="ask-q">"How many times should we test each condition? Why not just once?"</div>
+    <div class="ask-hint">Multiple trials. One test could be a fluke. Three tests show if the result is consistent.</div>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">During Testing</div>
+    <div class="ask-q">"If we changed TWO things at once &mdash; like the weight AND the car &mdash; could we still tell what caused the difference?"</div>
+    <div class="ask-hint">No! That's why we have controlled variables. Change one thing, measure the result. This is the foundation of the scientific method.</div>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">After a Weird Run</div>
+    <div class="ask-q">"That run looked different. Was it the CAR that was different, or something WE did?"</div>
+    <div class="ask-hint">This teaches them to distinguish between experimental error (procedure problem) and natural variation (real data). If THEY did something wrong, retry. If the car just had a weird run, keep it.</div>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">After All Tests</div>
+    <div class="ask-q">"Look at your data. Tell me a story about what happened."</div>
+    <div class="ask-hint">This is the conclusion. They should describe the trend: "As weight increased, speed increased" or "Weight didn't change the speed much." Have them point at specific numbers in the table.</div>
+  </div>
+
+  <div class="ask-box">
+    <div class="ask-label">Big Picture</div>
+    <div class="ask-q">"Where in the real world does this matter? When does weight + speed actually matter?"</div>
+    <div class="ask-hint">Car crashes (heavier = more damage), roller coasters, delivery trucks vs sports cars, rockets (fuel weight vs thrust). This is the "Application" section judges love.</div>
+  </div>
+</div>
+
+<!-- TROUBLESHOOTING -->
+<div class="guide-section" id="troubleshooting">
+  <h2>&#x1F527; Troubleshooting</h2>
+
+  <h3>The screen says "Disconnected"</h3>
+  <p>The phone/tablet lost WiFi connection to the M.A.S.S. Trap. Check that you're connected to the right WiFi network and refresh the page. Your data is saved &mdash; it will pick up where you left off.</p>
+
+  <h3>A run shows 0.000 seconds</h3>
+  <p>The car didn't break the finish sensor, or something was blocking it. Hit RETRY. Make sure nothing is sitting on or near the sensors.</p>
+
+  <h3>The system says "too fast"</h3>
+  <p>Something triggered both sensors almost simultaneously. Usually means the car was pushed, bounced, or something flew through the sensor. RETRY if the car wasn't released properly. KEEP if the car was just genuinely fast.</p>
+
+  <h3>My kid accidentally closed the browser</h3>
+  <p>No panic! Open the dashboard again and it will restore exactly where you left off. All data is saved after every run, both on the phone and on the ESP32 device.</p>
+
+  <h3>The case numbers jumped (DRY26 instead of MASS26)</h3>
+  <p>Dry Run mode is enabled. Case numbers starting with "DRY" are test runs that don't save real data. Look for the orange "DRY RUN" banner at the top. Turn it off for the real experiment.</p>
+
+  <h3>Photos won't upload</h3>
+  <p>The photo upload needs an internet connection (it uploads to a cloud service). The M.A.S.S. Trap itself doesn't need internet for timing and data &mdash; only photos require it. You can always add photos later.</p>
+</div>
+
+<!-- WHAT JUDGES WANT -->
+<div class="guide-section" id="sciencefair">
+  <h2>&#x1F3C6; What Science Fair Judges Want</h2>
+  <p>Here's the rubric breakdown and how M.A.S.S. Trap helps hit every point:</p>
+
+  <div class="step-card">
+    <span class="step-num">&#x2705;</span>
+    <span class="step-title">Testable Question (10 pts)</span>
+    <div class="step-body">"Does adding mass to a Hot Wheels car change its speed on a fixed-length track?"<br>The template auto-generates this.</div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">&#x2705;</span>
+    <span class="step-title">Hypothesis (10 pts)</span>
+    <div class="step-body">Your kid writes this BEFORE testing. "I predict that adding weight will make the car faster because gravity pulls heavier objects with more force."</div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">&#x2705;</span>
+    <span class="step-title">Variables (10 pts)</span>
+    <div class="step-body">Phase 1 defines IV (added weight), DV (speed/time), and CV (track, height, release). The export labels them clearly.</div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">&#x2705;</span>
+    <span class="step-title">Materials List (10 pts)</span>
+    <div class="step-body">M.A.S.S. Trap ESP32 system, Hot Wheels track (6.01m), test vehicles with known weights, tungsten weights, milligram scale, label printer (optional).</div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">&#x2705;</span>
+    <span class="step-title">Procedure (10 pts)</span>
+    <div class="step-body">The 6-phase workflow IS the procedure. Phase 4 has written step-by-step instructions. The Science Fair Report auto-generates this section.</div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">&#x2705;</span>
+    <span class="step-title">Quantitative Data in Metric (10 pts)</span>
+    <div class="step-body">All data is recorded in metric: time (seconds), speed (m/s), mass (grams). Multiple trials per condition. Automatically.</div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">&#x2705;</span>
+    <span class="step-title">Analysis with Trends (10 pts)</span>
+    <div class="step-body">Phase 6 summary table shows averages per condition. Your kid describes the pattern: "Speed increased as weight increased."</div>
+  </div>
+
+  <div class="step-card">
+    <span class="step-num">&#x2705;</span>
+    <span class="step-title">Conclusion (10 pts)</span>
+    <div class="step-body">Was the hypothesis correct? Cite specific numbers. What would you do differently? The Science Fair Report has fill-in sections for this.</div>
+  </div>
+
+  <div class="tip-box tip-cyan">
+    <strong>&#x1F4A1; Bonus points strategy:</strong> Evidence photos, printed evidence tags with QR codes, and a chain-of-custody approach will set your kid's project apart from every other poster board. It shows <em>process</em>, not just <em>results</em>.
+  </div>
+</div>
+
+<!-- PHASE SYNC FLOATING INDICATOR -->
+<div id="phaseSync" style="display:none;position:fixed;top:0;left:0;right:0;z-index:1000;background:var(--navy-card);border-bottom:2px solid var(--gold);padding:10px 16px;font-size:0.85rem;text-align:center;box-shadow:0 4px 20px rgba(0,0,0,0.5);">
+  <span id="phaseSyncText" style="color:var(--gold);font-weight:700;">Phase 1: Experiment Setup</span>
+  <span style="color:var(--text-muted);font-size:0.75rem;display:block;">Synced with your kid's dashboard</span>
+</div>
+
+<script>
+// ============================================================
+// PARENT GUIDE AUTO-SYNC
+// Reads ?phase=N from URL and auto-scrolls to matching section.
+// The kid's dashboard updates this URL when phases change.
+// ============================================================
+(function() {
+  var phaseMap = {
+    '1': 'phase1', '2': 'phase2', '3': 'phase3',
+    '4': 'phase4', '5': 'phase5', '6': 'phase6'
+  };
+  var phaseNames = {
+    '1': 'Experiment Setup', '2': 'Vehicle Intake', '3': 'Evidence Prep',
+    '4': 'Pre-Flight Check', '5': 'Data Collection', '6': 'Results & Report'
+  };
+
+  function syncPhase() {
+    var params = new URLSearchParams(window.location.search);
+    var phase = params.get('phase');
+    if (!phase || !phaseMap[phase]) return;
+
+    // Show floating indicator
+    var sync = document.getElementById('phaseSync');
+    var syncText = document.getElementById('phaseSyncText');
+    if (sync && syncText) {
+      syncText.textContent = 'Phase ' + phase + ': ' + (phaseNames[phase] || '');
+      sync.style.display = 'block';
+      document.body.style.paddingTop = '60px'; // Make room for fixed header
+    }
+
+    // Scroll to matching section
+    var target = document.getElementById(phaseMap[phase]);
+    if (target) {
+      setTimeout(function() {
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 300);
+
+      // Highlight the active section
+      target.style.borderColor = 'var(--gold)';
+      target.style.borderWidth = '2px';
+      target.style.boxShadow = '0 0 20px rgba(212,175,55,0.15)';
+    }
+
+    // Dim non-active phases (but keep them accessible)
+    var allSections = document.querySelectorAll('.guide-section');
+    for (var i = 0; i < allSections.length; i++) {
+      var id = allSections[i].id;
+      if (id && id.match(/^phase[1-6]$/) && id !== phaseMap[phase]) {
+        allSections[i].style.opacity = '0.5';
+      }
+    }
+  }
+
+  // Sync on load
+  syncPhase();
+
+  // Also listen for hash changes (for live updates via postMessage)
+  window.addEventListener('hashchange', function() {
+    var hash = window.location.hash.replace('#', '');
+    if (hash.match(/^phase[1-6]$/)) {
+      var newPhase = hash.replace('phase', '');
+      var url = new URL(window.location);
+      url.searchParams.set('phase', newPhase);
+      window.history.replaceState({}, '', url);
+      // Reset styles
+      var allSections = document.querySelectorAll('.guide-section');
+      for (var i = 0; i < allSections.length; i++) {
+        allSections[i].style.opacity = '1';
+        allSections[i].style.borderColor = '';
+        allSections[i].style.borderWidth = '';
+        allSections[i].style.boxShadow = '';
+      }
+      syncPhase();
+    }
+  });
+
+  // Listen for postMessage from the ESP32 dashboard (cross-origin sync)
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'massPhaseChange' && e.data.phase) {
+      window.location.hash = 'phase' + e.data.phase;
+    }
+  });
+})();
+</script>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>Built with &#x2764; by the Massfeller family</p>
+  <p style="margin-top:6px;">
+    <a href="index.html">M.A.S.S. Trap Home</a> &nbsp;|&nbsp;
+    <a href="store.html">Parts Store</a> &nbsp;|&nbsp;
+    <a href="wizard.html">Build Wizard</a> &nbsp;|&nbsp;
+    <a href="https://github.com/Ryan4n6/MASS-Trap">GitHub</a>
+  </p>
+  <p style="margin-top:10px;font-size:0.7rem;color:var(--text-muted);">
+    M.A.S.S. Trap &mdash; Motion Analysis & Speed System<br>
+    &copy; 2026 Ryan Massfeller. Open source under MIT License.
+  </p>
+</div>
+
+</div><!-- /.container -->
+</body>
+</html>
