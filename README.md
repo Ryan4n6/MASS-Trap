@@ -18,6 +18,20 @@ This project was engineered by a former **Police Detective** and **Digital Foren
 
 ---
 
+## 🌐 Live Demo & Documentation
+
+> **[Try the Interactive Demo →](https://ryan4n6.github.io/MASS-Trap/#demo)** — No hardware needed. All 5 themes. Simulated races.
+
+| Page | Description |
+|------|-------------|
+| [Project Home](https://ryan4n6.github.io/MASS-Trap/) | Interactive demo, build tiers, roadmap |
+| [Parent & Teacher Guide](https://ryan4n6.github.io/MASS-Trap/parents.html) | Step-by-step science fair helper for parents |
+| [Judge Showcase](https://ryan4n6.github.io/MASS-Trap/judges.html) | Science fair project page for judges |
+| [Parts Store](https://ryan4n6.github.io/MASS-Trap/store.html) | Curated parts lists by budget tier |
+| [Build Wizard](https://ryan4n6.github.io/MASS-Trap/wizard.html) | Interactive wiring guide |
+
+---
+
 ## "Interceptor" Architecture (Hardware)
 
 Unlike civilian-grade Arduino projects, The M.A.S.S. Trap runs on the **Interceptor Spec** -- a modified, high-performance stack designed for real-time telemetry, heavy data logging, and audio synthesis.
@@ -99,6 +113,29 @@ The system hosts its own web app (no internet required), turning any phone, tabl
 - **5 visual themes** -- switch look-and-feel from Interceptor to Hot Wheels Classic, Daytona, Case File, or Cyber
 - **Kiosk mode** -- presentation mode for science fairs hides controls, shows data only
 - **Imperial/Metric units** -- configurable display units (mph or km/h) with timezone selection
+
+### Evidence System & NFC
+- **Case numbers** — Sequential `MASS26-XXXX` format with chain of custody tracking
+- **QR-coded evidence tags** — Printable labels with case number, car info, and scannable QR code
+- **NFC auto-identification** — NTAG213 stickers on cars auto-select vehicle and arm track when scanned
+- **Photo documentation** — Upload evidence photos linked to case numbers via cloud hosting
+- **Forensic-grade logging** — Every data point traceable back to exact car, weight, condition, and trial
+
+### 6-Phase Science Fair Lab Manager
+- **Guided testing workflow** — Experiment Setup → Vehicle Intake → Evidence Prep → Pre-Flight → Data Collection → Results
+- **Test matrix generation** — Locard's Exchange Principle ordering prevents systematic bias
+- **Auto-advance** — System prompts operator through each run with audio cues
+- **Sanity checks** — Alerts on suspicious times (too fast, too slow, identical runs) with KEEP/RETRY options
+- **CSV export** — Raw data and summary tables formatted for science fair rubric requirements
+- **Auto-generated lab report** — Complete science fair report with hypothesis, variables, data tables, analysis, conclusion
+- **Persistence** — State saved to localStorage + ESP32 at every transition; full recovery on disconnect
+
+### Browser Firmware Update
+- **GitHub-direct OTA** — Download and flash firmware updates directly from GitHub releases
+- **MD5 verification** — Integrity check before flashing, dual OTA partition safety net
+- **TLS secured** — Embedded root CAs for secure HTTPS downloads
+- **Update detection** — Dashboard shows breathing red badge when new firmware is available
+- **Manual upload fallback** — Drag-and-drop `.bin` upload with progress bar
 
 ### Debug Console
 - **Web-based serial monitor** -- view device logs over WiFi at `/console`
@@ -232,6 +269,7 @@ The OTA password defaults to `admin` — change it in the config page for securi
 | `/history.html` | Evidence Log | Race history with full physics data |
 | `/config` | System Config | WiFi, pins, peer, track, audio, LiDAR, WLED, OTA settings |
 | `/console` | Debug Console | Timestamped serial log viewer, file browser, device info |
+| `/about.html` | The Kristina Report™ | Project stats, builders, live device status, commit timeline |
 
 ## API Endpoints
 
@@ -258,6 +296,9 @@ The OTA password defaults to `admin` — change it in the config page for securi
 | `/api/wled/effects` | GET | Proxy: list WLED effects |
 | `/api/backup` | GET | Legacy single-config backup |
 | `/api/restore` | POST | Legacy single-config restore |
+| `/api/firmware/status` | GET | Check for firmware updates against GitHub releases |
+| `/api/firmware/update-from-url` | POST | Download and flash firmware from URL |
+| `/api/firmware/upload` | POST | Upload firmware binary for manual OTA update |
 | `/api/reset` | POST | Factory reset (deletes config, reboots) |
 
 ## Project Structure
@@ -287,6 +328,8 @@ MASS-Trap/
 │   ├── dashboard.html         # Command Center (primary, served from LittleFS)
 │   ├── history.html           # Evidence Log page
 │   ├── system.html            # System configuration page
+│   ├── about.html             # The Kristina Report™ (project status page)
+│   ├── science_fair_report.html  # Auto-generated forensic lab report
 │   ├── main.js                # Shared JavaScript utilities
 │   ├── style.css              # Shared stylesheet
 │   ├── index.html             # Legacy dashboard source
@@ -329,11 +372,18 @@ MASS-Trap/
 
 ### Planned
 - [ ] **Hub Scoreboard Device** -- Waveshare ESP32 display as the central data authority with SD card storage
-- [ ] **NFC Car Tagging** -- Tap an NFC tag on each car to auto-select it before racing
-- [ ] **Testing Playlists** -- Pre-defined science fair test protocols (e.g., "Weight vs Speed", "Angle vs Distance")
-- [ ] **GitHub Version Check** -- Compare running firmware against latest release, notify when updates available
 - [ ] **Multi-Lane Support** -- Multiple finish sensors for parallel lane timing
 - [ ] **Tournament Bracket Mode** -- Head-to-head elimination bracket with automatic advancement
+
+### Completed (v2.6.0-beta)
+- [x] **NFC Car Tagging** -- NTAG213 stickers auto-select car and arm track on scan
+- [x] **6-Phase Science Fair Lab Manager** -- Guided forensic testing workflow with test matrix generation, auto-advance, and sanity checks
+- [x] **Browser Firmware Update** -- GitHub release detection, MD5-verified OTA, breathing badge notification
+- [x] **Evidence System** — Case numbers, QR tags, photo documentation, chain of custody
+- [x] **Science Fair Report Generator** — Auto-generated forensic lab report from experiment data
+- [x] **GitHub Pages Site** — Interactive demo, parent guide, judge showcase, parts store, build wizard
+- [x] **Community Feedback (Giscus)** — GitHub Discussions-powered comments and reactions on all pages
+- [x] **Google Analytics** — GA4 tracking across all GitHub Pages
 
 ### Completed (v2.5.0)
 - [x] **Theme Engine** -- 5 selectable themes (Interceptor, Classic, Daytona, Case File, Cyber) with localStorage persistence
@@ -382,8 +432,12 @@ MIT License -- use it, modify it, teach with it.
 
 *Built for my sons. May you always find the thrill in the data.*
 
-*In memory of the Formula Vee days. We are still racing, Dad.*
+*In memory of Richard Massfeller — General Contractor, Formula Vee racer, and the original builder. He built a 7ft pencil for a science fair. We built this.*
+
+*In memory of Sam Troia and Stephen "Beaver" Massfeller — the uncles who shaped who we are.*
 
 ---
+
+🏠 [Project Site](https://ryan4n6.github.io/MASS-Trap/) · 📦 [GitHub](https://github.com/Ryan4n6/MASS-Trap) · 📥 [Releases](https://github.com/Ryan4n6/MASS-Trap/releases) · 🛒 [Parts Store](https://ryan4n6.github.io/MASS-Trap/store.html)
 
 Firmware assistance by Claude (Anthropic).
