@@ -327,6 +327,130 @@ img{max-width:100%;height:auto}
         </div>
       </div>
 
+      <!-- ============================================= -->
+      <!--  FEATURE 1: EVIDENCE TAG (pops up after race) -->
+      <!-- ============================================= -->
+      <div id="demoEvTag" class="demo-ev-tag" style="display:none;">
+        <div class="demo-ev-tag-inner">
+          <div class="demo-ev-tag-header">
+            <div class="demo-ev-tag-badge">EVIDENCE TAG</div>
+            <button class="demo-ev-tag-close" onclick="demoCloseTag()" aria-label="Close">&times;</button>
+          </div>
+          <div class="demo-ev-tag-body">
+            <div class="demo-ev-tag-row">
+              <div class="demo-ev-tag-qr" id="demoEvQr"></div>
+              <div class="demo-ev-tag-info">
+                <div class="demo-ev-tag-case" id="demoEvCase">MASS26-0001</div>
+                <div class="demo-ev-tag-detail" id="demoEvDetail">--</div>
+              </div>
+            </div>
+            <div class="demo-ev-tag-meta" id="demoEvMeta">--</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================= -->
+      <!--  FEATURE 2: SCIENCE FAIR 6-PHASE STEPPER      -->
+      <!-- ============================================= -->
+      <div class="demo-section">
+        <div class="demo-section-title">SCIENCE FAIR MODE</div>
+        <div class="demo-sf-stepper" id="demoStepper">
+          <div class="demo-sf-step completed" data-phase="1">
+            <div class="demo-sf-dot">&#10003;</div>
+            <div class="demo-sf-label">Setup</div>
+          </div>
+          <div class="demo-sf-line completed"></div>
+          <div class="demo-sf-step completed" data-phase="2">
+            <div class="demo-sf-dot">&#10003;</div>
+            <div class="demo-sf-label">Intake</div>
+          </div>
+          <div class="demo-sf-line completed"></div>
+          <div class="demo-sf-step completed" data-phase="3">
+            <div class="demo-sf-dot">&#10003;</div>
+            <div class="demo-sf-label">Evidence</div>
+          </div>
+          <div class="demo-sf-line completed"></div>
+          <div class="demo-sf-step completed" data-phase="4">
+            <div class="demo-sf-dot">&#10003;</div>
+            <div class="demo-sf-label">Pre-Flight</div>
+          </div>
+          <div class="demo-sf-line active"></div>
+          <div class="demo-sf-step active" data-phase="5">
+            <div class="demo-sf-dot">5</div>
+            <div class="demo-sf-label">Collect</div>
+          </div>
+          <div class="demo-sf-line"></div>
+          <div class="demo-sf-step" data-phase="6">
+            <div class="demo-sf-dot">6</div>
+            <div class="demo-sf-label">Results</div>
+          </div>
+        </div>
+        <div class="demo-sf-info" id="demoSfInfo">
+          <div class="demo-sf-status">&#9654; PHASE 5: DATA COLLECTION</div>
+          <div class="demo-sf-desc">Collecting race data with sanity checks. Auto-advancing through test matrix.</div>
+          <div class="demo-sf-progress">
+            <div class="demo-sf-bar-bg">
+              <div class="demo-sf-bar-fill" id="demoSfBar" style="width:0%"></div>
+            </div>
+            <div class="demo-sf-bar-label" id="demoSfBarLabel">Run 0 of 20</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================= -->
+      <!--  FEATURE 3: THE GARAGE (interactive car grid) -->
+      <!-- ============================================= -->
+      <div class="demo-section">
+        <div class="demo-section-title">THE GARAGE</div>
+        <div class="demo-garage" id="demoGarage"></div>
+        <div class="demo-garage-hint">Click a car to select it for the next race</div>
+      </div>
+
+      <!-- ============================================= -->
+      <!--  FEATURE 4: FORENSIC ANALYSIS FORMULA CARDS   -->
+      <!-- ============================================= -->
+      <div class="demo-section">
+        <div class="demo-section-title">FORENSIC ANALYSIS</div>
+        <div class="demo-grid demo-grid-4" id="demoFormulas">
+          <div class="demo-formula-card">
+            <div class="demo-formula-eq">v = d / t</div>
+            <div class="demo-formula-name">Velocity</div>
+            <div class="demo-formula-val" id="demoFVel">-- m/s</div>
+            <div class="demo-formula-work" id="demoFVelWork">6.01m &divide; --s</div>
+          </div>
+          <div class="demo-formula-card">
+            <div class="demo-formula-eq">p = m &times; v</div>
+            <div class="demo-formula-name">Momentum</div>
+            <div class="demo-formula-val" id="demoFMom">-- kg&middot;m/s</div>
+            <div class="demo-formula-work" id="demoFMomWork">--kg &times; --m/s</div>
+          </div>
+          <div class="demo-formula-card">
+            <div class="demo-formula-eq">KE = &frac12;mv&sup2;</div>
+            <div class="demo-formula-name">Kinetic Energy</div>
+            <div class="demo-formula-val" id="demoFKE">-- J</div>
+            <div class="demo-formula-work" id="demoFKEWork">&frac12; &times; --kg &times; --&sup2;</div>
+          </div>
+          <div class="demo-formula-card">
+            <div class="demo-formula-eq">a = v / t</div>
+            <div class="demo-formula-name">Acceleration</div>
+            <div class="demo-formula-val" id="demoFAcc">-- m/s&sup2;</div>
+            <div class="demo-formula-work" id="demoFAccWork">--m/s &divide; --s</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================= -->
+      <!--  FEATURE 5: GHOST CAR COMPARISON               -->
+      <!-- ============================================= -->
+      <div id="demoGhost" class="demo-ghost" style="display:none;">
+        <div class="demo-ghost-inner">
+          <div class="demo-ghost-icon" id="demoGhostIcon">&#128123;</div>
+          <div class="demo-ghost-label">VS PERSONAL BEST</div>
+          <div class="demo-ghost-delta" id="demoGhostDelta">--</div>
+          <div class="demo-ghost-detail" id="demoGhostDetail">--</div>
+        </div>
+      </div>
+
       <!-- Version Badge -->
       <div class="demo-version">FW v2.6.0-beta</div>
     </div>
@@ -447,6 +571,81 @@ img{max-width:100%;height:auto}
 .demo-lb-rank{font-size:3rem;font-weight:900;color:var(--d-accent)}
 .demo-lb-text{font-size:1.1rem;font-weight:900;color:var(--d-text);margin:4px 0}
 .demo-lb-detail{font-size:0.75rem;color:var(--d-muted)}
+
+/* === FEATURE 1: EVIDENCE TAG === */
+.demo-ev-tag{position:absolute;bottom:60px;right:12px;z-index:9;animation:demoEvSlide 0.4s ease}
+@keyframes demoEvSlide{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.demo-ev-tag-inner{background:var(--d-card);border:2px solid var(--d-accent);border-radius:10px;padding:0;overflow:hidden;width:280px;box-shadow:0 8px 32px rgba(0,0,0,0.5)}
+.demo-ev-tag-header{display:flex;align-items:center;justify-content:space-between;padding:6px 10px;background:rgba(var(--d-accent-rgb),0.15);border-bottom:1px solid var(--d-accent)}
+.demo-ev-tag-badge{font-size:0.55rem;font-weight:900;letter-spacing:2px;color:var(--d-accent);text-transform:uppercase}
+.demo-ev-tag-close{background:none;border:none;color:var(--d-muted);font-size:1.2rem;cursor:pointer;padding:0 4px;line-height:1}
+.demo-ev-tag-close:hover{color:var(--d-danger)}
+.demo-ev-tag-body{padding:10px}
+.demo-ev-tag-row{display:flex;gap:10px;align-items:center}
+.demo-ev-tag-qr{width:64px;height:64px;flex-shrink:0;border-radius:4px;overflow:hidden;background:#fff;display:flex;align-items:center;justify-content:center}
+.demo-ev-tag-qr svg{width:56px;height:56px}
+.demo-ev-tag-info{flex:1;min-width:0}
+.demo-ev-tag-case{font-size:1rem;font-weight:900;color:var(--d-accent);font-family:var(--d-font-data);letter-spacing:1px}
+.demo-ev-tag-detail{font-size:0.7rem;color:var(--d-text);line-height:1.5;margin-top:2px}
+.demo-ev-tag-meta{font-size:0.6rem;color:var(--d-muted);border-top:1px solid var(--d-border);margin-top:8px;padding-top:6px;text-align:center;font-family:var(--d-font-data)}
+
+/* === FEATURE 2: SCIENCE FAIR STEPPER === */
+.demo-sf-stepper{display:flex;align-items:center;justify-content:center;gap:0;padding:4px 8px;flex-wrap:wrap}
+.demo-sf-step{display:flex;flex-direction:column;align-items:center;gap:2px;position:relative}
+.demo-sf-dot{width:28px;height:28px;border-radius:50%;background:var(--d-dark);border:2px solid var(--d-border);display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:900;color:var(--d-muted);transition:all 0.3s}
+.demo-sf-step.completed .demo-sf-dot{background:var(--d-success);border-color:var(--d-success);color:#fff}
+.demo-sf-step.active .demo-sf-dot{background:rgba(var(--d-accent-rgb),0.2);border-color:var(--d-accent);color:var(--d-accent);box-shadow:0 0 12px rgba(var(--d-accent-rgb),0.4);animation:demoSfPulse 2s infinite}
+@keyframes demoSfPulse{0%,100%{box-shadow:0 0 8px rgba(var(--d-accent-rgb),0.3)}50%{box-shadow:0 0 16px rgba(var(--d-accent-rgb),0.6)}}
+.demo-sf-label{font-size:0.5rem;font-weight:700;color:var(--d-muted);text-transform:uppercase;letter-spacing:0.5px;white-space:nowrap}
+.demo-sf-step.completed .demo-sf-label{color:var(--d-success)}
+.demo-sf-step.active .demo-sf-label{color:var(--d-accent)}
+.demo-sf-line{width:20px;height:2px;background:var(--d-border);margin:0 2px;margin-bottom:14px;transition:background 0.3s}
+.demo-sf-line.completed{background:var(--d-success)}
+.demo-sf-line.active{background:var(--d-accent);box-shadow:0 0 6px rgba(var(--d-accent-rgb),0.3)}
+.demo-sf-info{padding:8px 12px;margin-top:8px}
+.demo-sf-status{font-size:0.75rem;font-weight:900;color:var(--d-accent);letter-spacing:1px;text-transform:uppercase}
+.demo-sf-desc{font-size:0.7rem;color:var(--d-muted);margin-top:2px}
+.demo-sf-progress{margin-top:8px}
+.demo-sf-bar-bg{height:6px;background:var(--d-dark);border-radius:3px;overflow:hidden;border:1px solid var(--d-border)}
+.demo-sf-bar-fill{height:100%;background:linear-gradient(90deg,var(--d-accent),var(--d-success));border-radius:3px;transition:width 0.5s ease}
+.demo-sf-bar-label{font-size:0.6rem;color:var(--d-muted);text-align:center;margin-top:3px;font-family:var(--d-font-data)}
+
+/* === FEATURE 3: THE GARAGE === */
+.demo-garage{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+@media(max-width:500px){.demo-garage{grid-template-columns:repeat(2,1fr)}}
+.demo-garage-car{background:var(--d-dark);border:2px solid var(--d-border);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:all 0.2s;position:relative}
+.demo-garage-car:hover{border-color:var(--d-secondary);transform:translateY(-1px)}
+.demo-garage-car.selected{border-color:var(--d-accent);background:rgba(var(--d-accent-rgb),0.08);box-shadow:0 0 12px rgba(var(--d-accent-rgb),0.15)}
+.demo-garage-car.selected::after{content:"NEXT";position:absolute;top:4px;right:4px;font-size:0.45rem;font-weight:900;background:var(--d-accent);color:var(--d-bg);padding:1px 5px;border-radius:3px;letter-spacing:1px}
+.demo-garage-emoji{font-size:1.5rem;margin-bottom:2px}
+.demo-garage-name{font-size:0.7rem;font-weight:900;color:var(--d-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.demo-garage-weight{font-size:0.6rem;color:var(--d-muted);font-family:var(--d-font-data)}
+.demo-garage-runs{font-size:0.55rem;color:var(--d-muted);margin-top:2px}
+.demo-garage-best{font-size:0.55rem;color:var(--d-accent);font-family:var(--d-font-data);font-weight:700}
+.demo-garage-hint{font-size:0.6rem;color:var(--d-muted);text-align:center;margin-top:6px;font-style:italic}
+
+/* === FEATURE 4: FORMULA CARDS === */
+.demo-grid-4{grid-template-columns:repeat(4,1fr)}
+@media(max-width:600px){.demo-grid-4{grid-template-columns:repeat(2,1fr)}}
+.demo-formula-card{background:var(--d-dark);border:1px solid var(--d-border);border-radius:8px;padding:10px 8px;text-align:center;transition:border-color 0.3s}
+.demo-formula-card.highlight{border-color:var(--d-accent);box-shadow:0 0 8px rgba(var(--d-accent-rgb),0.15)}
+.demo-formula-eq{font-size:1rem;font-weight:900;color:var(--d-accent);font-family:var(--d-font-data);margin-bottom:2px;letter-spacing:1px}
+.demo-formula-name{font-size:0.55rem;font-weight:700;color:var(--d-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.demo-formula-val{font-size:0.95rem;font-weight:900;color:var(--d-text);font-family:var(--d-font-data)}
+.demo-formula-work{font-size:0.55rem;color:var(--d-muted);font-family:var(--d-font-data);margin-top:3px;opacity:0.7}
+
+/* === FEATURE 5: GHOST CAR === */
+.demo-ghost{position:absolute;top:120px;left:12px;z-index:8;animation:demoGhostFade 0.5s ease}
+@keyframes demoGhostFade{from{transform:translateX(-20px);opacity:0}to{transform:translateX(0);opacity:1}}
+.demo-ghost-inner{background:var(--d-card);border:2px solid var(--d-border);border-radius:10px;padding:10px 14px;text-align:center;min-width:140px;box-shadow:0 4px 16px rgba(0,0,0,0.4)}
+.demo-ghost-icon{font-size:1.4rem;margin-bottom:2px}
+.demo-ghost-label{font-size:0.5rem;font-weight:900;color:var(--d-muted);letter-spacing:1.5px;text-transform:uppercase}
+.demo-ghost-delta{font-size:1.3rem;font-weight:900;font-family:var(--d-font-data);margin:4px 0}
+.demo-ghost-delta.faster{color:var(--d-success)}
+.demo-ghost-delta.slower{color:var(--d-danger)}
+.demo-ghost-delta.record{color:var(--d-accent);animation:demoRecordPulse 0.6s ease 3}
+@keyframes demoRecordPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+.demo-ghost-detail{font-size:0.6rem;color:var(--d-muted);font-family:var(--d-font-data)}
 </style>
 
 <script>
@@ -495,7 +694,192 @@ img{max-width:100%;height:auto}
     cyber:       { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'COMMAND CENTER' }
   };
 
+  var demoCaseNum = 0;
+  var demoSfTotal = 20; // Science fair: 20 runs in matrix
+
+  // Car emoji map (consistent display)
+  var carEmoji = ['🏎️', '🚙', '🔧', '💀', '🏁', '🌙'];
+
   function $(id) { return document.getElementById(id); }
+
+  // ---- FEATURE 1: EVIDENCE TAG ----
+  function demoGenerateQrSvg() {
+    // Mini QR-like SVG pattern (cosmetic — not scannable, just looks right)
+    var size = 56;
+    var cells = 11;
+    var cell = size / cells;
+    var rects = '';
+    // Fixed finder patterns (top-left, top-right, bottom-left)
+    var finders = [[0,0],[7,0],[0,7]];
+    for (var f = 0; f < finders.length; f++) {
+      var fx = finders[f][0], fy = finders[f][1];
+      rects += '<rect x="' + (fx*cell) + '" y="' + (fy*cell) + '" width="' + (cell*3) + '" height="' + (cell*3) + '" fill="#000" rx="1"/>';
+      rects += '<rect x="' + ((fx+0.5)*cell) + '" y="' + ((fy+0.5)*cell) + '" width="' + (cell*2) + '" height="' + (cell*2) + '" fill="#fff" rx="0.5"/>';
+      rects += '<rect x="' + ((fx+1)*cell) + '" y="' + ((fy+1)*cell) + '" width="' + cell + '" height="' + cell + '" fill="#000" rx="0.5"/>';
+    }
+    // Random data cells
+    for (var i = 0; i < cells; i++) {
+      for (var j = 0; j < cells; j++) {
+        if ((i < 3 && j < 3) || (i >= 7 && j < 3) || (i < 3 && j >= 7)) continue;
+        if (Math.random() > 0.55) {
+          rects += '<rect x="' + (i*cell) + '" y="' + (j*cell) + '" width="' + cell + '" height="' + cell + '" fill="#000"/>';
+        }
+      }
+    }
+    return '<svg viewBox="0 0 ' + size + ' ' + size + '" xmlns="http://www.w3.org/2000/svg">' + rects + '</svg>';
+  }
+
+  function demoShowEvTag(car, race, caseNumber) {
+    var tag = $('demoEvTag');
+    var now = new Date();
+    var ts = now.getFullYear() + '-' +
+      String(now.getMonth()+1).padStart(2,'0') + '-' +
+      String(now.getDate()).padStart(2,'0') + ' ' +
+      String(now.getHours()).padStart(2,'0') + ':' +
+      String(now.getMinutes()).padStart(2,'0') + ':' +
+      String(now.getSeconds()).padStart(2,'0');
+    $('demoEvQr').innerHTML = demoGenerateQrSvg();
+    $('demoEvCase').textContent = caseNumber;
+    $('demoEvDetail').innerHTML = '<strong>' + car.name + '</strong><br>' +
+      car.weight.toFixed(3) + 'g | ' + race.time.toFixed(3) + 's<br>' +
+      race.mph.toFixed(1) + ' mph | ' + Math.round(race.scaleMph) + ' scale';
+    $('demoEvMeta').textContent = ts + ' | DEMO-FINISH | Track: 6.01m';
+    tag.style.display = '';
+    // Auto-hide after 6s
+    setTimeout(function() { tag.style.display = 'none'; }, 6000);
+  }
+
+  // ---- FEATURE 2: SCIENCE FAIR STEPPER ----
+  function demoUpdateStepper() {
+    var pct = Math.min(100, Math.round((demoRunCount / demoSfTotal) * 100));
+    var bar = $('demoSfBar');
+    var label = $('demoSfBarLabel');
+    if (bar) bar.style.width = pct + '%';
+    if (label) label.textContent = 'Run ' + Math.min(demoRunCount, demoSfTotal) + ' of ' + demoSfTotal;
+    // If all runs done, advance stepper to phase 6
+    if (demoRunCount >= demoSfTotal) {
+      demoSetStepperPhase(6);
+    }
+  }
+
+  function demoSetStepperPhase(phase) {
+    var steps = document.querySelectorAll('#demoStepper .demo-sf-step');
+    var lines = document.querySelectorAll('#demoStepper .demo-sf-line');
+    var phaseNames = ['', 'EXPERIMENT SETUP', 'VEHICLE INTAKE', 'EVIDENCE PREP', 'PRE-FLIGHT CHECK', 'DATA COLLECTION', 'RESULTS & REPORT'];
+    var phaseDescs = ['',
+      'Define variables, pick template, set conditions.',
+      'Select cars, verify weights, check NFC tags.',
+      'Assign case numbers, print tags, photograph setup.',
+      'Review test plan, readiness checklist, confirm.',
+      'Collecting race data with sanity checks. Auto-advancing through test matrix.',
+      'All tests complete! Review summary, export CSV, generate science fair report.'
+    ];
+    for (var i = 0; i < steps.length; i++) {
+      var p = parseInt(steps[i].getAttribute('data-phase'));
+      steps[i].className = 'demo-sf-step' + (p < phase ? ' completed' : p === phase ? ' active' : '');
+      var dot = steps[i].querySelector('.demo-sf-dot');
+      if (p < phase) dot.innerHTML = '&#10003;';
+      else dot.textContent = p;
+    }
+    for (var j = 0; j < lines.length; j++) {
+      var linePhase = j + 2;
+      lines[j].className = 'demo-sf-line' + (linePhase <= phase ? ' completed' : linePhase === phase + 1 ? ' active' : '');
+    }
+    var info = $('demoSfInfo');
+    if (info) {
+      info.querySelector('.demo-sf-status').innerHTML = '&#9654; PHASE ' + phase + ': ' + (phaseNames[phase] || '');
+      info.querySelector('.demo-sf-desc').textContent = phaseDescs[phase] || '';
+    }
+  }
+
+  // ---- FEATURE 3: THE GARAGE ----
+  function demoRenderGarage() {
+    var garage = $('demoGarage');
+    if (!garage) return;
+    garage.innerHTML = demoCars.map(function(car, i) {
+      var sel = i === demoCurrentCar ? ' selected' : '';
+      var best = car.stats.bestTime ? car.stats.bestTime.toFixed(3) + 's' : '--';
+      return '<div class="demo-garage-car' + sel + '" onclick="demoSelectCar(' + i + ')">' +
+        '<div class="demo-garage-emoji">' + carEmoji[i] + '</div>' +
+        '<div class="demo-garage-name">' + car.name + '</div>' +
+        '<div class="demo-garage-weight">' + car.weight.toFixed(1) + 'g</div>' +
+        '<div class="demo-garage-runs">' + car.stats.runs + ' runs</div>' +
+        '<div class="demo-garage-best">Best: ' + best + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  // ---- FEATURE 4: FORMULA CARDS ----
+  function demoUpdateFormulas(time, speedMps, weight) {
+    var mass_kg = weight / 1000;
+    var momentum = mass_kg * speedMps;
+    var ke = 0.5 * mass_kg * speedMps * speedMps;
+    var acc = speedMps / time;
+
+    $('demoFVel').textContent = speedMps.toFixed(2) + ' m/s';
+    $('demoFVelWork').textContent = '6.01m \u00F7 ' + time.toFixed(3) + 's';
+
+    $('demoFMom').textContent = momentum.toFixed(4) + ' kg\u00B7m/s';
+    $('demoFMomWork').textContent = mass_kg.toFixed(4) + 'kg \u00D7 ' + speedMps.toFixed(2) + 'm/s';
+
+    $('demoFKE').textContent = ke.toFixed(5) + ' J';
+    $('demoFKEWork').textContent = '\u00BD \u00D7 ' + mass_kg.toFixed(4) + 'kg \u00D7 ' + speedMps.toFixed(2) + '\u00B2';
+
+    $('demoFAcc').textContent = acc.toFixed(2) + ' m/s\u00B2';
+    $('demoFAccWork').textContent = speedMps.toFixed(2) + 'm/s \u00F7 ' + time.toFixed(3) + 's';
+
+    // Flash highlight
+    var cards = document.querySelectorAll('.demo-formula-card');
+    for (var i = 0; i < cards.length; i++) {
+      cards[i].classList.add('highlight');
+    }
+    setTimeout(function() {
+      for (var j = 0; j < cards.length; j++) {
+        cards[j].classList.remove('highlight');
+      }
+    }, 2000);
+  }
+
+  // ---- FEATURE 5: GHOST CAR ----
+  function demoShowGhost(car, currentTime) {
+    var ghost = $('demoGhost');
+    if (!ghost) return;
+    // Need at least one previous run for this car
+    if (car.stats.runs < 2 && car.stats.bestTime === currentTime) {
+      // First run for this car — show "FIRST RUN!"
+      ghost.style.display = '';
+      $('demoGhostIcon').textContent = '\uD83C\uDFC6'; // trophy
+      $('demoGhostDelta').textContent = 'FIRST RUN!';
+      $('demoGhostDelta').className = 'demo-ghost-delta record';
+      $('demoGhostDetail').textContent = currentTime.toFixed(3) + 's — new benchmark';
+      setTimeout(function() { ghost.style.display = 'none'; }, 5000);
+      return;
+    }
+    var prevBest = car.stats.prevBest || car.stats.bestTime;
+    if (prevBest == null) return;
+    var delta = currentTime - prevBest;
+    ghost.style.display = '';
+    if (delta < -0.001) {
+      // New record!
+      $('demoGhostIcon').textContent = '\uD83C\uDFC6'; // trophy
+      $('demoGhostDelta').textContent = delta.toFixed(3) + 's';
+      $('demoGhostDelta').className = 'demo-ghost-delta record';
+      $('demoGhostDetail').textContent = 'NEW RECORD! Was ' + prevBest.toFixed(3) + 's';
+    } else if (delta > 0.001) {
+      // Slower
+      $('demoGhostIcon').textContent = '\uD83D\uDC7B'; // ghost
+      $('demoGhostDelta').textContent = '+' + delta.toFixed(3) + 's';
+      $('demoGhostDelta').className = 'demo-ghost-delta slower';
+      $('demoGhostDetail').textContent = 'Best: ' + prevBest.toFixed(3) + 's';
+    } else {
+      // Tied
+      $('demoGhostIcon').textContent = '\uD83E\uDD1D'; // handshake
+      $('demoGhostDelta').textContent = 'TIED!';
+      $('demoGhostDelta').className = 'demo-ghost-delta faster';
+      $('demoGhostDetail').textContent = 'Matched ' + prevBest.toFixed(3) + 's';
+    }
+    setTimeout(function() { ghost.style.display = 'none'; }, 5000);
+  }
 
   function updateBanner() {
     var banner = $('demoBanner');
@@ -637,6 +1021,9 @@ img{max-width:100%;height:auto}
         var speedMps = demoTrackLength / targetTime;
         var race = showStats(targetTime, speedMps, car.weight);
 
+        // Save previous best BEFORE updating (for ghost car)
+        car.stats.prevBest = car.stats.bestTime;
+
         // Update car stats
         car.stats.runs++;
         if (car.stats.bestTime == null || targetTime < car.stats.bestTime) {
@@ -648,6 +1035,23 @@ img{max-width:100%;height:auto}
 
         addToHistory(car, race);
         renderMostWanted();
+
+        // === FEATURE 1: Evidence Tag ===
+        demoCaseNum++;
+        var caseStr = 'MASS26-' + String(demoCaseNum).padStart(4, '0');
+        demoShowEvTag(car, race, caseStr);
+
+        // === FEATURE 2: Science Fair Stepper ===
+        demoUpdateStepper();
+
+        // === FEATURE 3: Garage (update stats) ===
+        demoRenderGarage();
+
+        // === FEATURE 4: Formula Cards ===
+        demoUpdateFormulas(targetTime, speedMps, car.weight);
+
+        // === FEATURE 5: Ghost Car Comparison ===
+        demoShowGhost(car, targetTime);
 
         // Find rank
         var ranked = demoCars.filter(function(c) { return c.stats.bestTime != null; })
@@ -711,6 +1115,24 @@ img{max-width:100%;height:auto}
     }, 1000);
   };
 
+  window.demoSelectCar = function(index) {
+    if (demoState !== 'IDLE') return; // Can't switch mid-race
+    demoCurrentCar = index;
+    demoRenderGarage();
+    updateBanner();
+    // Reset auto-timer so selected car runs next
+    clearTimeout(demoAutoTimer);
+    demoAutoTimer = setTimeout(function autoLoop() {
+      simulateRace();
+      demoAutoTimer = setTimeout(autoLoop, 9000);
+    }, 3000);
+  };
+
+  window.demoCloseTag = function() {
+    var tag = $('demoEvTag');
+    if (tag) tag.style.display = 'none';
+  };
+
   window.demoSetTheme = function(theme) {
     demoTheme = theme;
     $('demoFrame').setAttribute('data-theme', theme);
@@ -737,6 +1159,12 @@ img{max-width:100%;height:auto}
 
     updateBanner();
     $('demoRuns').textContent = '0';
+
+    // Init Feature 2: Science Fair Stepper (Phase 5 active)
+    demoSetStepperPhase(5);
+
+    // Init Feature 3: Garage
+    demoRenderGarage();
 
     // Start auto-race cycle after 3s (give user time to see the idle state)
     demoAutoTimer = setTimeout(function autoLoop() {
