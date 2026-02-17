@@ -811,6 +811,7 @@ static void handleApiDiagnostics() {
       else if (addr == 0x48) name = "ADS1115 ADC";
       else if (addr == 0x50) name = "AT24C EEPROM";
       else if (addr == 0x27 || addr == 0x3F) name = "PCF8574 I/O Expander";
+      else if (addr == 0x5A) name = "MLX90614 IR Temp";
       else if (addr == 0x20) name = "PCF8574A I/O Expander";
       dev["device"] = name;
       deviceCount++;

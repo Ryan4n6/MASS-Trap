@@ -244,11 +244,29 @@ a:hover{color:#e8c84a;text-decoration:underline}
       <div class="module-desc">MAX98357A I2S amplifier + speaker. Race announcer and dispatcher voice system.</div>
       <div class="module-tag ready">GUIDE READY</div>
     </div>
-    <div class="module-card coming-soon">
+    <div class="module-card" onclick="showModule('wled')">
       <div class="module-emoji">&#128161;</div>
       <div class="module-name">WLED Strip</div>
-      <div class="module-desc">WS2812B addressable LEDs. Race state visualization.</div>
-      <div class="module-tag soon">COMING SOON</div>
+      <div class="module-desc">WS2812B addressable LEDs controlled by a standalone WLED controller. Race state visualization.</div>
+      <div class="module-tag ready">GUIDE READY</div>
+    </div>
+    <div class="module-card" onclick="showModule('trafficlight')">
+      <div class="module-emoji">&#128678;</div>
+      <div class="module-name">Drag Tree</div>
+      <div class="module-desc">LED traffic light countdown for the start gate. Pro-style staging sequence.</div>
+      <div class="module-tag ready">GUIDE READY</div>
+    </div>
+    <div class="module-card" onclick="showModule('environment')">
+      <div class="module-emoji">&#127777;</div>
+      <div class="module-name">Environment Sensor</div>
+      <div class="module-desc">BME280 temperature, humidity, and barometric pressure. Air density for drag calculations.</div>
+      <div class="module-tag ready">GUIDE READY</div>
+    </div>
+    <div class="module-card" onclick="showModule('irtemp')">
+      <div class="module-emoji">&#128293;</div>
+      <div class="module-name">Track Temp Gun</div>
+      <div class="module-desc">MLX90614 non-contact IR thermometer. Track surface temperature affects tire grip.</div>
+      <div class="module-tag ready">GUIDE READY</div>
     </div>
   </div>
 </div>
@@ -1499,6 +1517,595 @@ a:hover{color:#e8c84a;text-decoration:underline}
   </div>
 </div>
 
+<!-- ==================== WLED STRIP GUIDE ==================== -->
+<div id="guide-wled" class="wiring-guide">
+  <div class="container">
+    <div class="wg-title">
+      <h2>WLED Strip: Addressable LED Race Visualization</h2>
+      <p>A separate WLED controller drives WS2812B LED strips. The finish gate sends HTTP commands to change effects based on race state &mdash; no wiring between the ESP32 and LEDs.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="wg-progress">
+      <div class="wg-progress-label">SETUP PROGRESS</div>
+      <div class="wg-progress-bar">
+        <div class="wg-progress-fill" id="wlProgressFill" style="width:0%"></div>
+      </div>
+      <div class="wg-progress-text" id="wlProgressText">0 of 3 connections</div>
+    </div>
+
+    <!-- Parts List -->
+    <div class="parts-list">
+      <h3>Parts Needed</h3>
+      <div class="part-row">
+        <div class="part-icon">&#128161;</div>
+        <div>
+          <div class="part-name">WLED-Compatible Controller</div>
+          <div class="part-detail">ESP32 or ESP8266 running WLED firmware. BTF-LIGHTING controllers work out of the box. ~$8&ndash;$15.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#127752;</div>
+        <div>
+          <div class="part-name">WS2812B Addressable LED Strip</div>
+          <div class="part-detail">Any length. 60 LEDs/m is standard, 144/m for dense effects. 5V power. The M.A.S.S. Trap fleet uses a 1000-LED BTF strip.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#9889;</div>
+        <div>
+          <div class="part-name">5V Power Supply (sized for your strip)</div>
+          <div class="part-detail">Rule of thumb: 60mA per LED at full white. 300 LEDs = 18A = 90W minimum. Never power long strips from the controller&rsquo;s USB port.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128268;</div>
+        <div>
+          <div class="part-name">3-Pin JST or Screw Terminal Connectors</div>
+          <div class="part-detail">Data (green/white), +5V (red), Ground (black). Most strips come with pre-soldered JST connectors.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 1: Flash WLED -->
+    <div class="step-card" id="wl-step1">
+      <div class="step-header" onclick="wlToggleStep(1)">
+        <div class="step-number">1</div>
+        <div class="step-title">Flash WLED Firmware to the Controller</div>
+        <div class="step-check" onclick="event.stopPropagation(); wlCompleteStep(1)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>Visit <strong>install.wled.me</strong> in Chrome and flash directly from the browser &mdash; no tools needed.</p>
+        <div class="wg-tip">
+          <div class="wg-tip-label">Already Running WLED?</div>
+          If your controller came pre-flashed (BTF-LIGHTING, QuinLED, etc.), skip this step. Check by connecting to the controller&rsquo;s WiFi hotspot &mdash; if you see the WLED UI, you&rsquo;re good.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Connect to Network -->
+    <div class="step-card" id="wl-step2">
+      <div class="step-header" onclick="wlToggleStep(2)">
+        <div class="step-number">2</div>
+        <div class="step-title">Connect WLED to Your WiFi Network</div>
+        <div class="step-check" onclick="event.stopPropagation(); wlCompleteStep(2)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>Connect to the WLED hotspot (<em>WLED-AP</em>), open <strong>4.3.2.1</strong> in a browser, and enter your WiFi credentials under WiFi Settings.</p>
+        <p>After reboot, find the WLED controller&rsquo;s IP address on your router or use <code style="background:var(--navy);padding:2px 6px;border-radius:3px;font-size:0.75rem">ping wled-XXXX.local</code>.</p>
+        <div class="wg-tip">
+          <div class="wg-tip-label">Static IP Recommended</div>
+          Assign a static IP to the WLED controller in your router so the M.A.S.S. Trap always knows where to find it. The fleet currently uses <strong>192.168.1.159</strong>.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Configure in M.A.S.S. Trap -->
+    <div class="step-card" id="wl-step3">
+      <div class="step-header" onclick="wlToggleStep(3)">
+        <div class="step-number">3</div>
+        <div class="step-title">Set WLED Host in M.A.S.S. Trap Config</div>
+        <div class="step-check" onclick="event.stopPropagation(); wlCompleteStep(3)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>On the <strong>finish gate</strong>, go to System &rarr; Config and set the <em>WLED Host</em> field to the controller&rsquo;s IP address (e.g., <strong>192.168.1.159</strong>).</p>
+        <p>Save and reboot. The finish gate will now send HTTP API calls to WLED on every race state change:</p>
+        <table class="conn-table" style="margin-top:8px">
+          <thead>
+            <tr><th>Race State</th><th>WLED Effect</th><th>Description</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>IDLE</td><td>Configurable</td><td>Ambient/standby effect</td></tr>
+            <tr><td>ARMED</td><td>Configurable</td><td>Ready &mdash; waiting for car</td></tr>
+            <tr><td>RACING</td><td>Configurable</td><td>Car on track</td></tr>
+            <tr><td>FINISHED</td><td>Configurable</td><td>Celebration / result display</td></tr>
+          </tbody>
+        </table>
+        <div class="wg-tip" style="margin-top:12px">
+          <div class="wg-tip-label">No Wires to the ESP32</div>
+          WLED integration is 100% over WiFi &mdash; the finish gate sends HTTP requests to the WLED controller&rsquo;s API. The LED strip connects to the WLED controller only. Zero wires between the ESP32 and the LEDs.
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Banner -->
+    <div class="wg-success" id="wlSuccessBanner">
+      <h3>&#10003; WLED CONNECTED!</h3>
+      <p>Your LED strip is now linked to the race state machine. Effects change automatically on ARM, RACE, and FINISH.</p>
+      <div style="margin-top:12px">
+        <div class="wg-tip" style="text-align:left;margin:0">
+          <div class="wg-tip-label">Tuning Effects</div>
+          Browse effects in the WLED web UI, note the effect ID numbers, and set them in M.A.S.S. Trap&rsquo;s config for each race state. Fan favorites: <strong>Rainbow Runner</strong> (idle), <strong>Police</strong> (armed), <strong>Chase</strong> (racing), <strong>Fireworks</strong> (finished).
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== TRAFFIC LIGHT / DRAG TREE GUIDE ==================== -->
+<div id="guide-trafficlight" class="wiring-guide">
+  <div class="container">
+    <div class="wg-title">
+      <h2>Drag Tree: LED Traffic Light Start Sequence</h2>
+      <p>A classic drag racing countdown on the start gate &mdash; red, yellow, yellow, yellow, green. Wired directly to ESP32 GPIO pins through current-limiting resistors.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="wg-progress">
+      <div class="wg-progress-label">WIRING PROGRESS</div>
+      <div class="wg-progress-bar">
+        <div class="wg-progress-fill" id="tlProgressFill" style="width:0%"></div>
+      </div>
+      <div class="wg-progress-text" id="tlProgressText">0 of 4 connections</div>
+    </div>
+
+    <!-- Parts List -->
+    <div class="parts-list">
+      <h3>Parts Needed</h3>
+      <div class="part-row">
+        <div class="part-icon">&#128308;</div>
+        <div>
+          <div class="part-name">5mm LEDs: 2&times; Red, 3&times; Yellow, 2&times; Green</div>
+          <div class="part-detail">Standard through-hole 5mm LEDs. The Adeept Mini Traffic Light modules come pre-wired with R/Y/G on a single PCB.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#9889;</div>
+        <div>
+          <div class="part-name">220&ohm; Resistors (one per LED)</div>
+          <div class="part-detail">Current limiting. 220&ohm; gives ~10mA at 3.3V for standard LEDs. Use 330&ohm; for ultra-bright LEDs to avoid blinding the 10-year-old.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128268;</div>
+        <div>
+          <div class="part-name">Dupont Jumper Wires</div>
+          <div class="part-detail">One per LED plus a shared ground. If using traffic light modules, they come with headers.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128187;</div>
+        <div>
+          <div class="part-name">Start Gate ESP32-S3</div>
+          <div class="part-detail">The drag tree wires to the <strong>start gate</strong> node. The LEDs visualize the countdown sequence on the same device that detects the car launch.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connection Table -->
+    <div class="parts-list" style="margin-bottom:24px">
+      <h3>Connection Map &mdash; Drag Tree LEDs</h3>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">Each LED gets its own GPIO pin through a 220&ohm; resistor. Accent LEDs share a common ground. These GPIO assignments are preliminary &mdash; firmware support is coming.</p>
+      <table class="conn-table">
+        <thead>
+          <tr><th>LED</th><th>Color</th><th>ESP32-S3 Pin</th><th>Sequence Role</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="wire-dot" style="background:#ff3333"></span>Stage 1</td>
+            <td>Red</td>
+            <td><strong>GPIO 6</strong></td>
+            <td>Pre-stage &mdash; car approaching</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:#ff3333"></span>Stage 2</td>
+            <td>Red</td>
+            <td><strong>GPIO 7</strong></td>
+            <td>Staged &mdash; car in position</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:#ffcc00"></span>Amber 1</td>
+            <td>Yellow</td>
+            <td><strong>GPIO 15</strong>*</td>
+            <td>Countdown 3&hellip;</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:#ffcc00"></span>Amber 2</td>
+            <td>Yellow</td>
+            <td><strong>GPIO 16</strong>*</td>
+            <td>Countdown 2&hellip;</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:#ffcc00"></span>Amber 3</td>
+            <td>Yellow</td>
+            <td><strong>GPIO 17</strong>*</td>
+            <td>Countdown 1&hellip;</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:#33cc33"></span>Green 1</td>
+            <td>Green</td>
+            <td><strong>GPIO 18</strong></td>
+            <td>GO!</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:#33cc33"></span>Green 2</td>
+            <td>Green</td>
+            <td><strong>GPIO 21</strong></td>
+            <td>GO! (redundancy)</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:#333;border:1px solid #666"></span>Common</td>
+            <td>&mdash;</td>
+            <td><strong>GND</strong></td>
+            <td>Shared ground for all LEDs</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.7rem;color:var(--text-muted);margin-top:6px">*GPIO 15&ndash;17 are shared with audio on the finish gate. On the start gate, these pins are free since audio is typically on the finish gate only.</p>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step-card" id="tl-step1">
+      <div class="step-header" onclick="tlToggleStep(1)">
+        <div class="step-number">1</div>
+        <div class="step-title">Add Resistors to Each LED</div>
+        <div class="step-check" onclick="event.stopPropagation(); tlCompleteStep(1)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>Solder or crimp a <strong>220&ohm; resistor</strong> to the anode (long leg) of each LED. If using traffic light modules, the resistors are already on the PCB &mdash; skip this step.</p>
+        <div class="wg-tip">
+          <div class="wg-tip-label">LED Polarity</div>
+          LEDs have a direction. The <strong>longer leg is positive (anode)</strong> &mdash; goes to GPIO through the resistor. The shorter leg is negative (cathode) &mdash; goes to GND.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card" id="tl-step2">
+      <div class="step-header" onclick="tlToggleStep(2)">
+        <div class="step-number">2</div>
+        <div class="step-title">Wire LEDs to Start Gate GPIO Pins</div>
+        <div class="step-check" onclick="event.stopPropagation(); tlCompleteStep(2)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>Connect each LED&rsquo;s resistor lead to the corresponding GPIO pin. Connect all cathodes to a shared GND rail.</p>
+        <p>Arrange physically in drag tree order: <strong>Red &rarr; Red &rarr; Yellow &rarr; Yellow &rarr; Yellow &rarr; Green &rarr; Green</strong>, top to bottom.</p>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card" id="tl-step3">
+      <div class="step-header" onclick="tlToggleStep(3)">
+        <div class="step-number">3</div>
+        <div class="step-title">Mount the Drag Tree</div>
+        <div class="step-check" onclick="event.stopPropagation(); tlCompleteStep(3)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>Mount the LEDs vertically next to the start gate, visible to the operator at the top of the track. Options:</p>
+        <p>&bull; 3D-printed bracket (STL file coming soon)<br>
+        &bull; Drill holes in a strip of wood or acrylic<br>
+        &bull; Hot glue to a popsicle stick tower (Ben-approved method)</p>
+      </div>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-card" id="tl-step4">
+      <div class="step-header" onclick="tlToggleStep(4)">
+        <div class="step-number">4</div>
+        <div class="step-title">Test the Sequence</div>
+        <div class="step-check" onclick="event.stopPropagation(); tlCompleteStep(4)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>After flashing firmware with drag tree support, ARM the track and watch the countdown sequence fire.</p>
+        <div class="wg-tip">
+          <div class="wg-tip-label">Firmware Support: Coming Soon</div>
+          The drag tree GPIO definitions and countdown sequence are on the firmware roadmap. The hardware guide is ready so you can <strong>wire it now</strong> and it&rsquo;ll light up when the firmware update drops. Check <a href="https://github.com/Ryan4n6/MASS-Trap/releases" target="_blank" style="color:var(--gold)">GitHub Releases</a> for updates.
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Banner -->
+    <div class="wg-success" id="tlSuccessBanner">
+      <h3>&#10003; DRAG TREE WIRED!</h3>
+      <p>7 LEDs mounted and wired. When firmware support lands, your start gate will have a real drag strip countdown.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== ENVIRONMENT SENSOR GUIDE ==================== -->
+<div id="guide-environment" class="wiring-guide">
+  <div class="container">
+    <div class="wg-title">
+      <h2>Environment Sensor: BME280 / BMP280</h2>
+      <p>Measures temperature, humidity, and barometric pressure. Air density affects aerodynamic drag at scale &mdash; this sensor tells you if race conditions changed between runs.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="wg-progress">
+      <div class="wg-progress-label">WIRING PROGRESS</div>
+      <div class="wg-progress-bar">
+        <div class="wg-progress-fill" id="evProgressFill" style="width:0%"></div>
+      </div>
+      <div class="wg-progress-text" id="evProgressText">0 of 3 connections</div>
+    </div>
+
+    <!-- Parts List -->
+    <div class="parts-list">
+      <h3>Parts Needed</h3>
+      <div class="part-row">
+        <div class="part-icon">&#127777;</div>
+        <div>
+          <div class="part-name">BME280 or BMP280 Breakout Board</div>
+          <div class="part-detail">BME280 = temp + humidity + pressure (~$3). BMP280 = temp + pressure only (~$1.50). Both work. The &ldquo;E&rdquo; adds humidity. I2C interface.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128268;</div>
+        <div>
+          <div class="part-name">4 Dupont Jumper Wires (Female-Female)</div>
+          <div class="part-detail">Red (3.3V), black (GND), blue (SDA), yellow (SCL). I2C only needs 4 wires total.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128187;</div>
+        <div>
+          <div class="part-name">Any M.A.S.S. Trap ESP32-S3 Node</div>
+          <div class="part-detail">Best on the <strong>finish gate</strong> (logs data with race results), but works on any node. Shares the I2C bus with other sensors.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connection Table -->
+    <div class="parts-list" style="margin-bottom:24px">
+      <h3>Connection Map &mdash; BME280 / BMP280</h3>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">Standard I2C: 4 wires. Multiple I2C devices can share the same SDA/SCL bus.</p>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Wire</th><th>ESP32-S3 Pin</th><th>BME280 Pin</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+            <td><strong>3.3V</strong></td>
+            <td><strong>VIN / VCC</strong></td>
+            <td>Sensor power (3.3V safe)</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+            <td><strong>GND</strong></td>
+            <td><strong>GND</strong></td>
+            <td>Ground</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-blue)"></span>Blue</td>
+            <td><strong>GPIO 8</strong></td>
+            <td><strong>SDA</strong></td>
+            <td>I2C data</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-yellow)"></span>Yellow</td>
+            <td><strong>GPIO 9</strong></td>
+            <td><strong>SCL</strong></td>
+            <td>I2C clock</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.7rem;color:var(--text-muted);margin-top:6px">Default I2C address: <strong>0x76</strong> (or 0x77 if SDO pin is pulled high). The diagnostics page auto-detects either address.</p>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step-card" id="ev-step1">
+      <div class="step-header" onclick="evToggleStep(1)">
+        <div class="step-number">1</div>
+        <div class="step-title">Wire 4 Connections (VCC, GND, SDA, SCL)</div>
+        <div class="step-check" onclick="event.stopPropagation(); evCompleteStep(1)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>Connect the 4 wires per the table above. I2C is bus-based &mdash; if you already have another I2C device on GPIO 8/9, just add these wires in parallel (same pins, shared bus).</p>
+        <div class="wg-tip">
+          <div class="wg-tip-label">3.3V Only!</div>
+          The BME280 is a 3.3V sensor. Some breakout boards have a voltage regulator and accept 5V on VIN, but check your board&rsquo;s documentation. When in doubt, use the <strong>3.3V</strong> pin.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card" id="ev-step2">
+      <div class="step-header" onclick="evToggleStep(2)">
+        <div class="step-number">2</div>
+        <div class="step-title">Verify on Diagnostics Page</div>
+        <div class="step-check" onclick="event.stopPropagation(); evCompleteStep(2)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>Reboot the device, then open the <strong>System</strong> page and run diagnostics. Under the <strong>I2C Bus Scan</strong> section, you should see:</p>
+        <p><code style="background:var(--navy);padding:4px 8px;border-radius:3px;font-size:0.8rem">0x76: BME280/BMP280</code> &nbsp;or&nbsp; <code style="background:var(--navy);padding:4px 8px;border-radius:3px;font-size:0.8rem">0x77: BME280/BMP280</code></p>
+        <p>If neither address appears, check your wiring &mdash; I2C is picky about loose connections.</p>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card" id="ev-step3">
+      <div class="step-header" onclick="evToggleStep(3)">
+        <div class="step-number">3</div>
+        <div class="step-title">Position the Sensor</div>
+        <div class="step-check" onclick="event.stopPropagation(); evCompleteStep(3)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>Mount the sensor <strong>near the track</strong> but not directly on it &mdash; you want ambient air readings, not radiant heat from the track surface.</p>
+        <div class="wg-tip">
+          <div class="wg-tip-label">Firmware Support: Coming Soon</div>
+          The I2C bus scan already detects the BME280. Automatic environment logging with each race result is on the roadmap. Wire it now &mdash; the hardware is ready, the data pipeline is next.
+        </div>
+        <div class="wg-tip" style="margin-top:8px">
+          <div class="wg-tip-label">Science Fair Gold</div>
+          Logging temperature, humidity, and pressure with every race run lets you prove controlled variables. &ldquo;Ambient conditions were constant across all trials&rdquo; &mdash; that&rsquo;s an A+ sentence in any lab report.
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Banner -->
+    <div class="wg-success" id="evSuccessBanner">
+      <h3>&#10003; ENVIRONMENT SENSOR CONNECTED!</h3>
+      <p>BME280 detected on the I2C bus. Temperature, humidity, and pressure data available for race condition logging.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== IR THERMOMETER GUIDE ==================== -->
+<div id="guide-irtemp" class="wiring-guide">
+  <div class="container">
+    <div class="wg-title">
+      <h2>Track Temp Gun: MLX90614 IR Thermometer</h2>
+      <p>Non-contact infrared temperature sensor. Point it at the track surface to measure temperature without touching &mdash; because track temperature affects tire grip and rolling resistance.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="wg-progress">
+      <div class="wg-progress-label">WIRING PROGRESS</div>
+      <div class="wg-progress-bar">
+        <div class="wg-progress-fill" id="itProgressFill" style="width:0%"></div>
+      </div>
+      <div class="wg-progress-text" id="itProgressText">0 of 3 connections</div>
+    </div>
+
+    <!-- Parts List -->
+    <div class="parts-list">
+      <h3>Parts Needed</h3>
+      <div class="part-row">
+        <div class="part-icon">&#128293;</div>
+        <div>
+          <div class="part-name">MLX90614 IR Temperature Sensor</div>
+          <div class="part-detail">Two variants: <strong>GY-906</strong> (general FOV, ~$6) or <strong>MLX90614ESF-DCI</strong> (narrow 5&deg; FOV, ~$15, better for aiming at a specific track section). Both I2C.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128268;</div>
+        <div>
+          <div class="part-name">4 Dupont Jumper Wires (Female-Female)</div>
+          <div class="part-detail">Same I2C bus as the BME280 &mdash; if you already wired one, you&rsquo;re sharing SDA/SCL. Just add VCC and GND.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128187;</div>
+        <div>
+          <div class="part-name">Any M.A.S.S. Trap ESP32-S3 Node</div>
+          <div class="part-detail">Best on the <strong>finish gate</strong> or <strong>start gate</strong>, pointed at the track surface near the sensor line.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connection Table -->
+    <div class="parts-list" style="margin-bottom:24px">
+      <h3>Connection Map &mdash; MLX90614</h3>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">Same I2C bus as other sensors. Shares GPIO 8 (SDA) and GPIO 9 (SCL).</p>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Wire</th><th>ESP32-S3 Pin</th><th>MLX90614 Pin</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+            <td><strong>3.3V</strong></td>
+            <td><strong>VCC</strong></td>
+            <td>Sensor power (3.3V)</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+            <td><strong>GND</strong></td>
+            <td><strong>GND</strong></td>
+            <td>Ground</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-blue)"></span>Blue</td>
+            <td><strong>GPIO 8</strong></td>
+            <td><strong>SDA</strong></td>
+            <td>I2C data (shared bus)</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-yellow)"></span>Yellow</td>
+            <td><strong>GPIO 9</strong></td>
+            <td><strong>SCL</strong></td>
+            <td>I2C clock (shared bus)</td>
+          </tr>
+        </tbody>
+      </table>
+      <p style="font-size:0.7rem;color:var(--text-muted);margin-top:6px">Default I2C address: <strong>0x5A</strong>. Coexists on the same bus as BME280 (0x76/0x77) &mdash; different addresses, no conflict.</p>
+    </div>
+
+    <!-- Step 1 -->
+    <div class="step-card" id="it-step1">
+      <div class="step-header" onclick="itToggleStep(1)">
+        <div class="step-number">1</div>
+        <div class="step-title">Wire 4 Connections (VCC, GND, SDA, SCL)</div>
+        <div class="step-check" onclick="event.stopPropagation(); itCompleteStep(1)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>Connect the 4 wires per the table above. If the BME280 is already wired, you&rsquo;re sharing the same SDA/SCL lines &mdash; just splice into the existing bus.</p>
+        <div class="wg-tip">
+          <div class="wg-tip-label">DCI Variant: Cable Extension</div>
+          The MLX90614ESF-DCI version comes with a 50cm cable and a remote sensor head. This lets you mount the sensor head near the track while keeping the ESP32 further away. Great for tight spaces.
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card" id="it-step2">
+      <div class="step-header" onclick="itToggleStep(2)">
+        <div class="step-number">2</div>
+        <div class="step-title">Verify on Diagnostics Page</div>
+        <div class="step-check" onclick="event.stopPropagation(); itCompleteStep(2)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>Reboot the device and run diagnostics from the System page. Under the I2C Bus Scan, look for:</p>
+        <p><code style="background:var(--navy);padding:4px 8px;border-radius:3px;font-size:0.8rem">0x5A: MLX90614 (IR Temp)</code></p>
+        <p>If you have both the BME280 and MLX90614, you should see <strong>two devices</strong> on the I2C scan &mdash; one at 0x76 and one at 0x5A.</p>
+      </div>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card" id="it-step3">
+      <div class="step-header" onclick="itToggleStep(3)">
+        <div class="step-number">3</div>
+        <div class="step-title">Aim at the Track Surface</div>
+        <div class="step-check" onclick="event.stopPropagation(); itCompleteStep(3)">&#9744;</div>
+      </div>
+      <div class="step-body">
+        <p>Mount the sensor so it points <strong>down at the track surface</strong> at a 30&ndash;45&deg; angle, about 3&ndash;5cm above the track. The field of view determines the measurement area:</p>
+        <p>&bull; <strong>GY-906 (general FOV)</strong>: Wide cone, ~35&deg;. Mount closer for a smaller spot.<br>
+        &bull; <strong>DCI (narrow FOV)</strong>: Tight 5&deg; cone. Can measure a specific section from further away.</p>
+        <div class="wg-tip" style="margin-top:8px">
+          <div class="wg-tip-label">Why Track Temperature Matters</div>
+          Hot Wheels tires are plastic. At higher temperatures, the material softens slightly, increasing rolling resistance and changing grip characteristics. A 10&deg;C track temperature difference between morning and afternoon science fair runs is a <strong>confounding variable</strong> &mdash; this sensor lets you prove it was (or wasn&rsquo;t) a factor.
+        </div>
+        <div class="wg-tip" style="margin-top:8px">
+          <div class="wg-tip-label">Firmware Support: Coming Soon</div>
+          The I2C bus scan already detects the MLX90614 at address 0x5A. Automatic track temperature logging per race is on the roadmap. The hardware inventory has both GY-906 (general) and DCI (narrow) variants ready to go.
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Banner -->
+    <div class="wg-success" id="itSuccessBanner">
+      <h3>&#10003; TRACK TEMP GUN CONNECTED!</h3>
+      <p>MLX90614 detected on the I2C bus. Non-contact track surface temperature measurement is ready.</p>
+    </div>
+
+  </div>
+</div>
+
 <!-- ==================== FOOTER ==================== -->
 <div class="wiz-footer">
   <div class="container">
@@ -1520,10 +2127,14 @@ a:hover{color:#e8c84a;text-decoration:underline}
 
   /* ---- Module definitions ---- */
   var modules = {
-    telemetry: { totalSteps: 4, prefix: 'step', progressFill: 'progressFill', progressText: 'progressText', successBanner: 'successBanner', storageKey: 'mass_wizard_telemetry' },
-    finish:    { totalSteps: 3, prefix: 'fg-step', progressFill: 'fgProgressFill', progressText: 'fgProgressText', successBanner: 'fgSuccessBanner', storageKey: 'mass_wizard_finish' },
-    audio:     { totalSteps: 3, prefix: 'au-step', progressFill: 'auProgressFill', progressText: 'auProgressText', successBanner: 'auSuccessBanner', storageKey: 'mass_wizard_audio' },
-    speedtrap: { totalSteps: 4, prefix: 'st-step', progressFill: 'stProgressFill', progressText: 'stProgressText', successBanner: 'stSuccessBanner', storageKey: 'mass_wizard_speedtrap' }
+    telemetry:    { totalSteps: 4, prefix: 'step', progressFill: 'progressFill', progressText: 'progressText', successBanner: 'successBanner', storageKey: 'mass_wizard_telemetry' },
+    finish:       { totalSteps: 3, prefix: 'fg-step', progressFill: 'fgProgressFill', progressText: 'fgProgressText', successBanner: 'fgSuccessBanner', storageKey: 'mass_wizard_finish' },
+    audio:        { totalSteps: 3, prefix: 'au-step', progressFill: 'auProgressFill', progressText: 'auProgressText', successBanner: 'auSuccessBanner', storageKey: 'mass_wizard_audio' },
+    speedtrap:    { totalSteps: 4, prefix: 'st-step', progressFill: 'stProgressFill', progressText: 'stProgressText', successBanner: 'stSuccessBanner', storageKey: 'mass_wizard_speedtrap' },
+    wled:         { totalSteps: 3, prefix: 'wl-step', progressFill: 'wlProgressFill', progressText: 'wlProgressText', successBanner: 'wlSuccessBanner', storageKey: 'mass_wizard_wled' },
+    trafficlight: { totalSteps: 4, prefix: 'tl-step', progressFill: 'tlProgressFill', progressText: 'tlProgressText', successBanner: 'tlSuccessBanner', storageKey: 'mass_wizard_trafficlight' },
+    environment:  { totalSteps: 3, prefix: 'ev-step', progressFill: 'evProgressFill', progressText: 'evProgressText', successBanner: 'evSuccessBanner', storageKey: 'mass_wizard_environment' },
+    irtemp:       { totalSteps: 3, prefix: 'it-step', progressFill: 'itProgressFill', progressText: 'itProgressText', successBanner: 'itSuccessBanner', storageKey: 'mass_wizard_irtemp' }
   };
   var state = {}; // { telemetry: {1:true,2:true}, finish: {1:true} }
   var activeModule = 'telemetry';
@@ -1606,6 +2217,22 @@ a:hover{color:#e8c84a;text-decoration:underline}
   /* ---- Speed Trap module wrappers ---- */
   window.stToggleStep = function(n) { toggleStepGeneric('speedtrap', n); };
   window.stCompleteStep = function(n) { completeStepGeneric('speedtrap', n); };
+
+  /* ---- WLED module wrappers ---- */
+  window.wlToggleStep = function(n) { toggleStepGeneric('wled', n); };
+  window.wlCompleteStep = function(n) { completeStepGeneric('wled', n); };
+
+  /* ---- Traffic Light module wrappers ---- */
+  window.tlToggleStep = function(n) { toggleStepGeneric('trafficlight', n); };
+  window.tlCompleteStep = function(n) { completeStepGeneric('trafficlight', n); };
+
+  /* ---- Environment Sensor module wrappers ---- */
+  window.evToggleStep = function(n) { toggleStepGeneric('environment', n); };
+  window.evCompleteStep = function(n) { completeStepGeneric('environment', n); };
+
+  /* ---- IR Thermometer module wrappers ---- */
+  window.itToggleStep = function(n) { toggleStepGeneric('irtemp', n); };
+  window.itCompleteStep = function(n) { completeStepGeneric('irtemp', n); };
 
   /* ---- Finish Gate tier toggle ---- */
   window.setFinishTier = function(tier) {
