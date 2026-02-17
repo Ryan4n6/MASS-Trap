@@ -1173,6 +1173,20 @@ a:hover{color:#e8c84a;text-decoration:underline}
     var spinner = document.getElementById('diagSpinner');
     var results = document.getElementById('diagResults');
     var errBox = document.getElementById('diagError');
+
+    /* Detect mixed-content block: HTTPS page cannot fetch HTTP device */
+    var isSecurePage = window.location.protocol === 'https:';
+    var isPrivateIP = /^(192\.168\.|10\.|172\.(1[6-9]|2\d|3[01])\.|localhost|127\.)/.test(ip);
+    if (isSecurePage && isPrivateIP) {
+      errBox.innerHTML = '<strong>Browser security block.</strong> This page is served over HTTPS but your ESP32 uses HTTP — browsers block that mix.<br><br>' +
+        '<strong>Fix:</strong> Open the wizard directly on your device:<br>' +
+        '<a href="http://' + ip + '/wizard.html" style="color:var(--gold);text-decoration:underline;font-family:var(--mono)">http://' + ip + '/wizard.html</a><br><br>' +
+        'Or try: <a href="http://masstrap-finish.local/wizard.html" style="color:var(--gold);text-decoration:underline;font-family:var(--mono)">http://masstrap-finish.local/wizard.html</a><br><br>' +
+        '<span style="font-size:0.75rem;opacity:0.7">The diagnostics tool works perfectly when loaded from the device itself (same-origin).</span>';
+      errBox.style.display = 'block';
+      return;
+    }
+
     btn.disabled = true; btn.textContent = 'SCANNING...';
     spinner.style.display = 'inline';
     results.style.display = 'none';
