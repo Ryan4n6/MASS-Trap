@@ -1116,8 +1116,8 @@ a:hover{color:#e8c84a;text-decoration:underline}
         <div class="part-row">
           <div class="part-icon">&#128268;</div>
           <div>
-            <div class="part-name">3 Dupont Jumper Wires (+ 1 optional)</div>
-            <div class="part-detail">Red (5V), black (GND), blue (UART TX &rarr; I01/RXD). Optional green wire for BUSY pin (playback status).</div>
+            <div class="part-name">4 Dupont Jumper Wires</div>
+            <div class="part-detail">Red (5V), black (GND), blue (UART TX &rarr; I01/RXD), green (BUSY playback status).</div>
           </div>
         </div>
       </div>
@@ -1133,7 +1133,7 @@ a:hover{color:#e8c84a;text-decoration:underline}
       <!-- Connection Table -->
       <div class="parts-list" style="margin-bottom:24px">
         <h3>Connection Map &mdash; DY-SV5W</h3>
-        <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">3 wires minimum (power + UART). Optional 4th wire for BUSY status.</p>
+        <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">4 wires: power, ground, UART command, and BUSY playback status.</p>
         <table class="conn-table">
           <thead>
             <tr><th>Wire</th><th>ESP32-S3 Pin</th><th>DY-SV5W Pin</th><th>Purpose</th></tr>
@@ -1157,11 +1157,11 @@ a:hover{color:#e8c84a;text-decoration:underline}
               <td><strong>RXD / I01</strong></td>
               <td>UART data &mdash; ESP32 TX &rarr; DY-SV5W RX (I01, NOT I00)</td>
             </tr>
-            <tr style="color:var(--text-muted)">
+            <tr>
               <td><span class="wire-dot" style="background:var(--wire-green)"></span>Green</td>
               <td><strong>GPIO 16</strong> (input)</td>
               <td><strong>BUSY</strong></td>
-              <td>Optional &mdash; LOW = playing, HIGH = idle</td>
+              <td>Playback status &mdash; LOW = playing, HIGH = idle</td>
             </tr>
           </tbody>
         </table>
@@ -1199,22 +1199,24 @@ a:hover{color:#e8c84a;text-decoration:underline}
         <div class="step-header" onclick="auToggleStep(2)">
           <div class="step-number">2</div>
           <div class="step-info">
-            <div class="step-title" id="auStep2Title">Connect Power &amp; UART</div>
-            <div class="step-subtitle" id="auStep2Sub">Red: 5V &rarr; +5V &nbsp;|&nbsp; Black: GND &rarr; GND &nbsp;|&nbsp; Blue: GPIO 15 &rarr; RXD</div>
+            <div class="step-title" id="auStep2Title">Connect Power, UART &amp; BUSY</div>
+            <div class="step-subtitle" id="auStep2Sub">Red: 5V &rarr; +5V &nbsp;|&nbsp; Black: GND &rarr; GND &nbsp;|&nbsp; Blue: GPIO 15 &rarr; RXD &nbsp;|&nbsp; Green: BUSY &rarr; GPIO 16</div>
           </div>
           <div class="step-check" onclick="event.stopPropagation();auCompleteStep(2)">&#10003;</div>
         </div>
         <div class="step-body" id="auStep2Body">
           <div class="wg-tip">
-            <div class="wg-tip-label">Three Wires</div>
+            <div class="wg-tip-label">Four Wires</div>
             <strong>Red</strong> &rarr; ESP32 <em>5V</em> pin to DY-SV5W <em>+5V</em> (the board needs 5V, not 3.3V)<br>
             <strong>Black</strong> &rarr; ESP32 <em>GND</em> to DY-SV5W bottom <em>GND</em> pin<br>
-            <strong>Blue</strong> &rarr; ESP32 <em>GPIO 15</em> (TX) to DY-SV5W <em>RXD/I01</em> pin (the one labeled RX, NOT I00/TX)
+            <strong>Blue</strong> &rarr; ESP32 <em>GPIO 15</em> (TX) to DY-SV5W <em>RXD/I01</em> pin (the one labeled RX, NOT I00/TX)<br>
+            <strong>Green</strong> &rarr; DY-SV5W <em>BUSY</em> pin to ESP32 <em>GPIO 16</em> (input &mdash; firmware reads this to know when audio finishes)
           </div>
           <div style="text-align:center;margin:12px 0">
             <div class="wd-wire wire-red" data-label="5V POWER" style="width:80%;margin:12px auto"></div>
             <div class="wd-wire wire-black" data-label="GROUND" style="width:80%;margin:12px auto"></div>
             <div class="wd-wire wire-blue" data-label="UART TX → I01/RXD (GPIO 15)" style="width:80%;margin:12px auto"></div>
+            <div class="wd-wire wire-green" data-label="BUSY → GPIO 16 (playback status)" style="width:80%;margin:12px auto"></div>
           </div>
           <div class="wg-tip">
             <div class="wg-tip-label">5V Required</div>
@@ -1232,26 +1234,19 @@ a:hover{color:#e8c84a;text-decoration:underline}
         <div class="step-header" onclick="auToggleStep(3)">
           <div class="step-number">3</div>
           <div class="step-info">
-            <div class="step-title" id="auStep3Title">Connect Speaker &amp; Optional BUSY Pin</div>
-            <div class="step-subtitle" id="auStep3Sub">Speaker wires to screw terminals &nbsp;|&nbsp; Optional: BUSY &rarr; GPIO 16</div>
+            <div class="step-title" id="auStep3Title">Connect Speaker</div>
+            <div class="step-subtitle" id="auStep3Sub">Speaker wires to screw terminals or 3.5mm jack</div>
           </div>
           <div class="step-check" onclick="event.stopPropagation();auCompleteStep(3)">&#10003;</div>
         </div>
         <div class="step-body" id="auStep3Body">
           <div class="wg-tip">
             <div class="wg-tip-label">Speaker</div>
-            Connect a 4&ndash;8&ohm; speaker (3&ndash;5W) to the screw terminals labeled <strong>Speaker</strong> on the DY-SV5W board. Alternatively, plug headphones or an external amp into the <strong>3.5mm jack</strong>.
-          </div>
-          <div class="wg-tip" style="margin-top:8px">
-            <div class="wg-tip-label">BUSY Pin (Optional but Recommended)</div>
-            Wire the DY-SV5W <strong>BUSY</strong> pin to ESP32 <strong>GPIO 16</strong>. This pin goes LOW while audio is playing and HIGH when idle. The firmware can use this to:<br><br>
-            &bull; Queue announcements without overlapping<br>
-            &bull; Wait for &ldquo;Track Armed&rdquo; to finish before starting countdown<br>
-            &bull; Show a &ldquo;speaking&rdquo; indicator on the dashboard
+            Connect a 4&ndash;8&ohm; speaker (3&ndash;5W) to the screw terminals labeled <strong>Speaker</strong> on the DY-SV5W board. Polarity doesn&rsquo;t matter for a single speaker &mdash; either wire to either terminal. Alternatively, plug headphones or an external amp into the <strong>3.5mm stereo jack</strong>.
           </div>
           <div class="wg-tip" style="margin-top:8px">
             <div class="wg-tip-label">Volume Control</div>
-            The blue potentiometer on the board adjusts volume with a screwdriver. You can also set volume via UART command (0&ndash;30). The knob is a hardware override &mdash; start at half and adjust.
+            The <strong>blue potentiometer</strong> on the board adjusts volume with a small flathead screwdriver &mdash; clockwise for louder, counterclockwise for quieter. You can also set volume via UART command (0&ndash;30). The knob acts as a hardware ceiling &mdash; start at half rotation and dial in once you hear it.
           </div>
         </div>
       </div>
