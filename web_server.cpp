@@ -155,6 +155,8 @@ static void webSocketEvent(uint8_t num, WStype_t type, uint8_t *payload, size_t 
         startTime_us = 0;
         finishTime_us = 0;
         portEXIT_CRITICAL(&finishTimerMux);
+        // Aggressive clock sync before race — guarantees sub-50µs accuracy
+        sendToPeer(MSG_SYNC_REQ, nowUs(), 0);
         // Tell start gate to arm too
         sendToPeer(MSG_ARM_CMD, nowUs(), 0);
         setWLEDState("armed");

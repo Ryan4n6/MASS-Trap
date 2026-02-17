@@ -114,6 +114,7 @@ a:hover{color:#e8c84a;text-decoration:underline}
 .wd-wire.wire-yellow{background:var(--wire-yellow)}.wd-wire.wire-yellow::before{color:var(--wire-yellow)}
 .wd-wire.wire-green{background:var(--wire-green)}.wd-wire.wire-green::before{color:var(--wire-green)}
 .wd-wire.wire-orange{background:var(--wire-orange)}.wd-wire.wire-orange::before{color:var(--wire-orange)}
+.wd-wire.wire-white{background:var(--wire-white);border:1px solid #999}.wd-wire.wire-white::before{color:var(--wire-white)}
 
 /* --- CONNECTION TABLE --- */
 .conn-table{width:100%;border-collapse:collapse;font-size:0.8rem;margin:12px 0}
@@ -231,17 +232,17 @@ a:hover{color:#e8c84a;text-decoration:underline}
       <div class="module-desc">ESP32-S3 + IR sensor + optional LiDAR. Detects car release and starts the clock.</div>
       <div class="module-tag soon">COMING SOON</div>
     </div>
-    <div class="module-card coming-soon">
+    <div class="module-card" onclick="showModule('speedtrap')">
       <div class="module-emoji">&#128296;</div>
       <div class="module-name">Speed Trap</div>
       <div class="module-desc">ESP32-S3 + dual IR sensors. Measures mid-track velocity.</div>
-      <div class="module-tag soon">COMING SOON</div>
+      <div class="module-tag ready">GUIDE READY</div>
     </div>
-    <div class="module-card coming-soon">
+    <div class="module-card" onclick="showModule('audio')">
       <div class="module-emoji">&#128266;</div>
       <div class="module-name">Audio Module</div>
-      <div class="module-desc">DY-SV5W or MAX98357A. Race announcer and dispatcher voice system.</div>
-      <div class="module-tag soon">COMING SOON</div>
+      <div class="module-desc">MAX98357A I2S amplifier + speaker. Race announcer and dispatcher voice system.</div>
+      <div class="module-tag ready">GUIDE READY</div>
     </div>
     <div class="module-card coming-soon">
       <div class="module-emoji">&#128161;</div>
@@ -1035,6 +1036,469 @@ a:hover{color:#e8c84a;text-decoration:underline}
   </div>
 </div>
 
+<!-- ==================== AUDIO MODULE WIRING GUIDE ==================== -->
+<div id="guide-audio" class="wiring-guide">
+  <div class="container">
+    <div class="wg-title">
+      <h2>Audio Module: MAX98357A I2S Amplifier</h2>
+      <p>Add a race announcer to any M.A.S.S. Trap node. Announces car names, speed records, and race results out loud.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="wg-progress">
+      <div class="wg-progress-label">WIRING PROGRESS</div>
+      <div class="wg-progress-bar">
+        <div class="wg-progress-fill" id="auProgressFill" style="width:0%"></div>
+      </div>
+      <div class="wg-progress-text" id="auProgressText">0 of 3 connections</div>
+    </div>
+
+    <!-- Parts List -->
+    <div class="parts-list">
+      <h3>Parts Needed</h3>
+      <div class="part-row">
+        <div class="part-icon">&#128266;</div>
+        <div>
+          <div class="part-name">MAX98357A I2S Amplifier Breakout Board</div>
+          <div class="part-detail">3W class-D I2S DAC + amp on a single board. No external DAC needed. ~$4 on Amazon/AliExpress.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128264;</div>
+        <div>
+          <div class="part-name">4&ohm; or 8&ohm; Speaker, 1-3W</div>
+          <div class="part-detail">Any small speaker works. Bigger = louder. The amp drives both 4&ohm; and 8&ohm; impedances.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128268;</div>
+        <div>
+          <div class="part-name">5 Dupont Jumper Wires (Female-Female)</div>
+          <div class="part-detail">Red (power), black (ground), orange (BCLK), yellow (LRC), blue (DIN). Color-coded recommended.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128187;</div>
+        <div>
+          <div class="part-name">Already-Connected ESP32-S3</div>
+          <div class="part-detail">The finish gate (or any node) you already wired up. Audio is an add-on &mdash; you&rsquo;re adding 5 wires to an existing build.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connection Table -->
+    <div class="parts-list" style="margin-bottom:24px">
+      <h3>Connection Map &mdash; MAX98357A</h3>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">5 wires from ESP32-S3 to the amplifier board, then 2 wires from the amp to the speaker.</p>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Wire</th><th>ESP32-S3 Pin</th><th>MAX98357A Pin</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+            <td><strong>3.3V</strong></td>
+            <td><strong>VIN</strong></td>
+            <td>Amplifier power</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+            <td><strong>GND</strong></td>
+            <td><strong>GND</strong></td>
+            <td>Ground</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-orange)"></span>Orange</td>
+            <td><strong>GPIO 15</strong></td>
+            <td><strong>BCLK</strong></td>
+            <td>I2S Bit Clock</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-yellow)"></span>Yellow</td>
+            <td><strong>GPIO 16</strong></td>
+            <td><strong>LRC</strong></td>
+            <td>I2S Left/Right Clock</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-blue)"></span>Blue</td>
+            <td><strong>GPIO 17</strong></td>
+            <td><strong>DIN</strong></td>
+            <td>I2S Data</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="wg-tip" style="margin-top:8px">
+        <div class="wg-tip-label">Speaker Connection</div>
+        The MAX98357A has two speaker screw terminals labeled <strong>+</strong> and <strong>&minus;</strong>. Run two wires from these terminals to your speaker. Polarity matters for sound quality &mdash; match + to + and &minus; to &minus; if your speaker has markings.
+      </div>
+    </div>
+
+    <!-- STEP 1: Power -->
+    <div class="step-card active" id="au-step1" data-step="1">
+      <div class="step-header" onclick="auToggleStep(1)">
+        <div class="step-number">1</div>
+        <div class="step-info">
+          <div class="step-title">Connect Power</div>
+          <div class="step-subtitle">Red: ESP32-S3 3.3V &rarr; MAX98357A VIN &nbsp;|&nbsp; Black: GND &rarr; GND</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();auCompleteStep(1)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">Two Wires</div>
+          Connect the <strong>red wire</strong> from the ESP32-S3 <em>3.3V</em> pin to the MAX98357A <em>VIN</em> pin. Then connect the <strong>black wire</strong> from any ESP32-S3 <em>GND</em> pin to the MAX98357A <em>GND</em> pin.
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-red" data-label="3.3V POWER" style="width:80%;margin:12px auto"></div>
+          <div class="wd-wire wire-black" data-label="GROUND" style="width:80%;margin:12px auto"></div>
+        </div>
+        <div class="wg-tip">
+          <div class="wg-tip-label">3.3V is Fine</div>
+          The MAX98357A accepts 2.5V&ndash;5.5V on VIN. Running at 3.3V works perfectly &mdash; the amp is plenty loud. You <em>can</em> use the 5V pin for more volume, but 3.3V keeps things simple and safe.
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: I2S Data Lines -->
+    <div class="step-card" id="au-step2" data-step="2">
+      <div class="step-header" onclick="auToggleStep(2)">
+        <div class="step-number">2</div>
+        <div class="step-info">
+          <div class="step-title">Connect I2S Data Lines</div>
+          <div class="step-subtitle">Orange: GPIO 15 &rarr; BCLK &nbsp;|&nbsp; Yellow: GPIO 16 &rarr; LRC &nbsp;|&nbsp; Blue: GPIO 17 &rarr; DIN</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();auCompleteStep(2)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">Three Signal Wires</div>
+          These carry the digital audio data from the ESP32 to the amplifier using the I2S protocol:<br><br>
+          <strong>Orange</strong> &rarr; GPIO 15 to <em>BCLK</em> (Bit Clock &mdash; the timing signal)<br>
+          <strong>Yellow</strong> &rarr; GPIO 16 to <em>LRC</em> (Left/Right Clock &mdash; channel select)<br>
+          <strong>Blue</strong> &rarr; GPIO 17 to <em>DIN</em> (Data In &mdash; the actual audio samples)
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-orange" data-label="BCLK (GPIO 15)" style="width:80%;margin:12px auto"></div>
+          <div class="wd-wire wire-yellow" data-label="LRC (GPIO 16)" style="width:80%;margin:12px auto"></div>
+          <div class="wd-wire wire-blue" data-label="DIN (GPIO 17)" style="width:80%;margin:12px auto"></div>
+        </div>
+        <div class="wg-tip">
+          <div class="wg-tip-label">SD and GAIN Pins</div>
+          The MAX98357A also has <em>SD</em> (shutdown) and <em>GAIN</em> pins. <strong>Leave them disconnected.</strong> The firmware handles audio enable/disable via I2S control. The GAIN pin defaults to 9dB which is fine for Hot Wheels announcing.
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Speaker -->
+    <div class="step-card" id="au-step3" data-step="3">
+      <div class="step-header" onclick="auToggleStep(3)">
+        <div class="step-number">3</div>
+        <div class="step-info">
+          <div class="step-title">Connect Speaker</div>
+          <div class="step-subtitle">Speaker wires from MAX98357A + and &minus; terminals to speaker</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();auCompleteStep(3)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">Final Connection</div>
+          The MAX98357A has screw terminals (or solder pads) labeled <strong>+</strong> and <strong>&minus;</strong> for the speaker output. Run two wires from these to your speaker. If your speaker has polarity markings, match them. If not, either orientation works &mdash; you might just get slightly different phase response.
+        </div>
+        <div class="wg-tip">
+          <div class="wg-tip-label">Speaker Size</div>
+          Bigger speakers are louder. A 40mm 3W speaker is great for a desk setup. For stairwell tracks where the kid is running up and down, bigger is better &mdash; consider a 2-inch or 3-inch speaker so announcements carry.
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Banner -->
+    <div class="wg-success" id="auSuccessBanner">
+      <h3>&#10003; AUDIO MODULE WIRED!</h3>
+      <p>Hardware connected. Now enable it in firmware and upload sound files.</p>
+      <div style="margin-top:16px">
+        <div class="wg-tip" style="text-align:left;margin:0">
+          <div class="wg-tip-label">Enable Audio in Firmware</div>
+          <strong>1.</strong> Open the dashboard at your device&rsquo;s IP address<br>
+          <strong>2.</strong> Go to the <strong>System</strong> tab &rarr; <strong>Audio</strong> section<br>
+          <strong>3.</strong> Check <strong>Enable Audio</strong><br>
+          <strong>4.</strong> Click <strong>Save</strong>, then <strong>Reboot</strong><br>
+          <strong>5.</strong> After reboot, go to the <strong>Audio</strong> tab to upload WAV files
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="wg-tip" style="text-align:left;margin:0">
+          <div class="wg-tip-label">WAV File Format</div>
+          Audio files must be <strong>WAV format</strong>: 16kHz sample rate, 16-bit or 8-bit, mono. Keep files small &mdash; LittleFS has limited space (~9.9MB shared with HTML and config).<br><br>
+          Upload via dashboard or push via API:<br>
+          <code style="background:var(--navy);padding:2px 6px;border-radius:3px;font-size:0.75rem">curl -X POST http://DEVICE_IP/api/audio/upload -H "X-API-Key: admin" -F "file=@yourfile.wav"</code><br><br>
+          Volume range: <strong>0&ndash;21</strong> (default 10). Adjustable in System settings.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ==================== SPEED TRAP WIRING GUIDE ==================== -->
+<div id="guide-speedtrap" class="wiring-guide">
+  <div class="container">
+    <div class="wg-title">
+      <h2>Speed Trap: Dual IR Sensors</h2>
+      <p>A dedicated ESP32-S3 with two IR break-beam sensors at a known distance apart. Measures mid-track velocity and sends it to the finish gate via ESP-NOW.</p>
+    </div>
+
+    <!-- Progress -->
+    <div class="wg-progress">
+      <div class="wg-progress-label">WIRING PROGRESS</div>
+      <div class="wg-progress-bar">
+        <div class="wg-progress-fill" id="stProgressFill" style="width:0%"></div>
+      </div>
+      <div class="wg-progress-text" id="stProgressText">0 of 4 connections</div>
+    </div>
+
+    <!-- Parts List -->
+    <div class="parts-list">
+      <h3>Parts Needed</h3>
+      <div class="part-row">
+        <div class="part-icon">&#128187;</div>
+        <div>
+          <div class="part-name">ESP32-S3 N16R8 Dev Board (38-pin)</div>
+          <div class="part-detail">Dedicated board for the speed trap. Same model as finish and start gates &mdash; 16MB Flash / 8MB PSRAM.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128308;</div>
+        <div>
+          <div class="part-name">2&times; IR Break-Beam Sensor Pairs</div>
+          <div class="part-detail">Two complete pairs (transmitter + receiver each). One for the entry beam, one for the exit beam. 3-wire: VCC, GND, Signal.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128268;</div>
+        <div>
+          <div class="part-name">Dupont Jumper Wires (6 minimum)</div>
+          <div class="part-detail">2&times; red (VCC), 2&times; black (GND), 1&times; green (signal 1), 1&times; white (signal 2). Power can share rails.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128267;</div>
+        <div>
+          <div class="part-name">USB-C Cable + 5V Power Supply</div>
+          <div class="part-detail">USB-C for initial flash. 5V/2A for permanent installation.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128207;</div>
+        <div>
+          <div class="part-name">Ruler or Tape Measure</div>
+          <div class="part-detail">You <strong>must</strong> measure the exact distance between the two sensors. Speed = distance &divide; time. Precision matters.</div>
+        </div>
+      </div>
+      <div class="part-row">
+        <div class="part-icon">&#128296;</div>
+        <div>
+          <div class="part-name">Mounting Hardware</div>
+          <div class="part-detail">Something to hold both sensor pairs rigidly at a fixed, known distance apart. Hot glue, 3D-printed brackets, or tape on a ruler all work.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connection Table: Sensor 1 -->
+    <div class="parts-list" style="margin-bottom:24px">
+      <h3>Connection Map &mdash; Sensor 1 (Entry)</h3>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">The first sensor the car crosses. This starts the speed measurement timer.</p>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Wire</th><th>ESP32-S3 Pin</th><th>IR Sensor 1 Pin</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+            <td><strong>3.3V</strong></td>
+            <td><strong>VCC</strong></td>
+            <td>Sensor 1 power</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+            <td><strong>GND</strong></td>
+            <td><strong>GND</strong></td>
+            <td>Ground</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-green)"></span>Green</td>
+            <td><strong>GPIO 4</strong></td>
+            <td><strong>OUT / SIG</strong></td>
+            <td>Entry beam &mdash; first trigger</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Connection Table: Sensor 2 -->
+    <div class="parts-list" style="margin-bottom:24px">
+      <h3>Connection Map &mdash; Sensor 2 (Exit)</h3>
+      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">The second sensor the car crosses. The time difference between sensors gives you speed.</p>
+      <table class="conn-table">
+        <thead>
+          <tr><th>Wire</th><th>ESP32-S3 Pin</th><th>IR Sensor 2 Pin</th><th>Purpose</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+            <td><strong>3.3V (shared)</strong></td>
+            <td><strong>VCC</strong></td>
+            <td>Sensor 2 power</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+            <td><strong>GND (shared)</strong></td>
+            <td><strong>GND</strong></td>
+            <td>Ground</td>
+          </tr>
+          <tr>
+            <td><span class="wire-dot" style="background:var(--wire-white);border:1px solid #999"></span>White</td>
+            <td><strong>GPIO 5</strong></td>
+            <td><strong>OUT / SIG</strong></td>
+            <td>Exit beam &mdash; second trigger</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="wg-tip" style="margin-top:8px">
+        <div class="wg-tip-label">Sharing Power Rails</div>
+        Both sensors can share the same 3.3V and GND pins on the ESP32-S3. Most dev boards have multiple GND pins &mdash; use two different ones if you prefer cleaner wiring. The <strong>signal wires must be on separate GPIOs</strong> (4 and 5).
+      </div>
+    </div>
+
+    <!-- STEP 1: Sensor 1 Power -->
+    <div class="step-card active" id="st-step1" data-step="1">
+      <div class="step-header" onclick="stToggleStep(1)">
+        <div class="step-number">1</div>
+        <div class="step-info">
+          <div class="step-title">Connect Sensor 1 Power</div>
+          <div class="step-subtitle">Red: 3.3V &rarr; VCC &nbsp;|&nbsp; Black: GND &rarr; GND</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();stCompleteStep(1)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">Entry Sensor</div>
+          This is the sensor the car will cross <strong>first</strong>. Connect <strong>red</strong> to 3.3V and <strong>black</strong> to GND. Same as wiring any IR break-beam sensor.
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-red" data-label="3.3V POWER" style="width:80%;margin:12px auto"></div>
+          <div class="wd-wire wire-black" data-label="GROUND" style="width:80%;margin:12px auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2: Sensor 1 Signal -->
+    <div class="step-card" id="st-step2" data-step="2">
+      <div class="step-header" onclick="stToggleStep(2)">
+        <div class="step-number">2</div>
+        <div class="step-info">
+          <div class="step-title">Connect Sensor 1 Signal</div>
+          <div class="step-subtitle">Green: GPIO 4 &rarr; Sensor 1 OUT</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();stCompleteStep(2)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">Entry Trigger</div>
+          Connect the <strong>green wire</strong> from ESP32-S3 <em>GPIO 4</em> to Sensor 1&rsquo;s signal pin (OUT or SIG). When the car breaks this beam, the firmware captures a microsecond-precision timestamp &mdash; this is the &ldquo;start&rdquo; of the speed measurement.
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-green" data-label="SIGNAL 1 (GPIO 4)" style="width:80%;margin:12px auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 3: Sensor 2 Power -->
+    <div class="step-card" id="st-step3" data-step="3">
+      <div class="step-header" onclick="stToggleStep(3)">
+        <div class="step-number">3</div>
+        <div class="step-info">
+          <div class="step-title">Connect Sensor 2 Power</div>
+          <div class="step-subtitle">Red: 3.3V &rarr; VCC &nbsp;|&nbsp; Black: GND &rarr; GND (can share power rails)</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();stCompleteStep(3)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">Exit Sensor</div>
+          Wire the second IR sensor&rsquo;s power the same way. You can share the <em>3.3V</em> and <em>GND</em> pins with Sensor 1 &mdash; the ESP32-S3 can supply both sensors easily. Use a second GND pin or splice the wires if you prefer.
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-red" data-label="3.3V POWER (SHARED)" style="width:80%;margin:12px auto"></div>
+          <div class="wd-wire wire-black" data-label="GROUND (SHARED)" style="width:80%;margin:12px auto"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 4: Sensor 2 Signal -->
+    <div class="step-card" id="st-step4" data-step="4">
+      <div class="step-header" onclick="stToggleStep(4)">
+        <div class="step-number">4</div>
+        <div class="step-info">
+          <div class="step-title">Connect Sensor 2 Signal</div>
+          <div class="step-subtitle">White: GPIO 5 &rarr; Sensor 2 OUT</div>
+        </div>
+        <div class="step-check" onclick="event.stopPropagation();stCompleteStep(4)">&#10003;</div>
+      </div>
+      <div class="step-body">
+        <div class="wg-tip">
+          <div class="wg-tip-label">Exit Trigger</div>
+          Connect the <strong>white wire</strong> from ESP32-S3 <em>GPIO 5</em> to Sensor 2&rsquo;s signal pin. When the car breaks this beam, the firmware captures a second timestamp. <strong>Speed = sensor spacing &divide; time between triggers.</strong>
+        </div>
+        <div style="text-align:center;margin:12px 0">
+          <div class="wd-wire wire-white" data-label="SIGNAL 2 (GPIO 5)" style="width:80%;margin:12px auto"></div>
+        </div>
+        <div class="wg-tip">
+          <div class="wg-tip-label">Why GPIO 4 and GPIO 5?</div>
+          These are the firmware defaults for the speed trap&rsquo;s dual-ISR system. Both pins support hardware interrupts with <em>IRAM_ATTR</em> handlers and spinlock-protected 64-bit timestamps. The pin assignment is configurable in the device config if needed.
+        </div>
+      </div>
+    </div>
+
+    <!-- Success Banner -->
+    <div class="wg-success" id="stSuccessBanner">
+      <h3>&#10003; SPEED TRAP WIRED!</h3>
+      <p>Both sensors connected. Now measure your sensor spacing, flash the firmware, and configure the device.</p>
+      <div style="margin-top:16px">
+        <div class="wg-tip" style="text-align:left;margin:0">
+          <div class="wg-tip-label">Critical: Measure Sensor Spacing</div>
+          <strong>The distance between Sensor 1 and Sensor 2 directly determines speed accuracy.</strong> Use a ruler or tape measure. Measure center-to-center (where the beams cross the track), to the nearest millimeter.<br><br>
+          Enter this value in the device config as <em>sensor_spacing_m</em> in meters. For example:<br>
+          &bull; 10cm spacing = <strong>0.100</strong><br>
+          &bull; 15cm spacing = <strong>0.150</strong><br>
+          &bull; 20cm spacing = <strong>0.200</strong><br><br>
+          <strong>Wider spacing = more accurate</strong> (longer measurement window). 10&ndash;20cm is the sweet spot for 1:64 scale Hot Wheels.
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="wg-tip" style="text-align:left;margin:0">
+          <div class="wg-tip-label">Setup Checklist</div>
+          <strong>1.</strong> Flash firmware via USB: <code style="background:var(--navy);padding:2px 6px;border-radius:3px;font-size:0.75rem">pio run -t upload</code><br>
+          <strong>2.</strong> Connect to the setup hotspot: <em>MASS-Trap-Setup</em><br>
+          <strong>3.</strong> Set role to <strong>Speed Trap</strong> in the wizard at <em>192.168.4.1</em><br>
+          <strong>4.</strong> After reboot, verify both sensors on the speed trap status page<br>
+          <strong>5.</strong> Enter the exact sensor spacing in System &rarr; Config<br>
+          <strong>6.</strong> The speed trap auto-discovers the finish gate via ESP-NOW &mdash; no manual pairing needed
+        </div>
+      </div>
+      <div style="margin-top:12px">
+        <div class="wg-tip" style="text-align:left;margin:0">
+          <div class="wg-tip-label">Mounting Tips</div>
+          &bull; Both sensors must be at the <strong>same height</strong>, perpendicular to the track<br>
+          &bull; Aim the beams at <strong>car body height</strong> (~15mm above track), not wheel height<br>
+          &bull; Mount <strong>rigidly</strong> &mdash; any wobble changes the effective spacing and corrupts measurements<br>
+          &bull; The car must cross Sensor 1 first, then Sensor 2. Place them in the direction of travel.
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 <!-- ==================== FOOTER ==================== -->
 <div class="wiz-footer">
   <div class="container">
@@ -1057,7 +1521,9 @@ a:hover{color:#e8c84a;text-decoration:underline}
   /* ---- Module definitions ---- */
   var modules = {
     telemetry: { totalSteps: 4, prefix: 'step', progressFill: 'progressFill', progressText: 'progressText', successBanner: 'successBanner', storageKey: 'mass_wizard_telemetry' },
-    finish:    { totalSteps: 3, prefix: 'fg-step', progressFill: 'fgProgressFill', progressText: 'fgProgressText', successBanner: 'fgSuccessBanner', storageKey: 'mass_wizard_finish' }
+    finish:    { totalSteps: 3, prefix: 'fg-step', progressFill: 'fgProgressFill', progressText: 'fgProgressText', successBanner: 'fgSuccessBanner', storageKey: 'mass_wizard_finish' },
+    audio:     { totalSteps: 3, prefix: 'au-step', progressFill: 'auProgressFill', progressText: 'auProgressText', successBanner: 'auSuccessBanner', storageKey: 'mass_wizard_audio' },
+    speedtrap: { totalSteps: 4, prefix: 'st-step', progressFill: 'stProgressFill', progressText: 'stProgressText', successBanner: 'stSuccessBanner', storageKey: 'mass_wizard_speedtrap' }
   };
   var state = {}; // { telemetry: {1:true,2:true}, finish: {1:true} }
   var activeModule = 'telemetry';
@@ -1132,6 +1598,14 @@ a:hover{color:#e8c84a;text-decoration:underline}
   /* ---- Finish Gate module wrappers ---- */
   window.fgToggleStep = function(n) { toggleStepGeneric('finish', n); };
   window.fgCompleteStep = function(n) { completeStepGeneric('finish', n); };
+
+  /* ---- Audio Module wrappers ---- */
+  window.auToggleStep = function(n) { toggleStepGeneric('audio', n); };
+  window.auCompleteStep = function(n) { completeStepGeneric('audio', n); };
+
+  /* ---- Speed Trap module wrappers ---- */
+  window.stToggleStep = function(n) { toggleStepGeneric('speedtrap', n); };
+  window.stCompleteStep = function(n) { completeStepGeneric('speedtrap', n); };
 
   /* ---- Finish Gate tier toggle ---- */
   window.setFinishTier = function(tier) {

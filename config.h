@@ -45,15 +45,15 @@
 #define RACE_TIMEOUT_MS         30000       // 30s — abort if no finish
 
 // ESP-NOW peer health intervals (milliseconds)
-#define PING_INTERVAL_MS        2000        // Keepalive when peer is online
-#define PING_BACKOFF_MS         10000       // Keepalive when peer is offline
+#define PING_INTERVAL_MS        1000        // Keepalive when peer is online (was 2000)
+#define PING_BACKOFF_MS         5000        // Keepalive when peer is offline (was 10000)
 #define CLOCK_SYNC_INTERVAL_MS  30000       // Finish→start time sync request (30s)
 #define PEER_HEALTH_CHECK_MS    5000        // Peer status scan interval
 
 // ESP-NOW discovery (milliseconds)
-#define BEACON_INTERVAL_MS      3000        // Broadcast "I'm here"
-#define PEER_ONLINE_THRESH_MS   15000       // <15s since last heard = ONLINE
-#define PEER_STALE_THRESH_MS    60000       // <60s = STALE, >60s = OFFLINE
+#define BEACON_INTERVAL_MS      2000        // Broadcast "I'm here" (was 3000)
+#define PEER_ONLINE_THRESH_MS   10000       // <10s since last heard = ONLINE (was 15000)
+#define PEER_STALE_THRESH_MS    30000       // <30s = STALE, >30s = OFFLINE (was 60000)
 #define PEER_SAVE_DEBOUNCE_MS   2000        // Delay before writing /peers.json
 
 // Global log output — all Serial.printf calls should use LOG.printf instead

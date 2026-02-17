@@ -125,7 +125,9 @@ static bool connectWiFi(const char* ssid, const char* pass, const char* hostname
     // Pin AP to the same channel as the STA connection to prevent channel-hopping.
     WiFi.mode(WIFI_AP_STA);
     WiFi.softAP(hostname, NULL, WiFi.channel());
+    WiFi.setSleep(false);  // Disable modem sleep — all nodes are wall-powered
     delay(100);
+    LOG.println("[WIFI] Modem sleep DISABLED (low-latency mode)");
 
     wifiConnected = true;
     memset(wifiFailReason, 0, sizeof(wifiFailReason));
