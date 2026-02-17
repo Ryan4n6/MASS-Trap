@@ -37,3 +37,8 @@ secrets.h
 # --- Private data (order history, raw catalogs) ---
 amazon_orders_*.json
 amazon_parts_catalog.json
+
+# --- Audio pipeline (generated files, not source) ---
+audio/raw/
+audio/radio/
+audio/esp32/

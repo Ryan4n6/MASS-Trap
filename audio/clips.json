@@ -1,0 +1,129 @@
+{
+  "_comment": "M.A.S.S. Trap Audio Clip Definitions — Police Dispatcher Voice",
+  "_format": "Each clip has: filename (what ESP32 expects), script (what the dispatcher says), category (firmware/lab/extra), notes",
+  "_voice_instruction": "Speak as a calm authoritative police radio dispatcher with clipped cadence and clear enunciation, professional and slightly tense, like calling out a pursuit over the radio, short pauses between phrases, no filler words",
+  "_tts_notes": "Scripts are written TTS-friendly: minimal punctuation, no exclamation marks, commas only where natural breath pauses occur, no periods between short phrases that cause robotic stops",
+
+  "clips": [
+    {
+      "filename": "armed",
+      "script": "All units, track is armed, standing by for vehicle detection",
+      "category": "firmware",
+      "notes": "Plays on START GATE when system arms via LiDAR auto-arm or dashboard ARM button"
+    },
+    {
+      "filename": "go",
+      "script": "Vehicle detected, race is live",
+      "category": "firmware",
+      "notes": "Plays on START GATE when IR beam breaks. Keep SHORT, race is already in progress"
+    },
+    {
+      "filename": "finish",
+      "script": "Suspect vehicle has crossed the finish line, time recorded",
+      "category": "firmware",
+      "notes": "Plays on FINISH GATE when car crosses finish sensor"
+    },
+    {
+      "filename": "record",
+      "script": "New record, updating the Most Wanted list",
+      "category": "firmware",
+      "notes": "Plays on FINISH GATE when a new best time is set. Not yet wired in firmware code"
+    },
+    {
+      "filename": "reset",
+      "script": "All clear, track resetting to standby",
+      "category": "firmware",
+      "notes": "Plays when race state resets to IDLE after cooldown. Optional firmware addition"
+    },
+    {
+      "filename": "sync",
+      "script": "Clock sync complete, all stations aligned",
+      "category": "firmware",
+      "notes": "Could play when clock sync drift is corrected. Low priority"
+    },
+    {
+      "filename": "error",
+      "script": "Signal lost, check connections and retry",
+      "category": "firmware",
+      "notes": "General error sound, could play on ESP-NOW peer timeout"
+    },
+    {
+      "filename": "speed_trap",
+      "script": "Speed trap triggered, velocity recorded",
+      "category": "firmware",
+      "notes": "Plays on SPEEDTRAP device when dual-IR sensors capture velocity"
+    },
+    {
+      "filename": "attention",
+      "script": "Attention all units",
+      "category": "lab",
+      "notes": "General attention getter, used as prefix before condition changes in the lab manager"
+    },
+    {
+      "filename": "next_car",
+      "script": "Load next vehicle onto the track, standing by for deployment",
+      "category": "lab",
+      "notes": "Lab manager between runs when the car changes, Ben needs to swap cars"
+    },
+    {
+      "filename": "condition_change",
+      "script": "Attention, test conditions are changing, adjust vehicle weight as instructed",
+      "category": "lab",
+      "notes": "Lab manager weight condition changes, Ben needs to add or remove tungsten weights"
+    },
+    {
+      "filename": "trial_complete",
+      "script": "Trial complete, evidence logged, prepare for next run",
+      "category": "lab",
+      "notes": "Lab manager after each successful run in the testing loop"
+    },
+    {
+      "filename": "experiment_done",
+      "script": "All trials complete, lab is now secured, outstanding work units",
+      "category": "lab",
+      "notes": "Lab manager all tests finished, the victory moment"
+    },
+    {
+      "filename": "sanity_alert",
+      "script": "Anomalous reading detected, review data before proceeding",
+      "category": "lab",
+      "notes": "Lab manager sanity check triggered for suspicious timing or speed values"
+    },
+    {
+      "filename": "case_assigned",
+      "script": "New case number assigned, evidence chain initiated",
+      "category": "lab",
+      "notes": "Lab manager Phase 3 when case numbers are assigned to test matrix"
+    },
+    {
+      "filename": "leaderboard",
+      "script": "New entry on the Most Wanted board",
+      "category": "extra",
+      "notes": "When a new car makes it to the leaderboard"
+    },
+    {
+      "filename": "startup",
+      "script": "M A S S Trap online, all systems nominal",
+      "category": "extra",
+      "notes": "Boot sound after WiFi connects and ESP-NOW initializes. Spelled out M A S S so TTS reads each letter"
+    },
+    {
+      "filename": "peer_found",
+      "script": "New brother detected on the network",
+      "category": "extra",
+      "notes": "When a new ESP-NOW peer auto-discovers"
+    },
+    {
+      "filename": "calibration",
+      "script": "Calibration mode active, deploy reference sphere",
+      "category": "lab",
+      "notes": "Lab manager calibration template, tells Ben to use the steel ball bearing"
+    },
+    {
+      "filename": "photo_prompt",
+      "script": "Evidence photo required, document current setup",
+      "category": "lab",
+      "notes": "Lab manager Phase 3 prompts for setup photos before testing begins"
+    }
+  ]
+}
