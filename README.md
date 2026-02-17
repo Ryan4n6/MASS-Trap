@@ -471,6 +471,7 @@ MASS-Trap/
 | [MESH_AUTONOMY_DESIGN.md](MESH_AUTONOMY_DESIGN.md) | "10-Code" distributed ESP-NOW protocol — removes finish gate as single authority |
 | [DAYTONA_THEME_BRIEF.md](DAYTONA_THEME_BRIEF.md) | NASCAR-inspired theme design spec — typography, colors, personal easter eggs |
 | [HARDWARE_CATALOG.md](HARDWARE_CATALOG.md) | Complete hardware inventory with ASINs, costs, and role assignments |
+| [TECH_ASSESSMENT.md](TECH_ASSESSMENT.md) | Honest architecture review, tech stack recommendations, and the Human/AI Magna Carta |
 
 ## License
 
