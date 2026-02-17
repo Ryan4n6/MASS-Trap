@@ -103,9 +103,9 @@
     },
     {
       "filename": "startup",
-      "script": "M A S S Trap online, all systems nominal",
+      "script": "Mass Trap online, all systems nominal",
       "category": "extra",
-      "notes": "Boot sound after WiFi connects and ESP-NOW initializes. Spelled out M A S S so TTS reads each letter"
+      "notes": "Boot sound after WiFi connects and ESP-NOW initializes. Say Mass as one word, sounds like the family name"
     },
     {
       "filename": "peer_found",
