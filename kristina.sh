@@ -319,7 +319,7 @@ a:hover{text-decoration:underline}
   <div class="section-title"><span>📡</span> Live Device Status</div>
   <div class="live-grid" id="liveGrid">
     <div class="live-card"><div class="label">Status</div><div class="value" id="liveStatus">Connecting...</div></div>
-    <div class="live-card"><div class="label">Firmware</div><div class="value" id="liveFirmware">--</div></div>
+    <div class="live-card"><div class="label">Firmware</div><div class="value"><a href="https://github.com/Ryan4n6/MASS-Trap/releases" target="_blank" id="liveFirmware" style="color:inherit;text-decoration:underline dotted">--</a></div></div>
     <div class="live-card"><div class="label">Uptime</div><div class="value" id="liveUptime">--</div></div>
     <div class="live-card"><div class="label">Free Memory</div><div class="value" id="liveHeap">--</div></div>
     <div class="live-card"><div class="label">WiFi Signal</div><div class="value" id="liveRssi">--</div></div>
@@ -383,14 +383,45 @@ a:hover{text-decoration:underline}
         <div class="builder-name">Sam Massfeller</div>
         <div class="builder-role">V1 Creator &bull; Hardware Builder &bull; Original Vibe Coder</div>
       </div>
+      <div class="builder">
+        <div class="builder-name">Kristina Massfeller</div>
+        <div class="builder-role">Stepmom &bull; Team Morale &bull; The One Who Keeps Us Fed</div>
+      </div>
+      <div class="builder">
+        <div class="builder-name">Richard Massfeller</div>
+        <div class="builder-role">Dad &bull; Formula Vee Racer &bull; The 7-Foot Pencil Legend</div>
+      </div>
+      <div class="builder">
+        <div class="builder-name">Sam Troia</div>
+        <div class="builder-role">Uncle Sam &bull; Columbia University &bull; Concert Pianist &bull; In Memoriam</div>
+      </div>
+      <div class="builder">
+        <div class="builder-name">Stephen Massfeller</div>
+        <div class="builder-role">Uncle Beaver &bull; Pipeline Welder &bull; Built Things That Last &bull; In Memoriam</div>
+      </div>
     </div>
     <div class="dedication">
       This project was built at kitchen tables and workbenches between the hours of
-      midnight and sunrise. A dad, his two sons, and an AI &mdash; proving that the best
-      tools in the world are worthless without the people willing to stay up all night using them.
+      midnight and sunrise. A dad, his two sons, a stepmom who keeps the whole operation running,
+      and an AI &mdash; carrying forward the legacy of Richard&rsquo;s Formula Vees, Uncle Sam&rsquo;s
+      perfect pitch, and Uncle Beaver&rsquo;s pipeline welds. The best tools in the world are
+      worthless without the people willing to stay up all night using them.
+      <br><br>
+      <em>For Sam Troia and Stephen Massfeller &mdash; who built things that mattered.</em>
       <br><br>
       <span id="convoHoursNote">Built with love, caffeine, and approximately -- hours of conversation.</span>
     </div>
+  </div>
+</div>
+
+<!-- Links -->
+<div class="section">
+  <div class="section-title"><span>🔗</span> Links</div>
+  <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;padding:12px 0">
+    <a href="https://github.com/Ryan4n6/MASS-Trap" target="_blank" style="color:var(--gold);text-decoration:none;padding:8px 16px;border:1px solid var(--gold);border-radius:6px">&#128187; GitHub Repo</a>
+    <a href="https://ryan4n6.github.io/MASS-Trap/" target="_blank" style="color:var(--gold);text-decoration:none;padding:8px 16px;border:1px solid var(--gold);border-radius:6px">&#127968; Project Site</a>
+    <a href="https://ryan4n6.github.io/MASS-Trap/store.html" target="_blank" style="color:var(--gold);text-decoration:none;padding:8px 16px;border:1px solid var(--gold);border-radius:6px">&#128722; Parts Store</a>
+    <a href="https://github.com/Ryan4n6/MASS-Trap/releases" target="_blank" style="color:var(--gold);text-decoration:none;padding:8px 16px;border:1px solid var(--gold);border-radius:6px">&#128230; Releases</a>
   </div>
 </div>
 
