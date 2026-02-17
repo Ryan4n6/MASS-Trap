@@ -1058,8 +1058,23 @@ a:hover{color:#e8c84a;text-decoration:underline}
 <div id="guide-audio" class="wiring-guide">
   <div class="container">
     <div class="wg-title">
-      <h2>Audio Module: MAX98357A I2S Amplifier</h2>
-      <p>Add a race announcer to any M.A.S.S. Trap node. Announces car names, speed records, and race results out loud.</p>
+      <h2>Audio Module</h2>
+      <p>Add a race announcer to any M.A.S.S. Trap node. Announces car names, speed records, and race results out loud. Choose your hardware below.</p>
+    </div>
+
+    <!-- Audio Tier Selector -->
+    <div style="margin-bottom:24px">
+      <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;font-weight:700">Choose Your Audio Hardware</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <button onclick="setAudioTier('dysv5w')" id="btnAuDySv5w" class="tier-btn tier-active" style="background:var(--navy-light);color:var(--gold);border:2px solid var(--gold);padding:12px 14px;border-radius:8px;cursor:pointer;font-family:var(--font);text-align:left;transition:all 0.2s">
+          <div style="font-weight:700;font-size:0.85rem">&#127925; DY-SV5W Player</div>
+          <div style="font-size:0.7rem;margin-top:4px;opacity:0.8">UART-controlled MP3/WAV player with 32GB TF card, built-in 5W amp + speaker output. 3 wires to ESP32. <strong>Recommended.</strong></div>
+        </button>
+        <button onclick="setAudioTier('max98357a')" id="btnAuMax98" class="tier-btn" style="background:var(--navy-card);color:var(--text-muted);border:2px solid var(--gold-dim);padding:12px 14px;border-radius:8px;cursor:pointer;font-family:var(--font);text-align:left;transition:all 0.2s">
+          <div style="font-weight:700;font-size:0.85rem">&#128266; MAX98357A I2S Amp</div>
+          <div style="font-size:0.7rem;margin-top:4px;opacity:0.8">I2S DAC + 3W amp. ESP32 streams raw audio over I2S. Audio stored on ESP32 LittleFS (~9.9MB). 5 wires.</div>
+        </button>
+      </div>
     </div>
 
     <!-- Progress -->
@@ -1071,168 +1086,282 @@ a:hover{color:#e8c84a;text-decoration:underline}
       <div class="wg-progress-text" id="auProgressText">0 of 3 connections</div>
     </div>
 
-    <!-- Parts List -->
-    <div class="parts-list">
-      <h3>Parts Needed</h3>
-      <div class="part-row">
-        <div class="part-icon">&#128266;</div>
-        <div>
-          <div class="part-name">MAX98357A I2S Amplifier Breakout Board</div>
-          <div class="part-detail">3W class-D I2S DAC + amp on a single board. No external DAC needed. ~$4 on Amazon/AliExpress.</div>
+    <!-- ============ DY-SV5W TIER ============ -->
+    <div id="auTierDySv5w">
+
+      <!-- Parts List -->
+      <div class="parts-list">
+        <h3>Parts Needed</h3>
+        <div class="part-row">
+          <div class="part-icon">&#127925;</div>
+          <div>
+            <div class="part-name">DY-SV5W Voice Playback Module</div>
+            <div class="part-detail">Self-contained MP3/WAV player with 5W Class-D amp, TF card slot (up to 32GB), UART/IO/1-Wire control, volume knob. ~$4&ndash;$6 on Amazon/AliExpress.</div>
+          </div>
+        </div>
+        <div class="part-row">
+          <div class="part-icon">&#128190;</div>
+          <div>
+            <div class="part-name">MicroSD / TF Card (up to 32GB, FAT32)</div>
+            <div class="part-detail">Pre-load with numbered audio files: <code style="background:var(--navy);padding:1px 4px;border-radius:3px;font-size:0.75rem">00001.mp3</code>, <code style="background:var(--navy);padding:1px 4px;border-radius:3px;font-size:0.75rem">00002.mp3</code>, etc. The board plays files by number over UART.</div>
+          </div>
+        </div>
+        <div class="part-row">
+          <div class="part-icon">&#128264;</div>
+          <div>
+            <div class="part-name">4&ndash;8&ohm; Speaker (3&ndash;5W)</div>
+            <div class="part-detail">Connects to the onboard screw terminals labeled <strong>Speaker</strong>. Or use the 3.5mm stereo jack for headphones / external amp.</div>
+          </div>
+        </div>
+        <div class="part-row">
+          <div class="part-icon">&#128268;</div>
+          <div>
+            <div class="part-name">3 Dupont Jumper Wires (+ 1 optional)</div>
+            <div class="part-detail">Red (5V), black (GND), blue (UART TX &rarr; RXD). Optional green wire for BUSY pin (playback status).</div>
+          </div>
         </div>
       </div>
-      <div class="part-row">
-        <div class="part-icon">&#128264;</div>
-        <div>
-          <div class="part-name">4&ohm; or 8&ohm; Speaker, 1-3W</div>
-          <div class="part-detail">Any small speaker works. Bigger = louder. The amp drives both 4&ohm; and 8&ohm; impedances.</div>
+
+      <!-- DIP Switch Setting -->
+      <div class="wg-tip" style="margin-bottom:20px">
+        <div class="wg-tip-label">DIP Switch Setting &mdash; UART Mode</div>
+        Set the 3-position DIP switch to <strong>UART Serial Port Mode</strong>:<br><br>
+        <strong style="font-size:1.1rem">Switch 1: ON &nbsp;&nbsp; Switch 2: OFF &nbsp;&nbsp; Switch 3: ON</strong><br><br>
+        This gives the ESP32 full control: play/stop/pause, volume, track selection by number, and playback status. Set the switches <strong>before powering on</strong>.
+      </div>
+
+      <!-- Connection Table -->
+      <div class="parts-list" style="margin-bottom:24px">
+        <h3>Connection Map &mdash; DY-SV5W</h3>
+        <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">3 wires minimum (power + UART). Optional 4th wire for BUSY status.</p>
+        <table class="conn-table">
+          <thead>
+            <tr><th>Wire</th><th>ESP32-S3 Pin</th><th>DY-SV5W Pin</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+              <td><strong>5V</strong></td>
+              <td><strong>+5V</strong></td>
+              <td>Board power (5V required)</td>
+            </tr>
+            <tr>
+              <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+              <td><strong>GND</strong></td>
+              <td><strong>GND</strong> (bottom)</td>
+              <td>Ground (use bottom GND, not power GND)</td>
+            </tr>
+            <tr>
+              <td><span class="wire-dot" style="background:var(--wire-blue)"></span>Blue</td>
+              <td><strong>GPIO 15</strong></td>
+              <td><strong>RXD / I00</strong></td>
+              <td>UART data &mdash; ESP32 TX &rarr; DY-SV5W RX</td>
+            </tr>
+            <tr style="color:var(--text-muted)">
+              <td><span class="wire-dot" style="background:var(--wire-green)"></span>Green</td>
+              <td><strong>GPIO 16</strong> (input)</td>
+              <td><strong>BUSY</strong></td>
+              <td>Optional &mdash; LOW = playing, HIGH = idle</td>
+            </tr>
+          </tbody>
+        </table>
+        <p style="font-size:0.7rem;color:var(--text-muted);margin-top:6px">UART baud rate: <strong>9600</strong> (default). The DY-SV5W uses a simple binary protocol &mdash; send a byte sequence to play track N, set volume, stop, etc.</p>
+      </div>
+
+      <!-- Step 1: DIP Switches + TF Card -->
+      <div class="step-card active" id="au-step1" data-step="1">
+        <div class="step-header" onclick="auToggleStep(1)">
+          <div class="step-number">1</div>
+          <div class="step-info">
+            <div class="step-title" id="auStep1Title">Set DIP Switches &amp; Load TF Card</div>
+            <div class="step-subtitle" id="auStep1Sub">UART mode (1:ON 2:OFF 3:ON) &nbsp;|&nbsp; Copy numbered audio files to FAT32 card</div>
+          </div>
+          <div class="step-check" onclick="event.stopPropagation();auCompleteStep(1)">&#10003;</div>
+        </div>
+        <div class="step-body" id="auStep1Body">
+          <div class="wg-tip">
+            <div class="wg-tip-label">DIP Switch Position</div>
+            Flip the red DIP switches: <strong>1 = ON, 2 = OFF, 3 = ON</strong>. &ldquo;ON&rdquo; means pushed toward the &ldquo;ON&rdquo; label at the top of the switch block. Do this <strong>before</strong> applying power.
+          </div>
+          <div class="wg-tip" style="margin-top:8px">
+            <div class="wg-tip-label">Audio File Naming</div>
+            Format a MicroSD card as <strong>FAT32</strong> (max 32GB). Create files in the root directory named by number:<br><br>
+            <code style="background:var(--navy);padding:2px 6px;border-radius:3px;font-size:0.8rem">00001.mp3</code> &mdash; e.g. &ldquo;Track Armed&rdquo;<br>
+            <code style="background:var(--navy);padding:2px 6px;border-radius:3px;font-size:0.8rem">00002.mp3</code> &mdash; e.g. &ldquo;Race Started&rdquo;<br>
+            <code style="background:var(--navy);padding:2px 6px;border-radius:3px;font-size:0.8rem">00003.mp3</code> &mdash; e.g. &ldquo;New Record!&rdquo;<br><br>
+            Supports MP3 and WAV. 32GB = thousands of audio files. No more worrying about LittleFS space.
+          </div>
         </div>
       </div>
-      <div class="part-row">
-        <div class="part-icon">&#128268;</div>
-        <div>
-          <div class="part-name">5 Dupont Jumper Wires (Female-Female)</div>
-          <div class="part-detail">Red (power), black (ground), orange (BCLK), yellow (LRC), blue (DIN). Color-coded recommended.</div>
+
+      <!-- Step 2: Power + UART -->
+      <div class="step-card" id="au-step2" data-step="2">
+        <div class="step-header" onclick="auToggleStep(2)">
+          <div class="step-number">2</div>
+          <div class="step-info">
+            <div class="step-title" id="auStep2Title">Connect Power &amp; UART</div>
+            <div class="step-subtitle" id="auStep2Sub">Red: 5V &rarr; +5V &nbsp;|&nbsp; Black: GND &rarr; GND &nbsp;|&nbsp; Blue: GPIO 15 &rarr; RXD</div>
+          </div>
+          <div class="step-check" onclick="event.stopPropagation();auCompleteStep(2)">&#10003;</div>
+        </div>
+        <div class="step-body" id="auStep2Body">
+          <div class="wg-tip">
+            <div class="wg-tip-label">Three Wires</div>
+            <strong>Red</strong> &rarr; ESP32 <em>5V</em> pin to DY-SV5W <em>+5V</em> (the board needs 5V, not 3.3V)<br>
+            <strong>Black</strong> &rarr; ESP32 <em>GND</em> to DY-SV5W bottom <em>GND</em> pin<br>
+            <strong>Blue</strong> &rarr; ESP32 <em>GPIO 15</em> (TX) to DY-SV5W <em>RXD/I00</em> pin
+          </div>
+          <div style="text-align:center;margin:12px 0">
+            <div class="wd-wire wire-red" data-label="5V POWER" style="width:80%;margin:12px auto"></div>
+            <div class="wd-wire wire-black" data-label="GROUND" style="width:80%;margin:12px auto"></div>
+            <div class="wd-wire wire-blue" data-label="UART TX → RXD (GPIO 15)" style="width:80%;margin:12px auto"></div>
+          </div>
+          <div class="wg-tip">
+            <div class="wg-tip-label">5V Required</div>
+            Unlike the MAX98357A, the DY-SV5W <strong>needs 5V</strong>. Use the ESP32&rsquo;s 5V pin (fed from USB or barrel jack). The 3.3V pin won&rsquo;t work &mdash; the board&rsquo;s amp needs the full 5V rail.
+          </div>
+          <div class="wg-tip" style="margin-top:8px">
+            <div class="wg-tip-label">UART Level Shifting?</div>
+            The DY-SV5W RXD pin accepts 3.3V logic from the ESP32 directly &mdash; <strong>no level shifter needed</strong>. The ESP32&rsquo;s 3.3V HIGH is above the board&rsquo;s logic threshold.
+          </div>
         </div>
       </div>
-      <div class="part-row">
-        <div class="part-icon">&#128187;</div>
-        <div>
-          <div class="part-name">Already-Connected ESP32-S3</div>
-          <div class="part-detail">The finish gate (or any node) you already wired up. Audio is an add-on &mdash; you&rsquo;re adding 5 wires to an existing build.</div>
+
+      <!-- Step 3: Speaker + BUSY -->
+      <div class="step-card" id="au-step3" data-step="3">
+        <div class="step-header" onclick="auToggleStep(3)">
+          <div class="step-number">3</div>
+          <div class="step-info">
+            <div class="step-title" id="auStep3Title">Connect Speaker &amp; Optional BUSY Pin</div>
+            <div class="step-subtitle" id="auStep3Sub">Speaker wires to screw terminals &nbsp;|&nbsp; Optional: BUSY &rarr; GPIO 16</div>
+          </div>
+          <div class="step-check" onclick="event.stopPropagation();auCompleteStep(3)">&#10003;</div>
+        </div>
+        <div class="step-body" id="auStep3Body">
+          <div class="wg-tip">
+            <div class="wg-tip-label">Speaker</div>
+            Connect a 4&ndash;8&ohm; speaker (3&ndash;5W) to the screw terminals labeled <strong>Speaker</strong> on the DY-SV5W board. Alternatively, plug headphones or an external amp into the <strong>3.5mm jack</strong>.
+          </div>
+          <div class="wg-tip" style="margin-top:8px">
+            <div class="wg-tip-label">BUSY Pin (Optional but Recommended)</div>
+            Wire the DY-SV5W <strong>BUSY</strong> pin to ESP32 <strong>GPIO 16</strong>. This pin goes LOW while audio is playing and HIGH when idle. The firmware can use this to:<br><br>
+            &bull; Queue announcements without overlapping<br>
+            &bull; Wait for &ldquo;Track Armed&rdquo; to finish before starting countdown<br>
+            &bull; Show a &ldquo;speaking&rdquo; indicator on the dashboard
+          </div>
+          <div class="wg-tip" style="margin-top:8px">
+            <div class="wg-tip-label">Volume Control</div>
+            The blue potentiometer on the board adjusts volume with a screwdriver. You can also set volume via UART command (0&ndash;30). The knob is a hardware override &mdash; start at half and adjust.
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Connection Table -->
-    <div class="parts-list" style="margin-bottom:24px">
-      <h3>Connection Map &mdash; MAX98357A</h3>
-      <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">5 wires from ESP32-S3 to the amplifier board, then 2 wires from the amp to the speaker.</p>
-      <table class="conn-table">
-        <thead>
-          <tr><th>Wire</th><th>ESP32-S3 Pin</th><th>MAX98357A Pin</th><th>Purpose</th></tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
-            <td><strong>3.3V</strong></td>
-            <td><strong>VIN</strong></td>
-            <td>Amplifier power</td>
-          </tr>
-          <tr>
-            <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
-            <td><strong>GND</strong></td>
-            <td><strong>GND</strong></td>
-            <td>Ground</td>
-          </tr>
-          <tr>
-            <td><span class="wire-dot" style="background:var(--wire-orange)"></span>Orange</td>
-            <td><strong>GPIO 15</strong></td>
-            <td><strong>BCLK</strong></td>
-            <td>I2S Bit Clock</td>
-          </tr>
-          <tr>
-            <td><span class="wire-dot" style="background:var(--wire-yellow)"></span>Yellow</td>
-            <td><strong>GPIO 16</strong></td>
-            <td><strong>LRC</strong></td>
-            <td>I2S Left/Right Clock</td>
-          </tr>
-          <tr>
-            <td><span class="wire-dot" style="background:var(--wire-blue)"></span>Blue</td>
-            <td><strong>GPIO 17</strong></td>
-            <td><strong>DIN</strong></td>
-            <td>I2S Data</td>
-          </tr>
-        </tbody>
-      </table>
-      <div class="wg-tip" style="margin-top:8px">
-        <div class="wg-tip-label">Speaker Connection</div>
-        The MAX98357A has two speaker screw terminals labeled <strong>+</strong> and <strong>&minus;</strong>. Run two wires from these terminals to your speaker. Polarity matters for sound quality &mdash; match + to + and &minus; to &minus; if your speaker has markings.
+    <!-- ============ MAX98357A TIER ============ -->
+    <div id="auTierMax98" style="display:none">
+
+      <!-- Parts List -->
+      <div class="parts-list">
+        <h3>Parts Needed</h3>
+        <div class="part-row">
+          <div class="part-icon">&#128266;</div>
+          <div>
+            <div class="part-name">MAX98357A I2S Amplifier Breakout Board</div>
+            <div class="part-detail">3W class-D I2S DAC + amp on a single board. No external DAC needed. ~$4 on Amazon/AliExpress.</div>
+          </div>
+        </div>
+        <div class="part-row">
+          <div class="part-icon">&#128264;</div>
+          <div>
+            <div class="part-name">4&ohm; or 8&ohm; Speaker, 1-3W</div>
+            <div class="part-detail">Any small speaker works. Bigger = louder. The amp drives both 4&ohm; and 8&ohm; impedances.</div>
+          </div>
+        </div>
+        <div class="part-row">
+          <div class="part-icon">&#128268;</div>
+          <div>
+            <div class="part-name">5 Dupont Jumper Wires (Female-Female)</div>
+            <div class="part-detail">Red (power), black (ground), orange (BCLK), yellow (LRC), blue (DIN). Color-coded recommended.</div>
+          </div>
+        </div>
+        <div class="part-row">
+          <div class="part-icon">&#128187;</div>
+          <div>
+            <div class="part-name">Already-Connected ESP32-S3</div>
+            <div class="part-detail">The finish gate (or any node) you already wired up. Audio is an add-on &mdash; you&rsquo;re adding 5 wires to an existing build.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Connection Table -->
+      <div class="parts-list" style="margin-bottom:24px">
+        <h3>Connection Map &mdash; MAX98357A</h3>
+        <p style="font-size:0.75rem;color:var(--text-muted);margin-bottom:8px">5 wires from ESP32-S3 to the amplifier board, then 2 wires from the amp to the speaker.</p>
+        <table class="conn-table">
+          <thead>
+            <tr><th>Wire</th><th>ESP32-S3 Pin</th><th>MAX98357A Pin</th><th>Purpose</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="wire-dot" style="background:var(--wire-red)"></span>Red</td>
+              <td><strong>3.3V</strong></td>
+              <td><strong>VIN</strong></td>
+              <td>Amplifier power</td>
+            </tr>
+            <tr>
+              <td><span class="wire-dot" style="background:var(--wire-black);border:1px solid #666"></span>Black</td>
+              <td><strong>GND</strong></td>
+              <td><strong>GND</strong></td>
+              <td>Ground</td>
+            </tr>
+            <tr>
+              <td><span class="wire-dot" style="background:var(--wire-orange)"></span>Orange</td>
+              <td><strong>GPIO 15</strong></td>
+              <td><strong>BCLK</strong></td>
+              <td>I2S Bit Clock</td>
+            </tr>
+            <tr>
+              <td><span class="wire-dot" style="background:var(--wire-yellow)"></span>Yellow</td>
+              <td><strong>GPIO 16</strong></td>
+              <td><strong>LRC</strong></td>
+              <td>I2S Left/Right Clock</td>
+            </tr>
+            <tr>
+              <td><span class="wire-dot" style="background:var(--wire-blue)"></span>Blue</td>
+              <td><strong>GPIO 17</strong></td>
+              <td><strong>DIN</strong></td>
+              <td>I2S Data</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="wg-tip" style="margin-top:8px">
+          <div class="wg-tip-label">Speaker Connection</div>
+          The MAX98357A has two speaker screw terminals labeled <strong>+</strong> and <strong>&minus;</strong>. Run two wires from these terminals to your speaker. Polarity matters for sound quality &mdash; match + to + and &minus; to &minus; if your speaker has markings.
+        </div>
+      </div>
+
+      <!-- Placeholder steps (MAX98357A uses same au-step IDs, toggled by tier) -->
+      <div class="wg-tip" style="margin-bottom:16px">
+        <div class="wg-tip-label">MAX98357A Wiring Steps</div>
+        <strong>Step 1 &mdash; Power:</strong> Red wire from ESP32 <em>3.3V</em> &rarr; MAX98357A <em>VIN</em>. Black wire from <em>GND</em> &rarr; <em>GND</em>. The MAX98357A accepts 2.5V&ndash;5.5V on VIN.<br><br>
+        <strong>Step 2 &mdash; I2S Data:</strong> Orange &rarr; GPIO 15 to <em>BCLK</em>. Yellow &rarr; GPIO 16 to <em>LRC</em>. Blue &rarr; GPIO 17 to <em>DIN</em>. Leave <em>SD</em> and <em>GAIN</em> pins disconnected.<br><br>
+        <strong>Step 3 &mdash; Speaker:</strong> Run two wires from the MAX98357A speaker screw terminals to your 4&ndash;8&ohm; speaker. Match polarity if marked.
+      </div>
+      <div class="wg-tip">
+        <div class="wg-tip-label">I2S vs UART: Why Choose MAX98357A?</div>
+        The MAX98357A is a &ldquo;dumb amp&rdquo; &mdash; the ESP32 does all the audio processing and streams PCM data over I2S. This means:<br><br>
+        &bull; Audio files stored on ESP32 LittleFS (~9.9MB shared with web UI)<br>
+        &bull; CPU load on ESP32 during playback (DMA handles most of it)<br>
+        &bull; Full software control of audio generation (synthesize, mix, effects)<br>
+        &bull; No SD card needed<br><br>
+        Choose this if you want software-generated audio or have limited physical space. Choose the <strong>DY-SV5W</strong> if you want pre-recorded announcements with 32GB of storage and zero ESP32 CPU load.
       </div>
     </div>
 
-    <!-- STEP 1: Power -->
-    <div class="step-card active" id="au-step1" data-step="1">
-      <div class="step-header" onclick="auToggleStep(1)">
-        <div class="step-number">1</div>
-        <div class="step-info">
-          <div class="step-title">Connect Power</div>
-          <div class="step-subtitle">Red: ESP32-S3 3.3V &rarr; MAX98357A VIN &nbsp;|&nbsp; Black: GND &rarr; GND</div>
-        </div>
-        <div class="step-check" onclick="event.stopPropagation();auCompleteStep(1)">&#10003;</div>
-      </div>
-      <div class="step-body">
-        <div class="wg-tip">
-          <div class="wg-tip-label">Two Wires</div>
-          Connect the <strong>red wire</strong> from the ESP32-S3 <em>3.3V</em> pin to the MAX98357A <em>VIN</em> pin. Then connect the <strong>black wire</strong> from any ESP32-S3 <em>GND</em> pin to the MAX98357A <em>GND</em> pin.
-        </div>
-        <div style="text-align:center;margin:12px 0">
-          <div class="wd-wire wire-red" data-label="3.3V POWER" style="width:80%;margin:12px auto"></div>
-          <div class="wd-wire wire-black" data-label="GROUND" style="width:80%;margin:12px auto"></div>
-        </div>
-        <div class="wg-tip">
-          <div class="wg-tip-label">3.3V is Fine</div>
-          The MAX98357A accepts 2.5V&ndash;5.5V on VIN. Running at 3.3V works perfectly &mdash; the amp is plenty loud. You <em>can</em> use the 5V pin for more volume, but 3.3V keeps things simple and safe.
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 2: I2S Data Lines -->
-    <div class="step-card" id="au-step2" data-step="2">
-      <div class="step-header" onclick="auToggleStep(2)">
-        <div class="step-number">2</div>
-        <div class="step-info">
-          <div class="step-title">Connect I2S Data Lines</div>
-          <div class="step-subtitle">Orange: GPIO 15 &rarr; BCLK &nbsp;|&nbsp; Yellow: GPIO 16 &rarr; LRC &nbsp;|&nbsp; Blue: GPIO 17 &rarr; DIN</div>
-        </div>
-        <div class="step-check" onclick="event.stopPropagation();auCompleteStep(2)">&#10003;</div>
-      </div>
-      <div class="step-body">
-        <div class="wg-tip">
-          <div class="wg-tip-label">Three Signal Wires</div>
-          These carry the digital audio data from the ESP32 to the amplifier using the I2S protocol:<br><br>
-          <strong>Orange</strong> &rarr; GPIO 15 to <em>BCLK</em> (Bit Clock &mdash; the timing signal)<br>
-          <strong>Yellow</strong> &rarr; GPIO 16 to <em>LRC</em> (Left/Right Clock &mdash; channel select)<br>
-          <strong>Blue</strong> &rarr; GPIO 17 to <em>DIN</em> (Data In &mdash; the actual audio samples)
-        </div>
-        <div style="text-align:center;margin:12px 0">
-          <div class="wd-wire wire-orange" data-label="BCLK (GPIO 15)" style="width:80%;margin:12px auto"></div>
-          <div class="wd-wire wire-yellow" data-label="LRC (GPIO 16)" style="width:80%;margin:12px auto"></div>
-          <div class="wd-wire wire-blue" data-label="DIN (GPIO 17)" style="width:80%;margin:12px auto"></div>
-        </div>
-        <div class="wg-tip">
-          <div class="wg-tip-label">SD and GAIN Pins</div>
-          The MAX98357A also has <em>SD</em> (shutdown) and <em>GAIN</em> pins. <strong>Leave them disconnected.</strong> The firmware handles audio enable/disable via I2S control. The GAIN pin defaults to 9dB which is fine for Hot Wheels announcing.
-        </div>
-      </div>
-    </div>
-
-    <!-- STEP 3: Speaker -->
-    <div class="step-card" id="au-step3" data-step="3">
-      <div class="step-header" onclick="auToggleStep(3)">
-        <div class="step-number">3</div>
-        <div class="step-info">
-          <div class="step-title">Connect Speaker</div>
-          <div class="step-subtitle">Speaker wires from MAX98357A + and &minus; terminals to speaker</div>
-        </div>
-        <div class="step-check" onclick="event.stopPropagation();auCompleteStep(3)">&#10003;</div>
-      </div>
-      <div class="step-body">
-        <div class="wg-tip">
-          <div class="wg-tip-label">Final Connection</div>
-          The MAX98357A has screw terminals (or solder pads) labeled <strong>+</strong> and <strong>&minus;</strong> for the speaker output. Run two wires from these to your speaker. If your speaker has polarity markings, match them. If not, either orientation works &mdash; you might just get slightly different phase response.
-        </div>
-        <div class="wg-tip">
-          <div class="wg-tip-label">Speaker Size</div>
-          Bigger speakers are louder. A 40mm 3W speaker is great for a desk setup. For stairwell tracks where the kid is running up and down, bigger is better &mdash; consider a 2-inch or 3-inch speaker so announcements carry.
-        </div>
-      </div>
-    </div>
-
-    <!-- Success Banner -->
+    <!-- Success Banner (shared) -->
     <div class="wg-success" id="auSuccessBanner">
       <h3>&#10003; AUDIO MODULE WIRED!</h3>
-      <p>Hardware connected. Now enable it in firmware and upload sound files.</p>
+      <p>Hardware connected. Now enable it in firmware and load your audio files.</p>
       <div style="margin-top:16px">
         <div class="wg-tip" style="text-align:left;margin:0">
           <div class="wg-tip-label">Enable Audio in Firmware</div>
@@ -1240,16 +1369,14 @@ a:hover{color:#e8c84a;text-decoration:underline}
           <strong>2.</strong> Go to the <strong>System</strong> tab &rarr; <strong>Audio</strong> section<br>
           <strong>3.</strong> Check <strong>Enable Audio</strong><br>
           <strong>4.</strong> Click <strong>Save</strong>, then <strong>Reboot</strong><br>
-          <strong>5.</strong> After reboot, go to the <strong>Audio</strong> tab to upload WAV files
+          <strong>5.</strong> After reboot, go to the <strong>Audio</strong> tab to manage sound files
         </div>
       </div>
       <div style="margin-top:12px">
-        <div class="wg-tip" style="text-align:left;margin:0">
-          <div class="wg-tip-label">WAV File Format</div>
-          Audio files must be <strong>WAV format</strong>: 16kHz sample rate, 16-bit or 8-bit, mono. Keep files small &mdash; LittleFS has limited space (~9.9MB shared with HTML and config).<br><br>
-          Upload via dashboard or push via API:<br>
-          <code style="background:var(--navy);padding:2px 6px;border-radius:3px;font-size:0.75rem">curl -X POST http://DEVICE_IP/api/audio/upload -H "X-API-Key: admin" -F "file=@yourfile.wav"</code><br><br>
-          Volume range: <strong>0&ndash;21</strong> (default 10). Adjustable in System settings.
+        <div class="wg-tip" style="text-align:left;margin:0" id="auFileFormatTip">
+          <div class="wg-tip-label">Audio File Format</div>
+          <strong>DY-SV5W:</strong> MP3 or WAV on a FAT32 TF card (up to 32GB). Files named <code style="background:var(--navy);padding:1px 4px;border-radius:3px;font-size:0.75rem">00001.mp3</code> through <code style="background:var(--navy);padding:1px 4px;border-radius:3px;font-size:0.75rem">65535.mp3</code>. Volume: 0&ndash;30 via UART or potentiometer.<br><br>
+          <strong>MAX98357A:</strong> WAV format only, 16kHz, 16-bit or 8-bit, mono. Stored on ESP32 LittleFS (~9.9MB). Volume: 0&ndash;21 in System settings.
         </div>
       </div>
     </div>
@@ -2265,6 +2392,27 @@ a:hover{color:#e8c84a;text-decoration:underline}
     try { localStorage.setItem('mass_wizard_finish_tier', tier); } catch(e) {}
   };
 
+  /* ---- Audio tier toggle (DY-SV5W vs MAX98357A) ---- */
+  window.setAudioTier = function(tier) {
+    var dyDiv = document.getElementById('auTierDySv5w');
+    var maxDiv = document.getElementById('auTierMax98');
+    var btnDy = document.getElementById('btnAuDySv5w');
+    var btnMax = document.getElementById('btnAuMax98');
+
+    if (tier === 'max98357a') {
+      if (dyDiv) dyDiv.style.display = 'none';
+      if (maxDiv) maxDiv.style.display = '';
+      if (btnDy) { btnDy.style.borderColor = 'var(--gold-dim)'; btnDy.style.color = 'var(--text-muted)'; btnDy.style.background = 'var(--navy-card)'; }
+      if (btnMax) { btnMax.style.borderColor = 'var(--gold)'; btnMax.style.color = 'var(--gold)'; btnMax.style.background = 'var(--navy-light)'; }
+    } else {
+      if (dyDiv) dyDiv.style.display = '';
+      if (maxDiv) maxDiv.style.display = 'none';
+      if (btnMax) { btnMax.style.borderColor = 'var(--gold-dim)'; btnMax.style.color = 'var(--text-muted)'; btnMax.style.background = 'var(--navy-card)'; }
+      if (btnDy) { btnDy.style.borderColor = 'var(--gold)'; btnDy.style.color = 'var(--gold)'; btnDy.style.background = 'var(--navy-light)'; }
+    }
+    try { localStorage.setItem('mass_wizard_audio_tier', tier); } catch(e) {}
+  };
+
   /* ---- Hardware Diagnostics ---- */
   window.runDiagnostics = function() {
     var ip = document.getElementById('diagIP').value.trim();
@@ -2884,6 +3032,11 @@ a:hover{color:#e8c84a;text-decoration:underline}
     try {
       var savedTier = localStorage.getItem('mass_wizard_finish_tier');
       if (savedTier) setFinishTier(savedTier);
+    } catch(e) {}
+    // Restore audio tier
+    try {
+      var savedAudioTier = localStorage.getItem('mass_wizard_audio_tier');
+      if (savedAudioTier) setAudioTier(savedAudioTier);
     } catch(e) {}
     // Restore diagnostics IP
     try {
