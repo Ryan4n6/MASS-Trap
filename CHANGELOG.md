@@ -68,8 +68,8 @@ Normal (non-playlist) race mode is completely untouched — NFC scan, arm, race,
 - Physics formula cards with live-substituted values from actual test data
 - Print-optimized: page breaks, no-break sections, grayscale charts
 
-### Added — About / Kristina Report Page (`about.html`)
-- **"The Kristina Report"** — comprehensive project status page named after the stakeholder who needed it most
+### Added — About / Special K Report Page (`about.html`)
+- **"The Special K Report"** — comprehensive project status page named after the stakeholder who needed it most
 - Live device status: fetches `/api/info`, `/api/version`, `/api/wifi-status` in real time
 - Project statistics: lines of code, features, API endpoints, race count, uptime
 - Feature inventory with status indicators (complete / in progress / planned)

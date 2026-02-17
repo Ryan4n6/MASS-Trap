@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================================================
-#  kristina.sh — The Kristina Report™
+#  kristina.sh — The Special K Report™
 #  "Are you guys even getting anything done?"
 #
 #  Usage: ./kristina.sh          (full report)
@@ -137,7 +137,7 @@ FEATURES=(
   "Speed Trap|Third sensor measures mid-track velocity with dual IR beams|done"
   "Live Leaderboard|Most Wanted list ranks all cars by speed with criminal verdicts|done"
   "Kiosk Mode|Display-only presentation mode for science fair booth|done"
-  "The Kristina Report|Click version badge on any page to see this — you are here|done"
+  "The Special K Report|Click version badge on any page to see this — you are here|done"
   "Logo and Badge|Judge Dredd shield design for the project identity|wip"
 )
 
@@ -164,7 +164,7 @@ if [ "$1" = "--html" ]; then
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>The Kristina Report™ — M.A.S.S. Trap</title>
+<title>The Special K Report™ — M.A.S.S. Trap</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--navy:#091B2F;--navy-light:#0d2847;--navy-mid:#112d4e;--gold:#D4AF37;--gold-dim:rgba(212,175,55,0.3);--orange:#FF4500;--text:#E8E8E8;--text-muted:#8899AA;--green:#28a745;--red:#dc3545;--cyan:#17a2b8;--font-main:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;--font-data:"SF Mono",Monaco,"Cascadia Code",monospace}
@@ -427,7 +427,7 @@ a:hover{text-decoration:underline}
 
 <!-- Footer -->
 <div class="footer">
-  <div class="tagline">The Kristina Report&trade; &mdash; because the scoreboard doesn&rsquo;t lie.</div>
+  <div class="tagline">The Special K Report&trade; &mdash; because the scoreboard doesn&rsquo;t lie.</div>
   <div><a href="/dashboard.html">&larr; Back to Dashboard</a></div>
   <div style="margin-top:8px" id="generatedAt">Generated: --</div>
 </div>
@@ -694,7 +694,7 @@ if [ "$1" = "--json" ]; then
   cat <<ENDJSON
 {
   "project": "M.A.S.S. Trap",
-  "report": "The Kristina Report",
+  "report": "The Special K Report",
   "generated": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
   "age_days": ${PROJECT_AGE_DAYS},
   "total_commits": ${TOTAL_COMMITS},
@@ -781,5 +781,5 @@ echo -e "${BOLD}⚾ ANNOUNCER'S BOOTH:${RESET}"
 echo -e "   ${CYAN}\"${RANDOM_STAT}\"${RESET}"
 echo -e "${GOLD}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${RESET}"
 echo ""
-echo -e "${DIM}The Kristina Report™ — because the scoreboard doesn't lie.${RESET}"
+echo -e "${DIM}The Special K Report™ — because the scoreboard doesn't lie.${RESET}"
 echo ""
