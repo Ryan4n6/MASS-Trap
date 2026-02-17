@@ -1117,7 +1117,7 @@ a:hover{color:#e8c84a;text-decoration:underline}
           <div class="part-icon">&#128268;</div>
           <div>
             <div class="part-name">3 Dupont Jumper Wires (+ 1 optional)</div>
-            <div class="part-detail">Red (5V), black (GND), blue (UART TX &rarr; RXD). Optional green wire for BUSY pin (playback status).</div>
+            <div class="part-detail">Red (5V), black (GND), blue (UART TX &rarr; I01/RXD). Optional green wire for BUSY pin (playback status).</div>
           </div>
         </div>
       </div>
@@ -1154,8 +1154,8 @@ a:hover{color:#e8c84a;text-decoration:underline}
             <tr>
               <td><span class="wire-dot" style="background:var(--wire-blue)"></span>Blue</td>
               <td><strong>GPIO 15</strong></td>
-              <td><strong>RXD / I00</strong></td>
-              <td>UART data &mdash; ESP32 TX &rarr; DY-SV5W RX</td>
+              <td><strong>RXD / I01</strong></td>
+              <td>UART data &mdash; ESP32 TX &rarr; DY-SV5W RX (I01, NOT I00)</td>
             </tr>
             <tr style="color:var(--text-muted)">
               <td><span class="wire-dot" style="background:var(--wire-green)"></span>Green</td>
@@ -1209,12 +1209,12 @@ a:hover{color:#e8c84a;text-decoration:underline}
             <div class="wg-tip-label">Three Wires</div>
             <strong>Red</strong> &rarr; ESP32 <em>5V</em> pin to DY-SV5W <em>+5V</em> (the board needs 5V, not 3.3V)<br>
             <strong>Black</strong> &rarr; ESP32 <em>GND</em> to DY-SV5W bottom <em>GND</em> pin<br>
-            <strong>Blue</strong> &rarr; ESP32 <em>GPIO 15</em> (TX) to DY-SV5W <em>RXD/I00</em> pin
+            <strong>Blue</strong> &rarr; ESP32 <em>GPIO 15</em> (TX) to DY-SV5W <em>RXD/I01</em> pin (the one labeled RX, NOT I00/TX)
           </div>
           <div style="text-align:center;margin:12px 0">
             <div class="wd-wire wire-red" data-label="5V POWER" style="width:80%;margin:12px auto"></div>
             <div class="wd-wire wire-black" data-label="GROUND" style="width:80%;margin:12px auto"></div>
-            <div class="wd-wire wire-blue" data-label="UART TX → RXD (GPIO 15)" style="width:80%;margin:12px auto"></div>
+            <div class="wd-wire wire-blue" data-label="UART TX → I01/RXD (GPIO 15)" style="width:80%;margin:12px auto"></div>
           </div>
           <div class="wg-tip">
             <div class="wg-tip-label">5V Required</div>
