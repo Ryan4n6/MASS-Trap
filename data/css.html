@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="interceptor">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="color-scheme" content="dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none';">
+<title>CSS Map — M.A.S.S. Trap Component Reference</title>
+<link rel="stylesheet" href="/style.css">
+<style>
+  /* === CSS MAP PAGE OVERRIDES === */
+  body { padding-bottom: 20px; }
+  .css-map { max-width: 1100px; margin: 0 auto; padding: 16px; }
+  .css-map h2 { color: var(--accent); font-size: 1.4rem; font-weight: 900; letter-spacing: 2px;
+    text-transform: uppercase; margin: 32px 0 8px; border-bottom: 2px solid var(--accent); padding-bottom: 6px; }
+  .css-map h2:first-of-type { margin-top: 16px; }
+  .ref-row { display: flex; align-items: flex-start; gap: 16px; margin: 12px 0; padding: 12px;
+    border: 1px dashed var(--border); border-radius: 8px; flex-wrap: wrap; }
+  .ref-label { min-width: 200px; flex-shrink: 0; }
+  .ref-label code { font-size: 0.85rem; color: var(--accent); font-weight: 700;
+    background: var(--bg-dark); padding: 2px 6px; border-radius: 4px; display: inline-block; margin-bottom: 4px; }
+  .ref-label .ref-desc { font-size: 0.72rem; color: var(--text-muted); line-height: 1.3; }
+  .ref-example { flex: 1; min-width: 260px; }
+  .ref-example-inline { display: inline-flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .ref-note { font-size: 0.7rem; color: var(--text-muted); font-style: italic; margin-top: 4px; }
+  /* Make examples non-functional */
+  .ref-example .btn { pointer-events: none; width: auto; display: inline-block; margin: 2px; }
+  .ref-example .conn-badge { position: static; }
+  .ref-example .version-badge { position: static; display: inline-flex; }
+  .ref-example .fleet-bar { position: static; }
+  .ref-example .mass-nav { position: static; }
+  .ref-example .state-banner { font-size: 1.2rem; padding: 10px; }
+  .ref-example .leaderboard-overlay { position: static; display: flex; background: rgba(0,0,0,0.5);
+    padding: 16px; border-radius: 8px; }
+  .ref-example .leaderboard-card { max-width: 100%; animation: none; }
+  .ref-example .status-bar { position: static; display: block; }
+  .ref-example .save-bar { position: static; }
+  .ref-example .dry-run-banner { margin: 0; }
+  .ref-example table { font-size: 0.8rem; }
+  .ref-example .garage-car { position: relative; }
+  .ref-example .mw-card { position: relative; }
+  .ref-example .mass-toast-container { position: static; transform: none; }
+  .ref-example .mass-toast { opacity: 1; transform: none; pointer-events: none; margin: 4px 0; }
+  .ref-example .serial-output { height: 80px; font-size: 0.7rem; }
+  .ref-example .fw-update-overlay { position: static; display: flex; background: rgba(0,0,0,0.7);
+    padding: 16px; border-radius: 8px; min-height: 100px; }
+  .ref-example .info-card { min-width: 0; }
+  /* Theme picker for this page */
+  .map-theme-bar { position: sticky; top: 0; z-index: 9500; background: var(--bg-dark);
+    border-bottom: 2px solid var(--accent); padding: 8px 16px; display: flex;
+    align-items: center; gap: 12px; flex-wrap: wrap; }
+  .map-theme-bar label { font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    letter-spacing: 1px; color: var(--text-muted); }
+  .map-theme-bar select { padding: 4px 8px; border-radius: 4px; background: var(--bg-input);
+    color: var(--text); border: 1px solid var(--border); font-size: 0.8rem; }
+  .map-theme-bar .map-title { font-size: 1rem; font-weight: 900; color: var(--accent);
+    letter-spacing: 2px; text-transform: uppercase; }
+</style>
+</head>
+<body>
+
+<div class="map-theme-bar">
+  <span class="map-title">CSS MAP</span>
+  <label for="mapTheme">Theme:</label>
+  <select id="mapTheme" onchange="document.documentElement.setAttribute('data-theme', this.value)">
+    <option value="interceptor">Interceptor</option>
+    <option value="classic">Classic</option>
+    <option value="daytona">Daytona</option>
+    <option value="casefile">Case File</option>
+    <option value="cyber">Cyber</option>
+  </select>
+  <span style="font-size:0.65rem; color:var(--text-muted); margin-left:auto;">Switch themes to see how each component adapts</span>
+</div>
+
+<div class="css-map">
+
+<!-- ============================================================ -->
+<h2>1. Page Header</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.page-header</code>
+    <div class="ref-desc">Top-of-page branding block. Contains the shield, title, subtitle, and tagline.</div>
+  </div>
+  <div class="ref-example">
+    <div class="page-header">
+      <div class="page-header-shield"></div>
+      <h1>M.A.S.S. TRAP</h1>
+      <div class="subtitle">MOTION ANALYSIS & SPEED SYSTEM</div>
+      <div class="tagline">COMMAND CENTER</div>
+    </div>
+  </div>
+</div>
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.page-header-shield</code>
+    <div class="ref-desc">Hexagonal badge with "M" letterform. Color varies by theme.</div>
+  </div>
+  <div class="ref-example">
+    <div style="display:flex; gap:8px; align-items:center;">
+      <div class="page-header-shield"></div>
+      <span style="font-size:0.75rem; color:var(--text-muted);">&larr; The shield. Clip-path hexagon, accent-colored.</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>2. State Banner</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.state-banner</code>
+    <div class="ref-desc">The big race state display. Has 4 states: idle, armed, racing, finished. Each has unique border color, glow, and animation.</div>
+  </div>
+  <div class="ref-example">
+    <div class="state-banner idle" style="margin-bottom:8px;">IDLE &mdash; PIT LANE</div>
+    <div class="state-banner armed" style="margin-bottom:8px;">ARMED &mdash; GREEN FLAG</div>
+    <div class="state-banner racing" style="margin-bottom:8px;">RACING &mdash; FULL SEND</div>
+    <div class="state-banner finished">FINISHED &mdash; CHECKERED FLAG</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>3. Cards</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.card</code>
+    <div class="ref-desc">Data display card. Shows a metric value + label. Bottom border is secondary color. Lifts on hover.</div>
+  </div>
+  <div class="ref-example">
+    <div class="grid" style="max-width:500px;">
+      <div class="card">
+        <div class="card-label">ELAPSED TIME</div>
+        <div class="card-value">1.234<span class="card-unit">s</span></div>
+      </div>
+      <div class="card card-accent">
+        <div class="card-label">SCALE SPEED</div>
+        <div class="card-value">142<span class="card-unit">mph</span></div>
+      </div>
+    </div>
+    <div class="ref-note"><code>.card-accent</code> swaps border + value color to accent (gold)</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>4. Sections</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.section</code> + <code>.section-title</code>
+    <div class="ref-desc">Grouped content container with a floating pill badge title. The title sits above the border at top-left.</div>
+  </div>
+  <div class="ref-example">
+    <div class="section" style="padding-top:20px;">
+      <div class="section-title">GARAGE</div>
+      <p style="color:var(--text-muted); font-size:0.85rem;">Content goes here. The yellow pill is <code>.section-title</code>.</p>
+    </div>
+    <div style="margin-top:12px;"></div>
+    <div class="section" style="padding-top:20px;">
+      <div class="section-title danger">DANGER ZONE</div>
+      <p style="color:var(--text-muted); font-size:0.85rem;"><code>.section-title.danger</code> = red pill.</p>
+    </div>
+  </div>
+</div>
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>summary.section-title</code>
+    <div class="ref-desc">When used inside a &lt;details&gt; element, the title stays in-flow (not floating) and acts as the expand/collapse trigger.</div>
+  </div>
+  <div class="ref-example">
+    <details>
+      <summary class="section-title">COLLAPSIBLE SECTION (click me)</summary>
+      <div class="section" style="border-top:none; border-radius: 0 0 12px 12px; margin-top:-2px;">
+        <p style="color:var(--text-muted); font-size:0.85rem;">This is the hidden content revealed on expand.</p>
+      </div>
+    </details>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>5. Buttons</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.btn</code>
+    <div class="ref-desc">Base button. Full-width by default. Add modifiers for color variants. <code>.btn-sm</code> makes it compact + auto-width.</div>
+  </div>
+  <div class="ref-example ref-example-inline">
+    <button class="btn btn-accent btn-sm">btn-accent</button>
+    <button class="btn btn-primary btn-sm">btn-primary</button>
+    <button class="btn btn-success btn-sm">btn-success</button>
+    <button class="btn btn-danger btn-sm">btn-danger</button>
+    <button class="btn btn-outline btn-sm">btn-outline</button>
+    <button class="btn btn-sm" disabled>disabled</button>
+  </div>
+</div>
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.btn</code> (full width)
+    <div class="ref-desc">Without <code>.btn-sm</code>, buttons expand to fill their container.</div>
+  </div>
+  <div class="ref-example" style="max-width:300px;">
+    <button class="btn btn-accent">ARM TRACK</button>
+    <button class="btn btn-danger">RESET</button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>6. Navigation</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.mass-nav</code>
+    <div class="ref-desc">Main navigation bar. Sticky top on desktop, fixed bottom on mobile. Has folder-tab look on desktop. Daytona adds a checkered flag strip.</div>
+  </div>
+  <div class="ref-example">
+    <nav class="mass-nav" style="border-radius:8px; overflow:hidden;">
+      <div class="mass-nav-list" style="max-width:100%;">
+        <a href="#" class="active"><span class="mass-nav-icon">🏎️</span><span class="mass-nav-label">Dashboard</span></a>
+        <a href="#"><span class="mass-nav-icon">🔧</span><span class="mass-nav-label">Garage</span></a>
+        <a href="#"><span class="mass-nav-icon">📊</span><span class="mass-nav-label">History</span></a>
+        <a href="#"><span class="mass-nav-icon">⚙️</span><span class="mass-nav-label">System</span></a>
+      </div>
+    </nav>
+    <div class="ref-note">The <code>.active</code> tab breaks through the bottom border on desktop.</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>7. Connection Badge</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.conn-badge</code>
+    <div class="ref-desc">WebSocket connection indicator. Normally fixed top-right. Shows green when connected, red when disconnected.</div>
+  </div>
+  <div class="ref-example ref-example-inline">
+    <span class="conn-badge connected">CONNECTED</span>
+    <span class="conn-badge disconnected">DISCONNECTED</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>8. Version Badge</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.version-badge</code>
+    <div class="ref-desc">Firmware version indicator. Normally fixed bottom-right. Daytona theme turns it into a 76 ball (orange sphere). Pulses red when update available.</div>
+  </div>
+  <div class="ref-example ref-example-inline">
+    <span class="version-badge"><a href="#">v2.6.0</a></span>
+    <span class="version-badge update-available"><a href="#">v2.6.0</a></span>
+    <span style="font-size:0.7rem; color:var(--text-muted);">&larr; <code>.update-available</code> (breathing red)</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>9. Fleet Dispatch Bar</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.fleet-bar</code>
+    <div class="ref-desc">Bottom status bar showing all peers, sync status, and health metrics. Daytona = scanner LCD green. Cyber = teal glow. Monospace font.</div>
+  </div>
+  <div class="ref-example">
+    <div class="fleet-bar" style="border-radius:6px; overflow:hidden;">
+      <span class="fleet-bar-host">masstrap-finish</span>
+      <span class="fleet-bar-sep">|</span>
+      <span class="fleet-bar-roster">
+        <span class="fb-peer online">START</span>
+        <span class="fb-peer stale">SPEEDTRAP</span>
+        <span class="fb-peer offline">TESTBED</span>
+      </span>
+      <span class="fleet-bar-sep">|</span>
+      <span class="fleet-bar-metrics">
+        <span class="fb-sync synced">SYNCED</span>
+        <span class="fb-rssi">-32dBm</span>
+        <span class="fb-heap">284KB</span>
+        <span class="fb-uptime">4h12m</span>
+      </span>
+    </div>
+    <div class="ref-note">
+      Peer states: <code>.fb-peer.online</code> (green) &bull;
+      <code>.fb-peer.stale</code> (gold/magenta) &bull;
+      <code>.fb-peer.offline</code> (red)
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>10. Toast Notifications</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.mass-toast</code>
+    <div class="ref-desc">Slide-in notification banners. Created by <code>massToast(msg, type)</code> in main.js. 4 types: success, error, info, warn.</div>
+  </div>
+  <div class="ref-example">
+    <div class="mass-toast-container" style="align-items:stretch; width:100%;">
+      <div class="mass-toast success" style="width:100%;">GARAGE SAVED SUCCESSFULLY</div>
+      <div class="mass-toast error" style="width:100%;">CONNECTION LOST</div>
+      <div class="mass-toast info" style="width:100%;">CLOCK SYNC COMPLETE &mdash; 42&mu;s</div>
+      <div class="mass-toast warn" style="width:100%;">FIRMWARE UPDATE FAILED</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>11. Tables</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>table</code> / <code>thead</code> / <code>tbody</code>
+    <div class="ref-desc">Data tables. Header bg and color change per theme: dark+gold (Interceptor), blue+white (Classic), red (Daytona), brown (Case File), navy+teal (Cyber).</div>
+  </div>
+  <div class="ref-example">
+    <table>
+      <thead><tr><th>RUN</th><th>CAR</th><th>TIME</th><th>SPEED</th></tr></thead>
+      <tbody>
+        <tr><td>001</td><td>Blue Mustang</td><td>1.234s</td><td>4.87 m/s</td></tr>
+        <tr><td>002</td><td>Red F-150</td><td>1.456s</td><td>4.13 m/s</td></tr>
+        <tr><td>003</td><td>Black Charger</td><td>1.189s</td><td>5.06 m/s</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>12. Garage Cars</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.garage-car</code>
+    <div class="ref-desc">Individual car card in the garage grid. Has delete (X) and edit buttons. Active state = selected for racing. Shows stats row at bottom.</div>
+  </div>
+  <div class="ref-example">
+    <div class="garage-grid" style="max-width:500px;">
+      <div class="garage-car active" style="position:relative;">
+        <button class="delete-btn" title="Delete">X</button>
+        <button class="edit-btn" title="Edit">E</button>
+        <h3>Blue Mustang</h3>
+        <p>35.000g</p>
+        <div class="garage-stats">
+          <span>Best: 1.189s</span>
+          <span>Runs: 12</span>
+        </div>
+      </div>
+      <div class="garage-car" style="position:relative;">
+        <button class="delete-btn" title="Delete">X</button>
+        <h3>Red F-150</h3>
+        <p>38.025g</p>
+        <div class="garage-stats">
+          <span>Best: 1.456s</span>
+          <span>Runs: 8</span>
+        </div>
+      </div>
+    </div>
+    <div class="ref-note"><code>.active</code> = accent border + glow (this car is on the track)</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>13. Most Wanted / Leaderboard</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.mw-card</code>
+    <div class="ref-desc">Leaderboard entry card. Rank badge floats at top-left. #1 gets gold glow. Threat level pill at bottom.</div>
+  </div>
+  <div class="ref-example">
+    <div class="mw-board" style="max-width:600px;">
+      <div class="mw-card rank-1" style="position:relative;">
+        <div class="mw-rank" style="position:absolute; top:-10px; left:12px;">#1</div>
+        <div class="mw-name">Blue Mustang</div>
+        <div class="mw-stats">
+          <div><span style="color:var(--text-muted);">Best</span> <strong>1.189s</strong></div>
+          <div><span style="color:var(--text-muted);">Speed</span> <strong>5.06 m/s</strong></div>
+          <div><span style="color:var(--text-muted);">Runs</span> <strong>12</strong></div>
+          <div><span style="color:var(--text-muted);">Avg</span> <strong>1.245s</strong></div>
+        </div>
+        <div class="mw-threat armed-dangerous">ARMED & DANGEROUS</div>
+      </div>
+      <div class="mw-card rank-2" style="position:relative;">
+        <div class="mw-rank" style="position:absolute; top:-10px; left:12px;">#2</div>
+        <div class="mw-name">Red F-150</div>
+        <div class="mw-stats">
+          <div><span style="color:var(--text-muted);">Best</span> <strong>1.456s</strong></div>
+          <div><span style="color:var(--text-muted);">Speed</span> <strong>4.13 m/s</strong></div>
+        </div>
+        <div class="mw-threat known-offender">KNOWN OFFENDER</div>
+      </div>
+    </div>
+    <div class="ref-note">
+      Threat levels: <code>.armed-dangerous</code> (red) &bull;
+      <code>.known-offender</code> (gold) &bull;
+      <code>.person-of-interest</code> (gray)
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>14. Leaderboard Overlay</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.leaderboard-overlay</code>
+    <div class="ref-desc">Full-screen popup that appears after a race finishes showing the car's ranking. Has rank number, time, and close button.</div>
+  </div>
+  <div class="ref-example">
+    <div class="leaderboard-overlay show" style="min-height:200px; border-radius:8px;">
+      <div class="leaderboard-card" style="animation:none;">
+        <div class="leaderboard-rank">#1</div>
+        <div class="leaderboard-text">BLUE MUSTANG</div>
+        <div class="leaderboard-detail">1.189s &mdash; NEW PERSONAL BEST</div>
+        <button class="btn btn-accent btn-sm" style="margin-top:12px;">DISMISS</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>15. Forms & Inputs</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>input</code> / <code>select</code> / <code>textarea</code>
+    <div class="ref-desc">Form elements. Dark bg, rounded, full-width. Focus state adds accent outline glow.</div>
+  </div>
+  <div class="ref-example" style="max-width:400px;">
+    <input type="text" placeholder="Text input" style="margin-bottom:8px;">
+    <input type="number" placeholder="Number input" value="35.000" step="0.001" style="margin-bottom:8px;">
+    <select style="margin-bottom:8px;">
+      <option>Select dropdown</option>
+      <option>Option A</option>
+      <option>Option B</option>
+    </select>
+    <textarea rows="2" placeholder="Textarea..."></textarea>
+  </div>
+</div>
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.toggle-row</code> / <code>.toggle-switch</code>
+    <div class="ref-desc">Custom toggle switch for boolean settings. Pill track with sliding circle.</div>
+  </div>
+  <div class="ref-example" style="max-width:400px;">
+    <div class="toggle-row">
+      <span>Enable LiDAR Auto-Arm</span>
+      <label class="toggle-switch">
+        <input type="checkbox" checked>
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+    <div class="toggle-row" style="margin-top:8px;">
+      <span>Audio Enabled</span>
+      <label class="toggle-switch">
+        <input type="checkbox">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>16. Grid Layouts</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.grid</code> / <code>.grid-2</code> / <code>.grid-3</code>
+    <div class="ref-desc">CSS grid wrappers. <code>.grid</code> auto-fills at 150px min. <code>.grid-2/3/4</code> force column counts.</div>
+  </div>
+  <div class="ref-example">
+    <div class="grid" style="max-width:500px;">
+      <div class="card"><div class="card-label">CARD A</div><div class="card-value">1</div></div>
+      <div class="card"><div class="card-label">CARD B</div><div class="card-value">2</div></div>
+      <div class="card"><div class="card-label">CARD C</div><div class="card-value">3</div></div>
+    </div>
+    <div class="ref-note"><code>.grid</code> = auto-fit responsive. Cards reflow based on container width.</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>17. Info Cards (System Page)</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.info-card</code>
+    <div class="ref-desc">Compact stat card for system info. Has a small label and monospace value.</div>
+  </div>
+  <div class="ref-example">
+    <div class="info-grid" style="max-width:500px;">
+      <div class="info-card"><div class="label">FREE HEAP</div><div class="value">284 KB</div></div>
+      <div class="info-card"><div class="label">UPTIME</div><div class="value">4h 12m</div></div>
+      <div class="info-card"><div class="label">WIFI RSSI</div><div class="value">-32 dBm</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.info-box</code>
+    <div class="ref-desc">Notification/tip box. Variants: default (blue-ish), <code>.warning</code> (gold), <code>.danger</code> (red).</div>
+  </div>
+  <div class="ref-example" style="max-width:500px;">
+    <div class="info-box" style="margin-bottom:8px;">Default info box &mdash; secondary-tinted background.</div>
+    <div class="info-box warning" style="margin-bottom:8px;">Warning info box &mdash; accent-tinted background.</div>
+    <div class="info-box danger">Danger info box &mdash; red-tinted background.</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>18. Peer Status Dots</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.peer-dot</code> / <code>.status-dot</code>
+    <div class="ref-desc">Tiny circle indicators. Peer dots show ESP-NOW peer health. Status dots show sensor/system state.</div>
+  </div>
+  <div class="ref-example ref-example-inline">
+    <span class="peer-dot online"></span> <span style="font-size:0.75rem;">online</span>
+    <span class="peer-dot stale"></span> <span style="font-size:0.75rem;">stale</span>
+    <span class="peer-dot offline"></span> <span style="font-size:0.75rem;">offline</span>
+    <span style="margin-left:16px;"></span>
+    <span class="status-dot ok"></span> <span style="font-size:0.75rem;">ok</span>
+    <span class="status-dot err"></span> <span style="font-size:0.75rem;">err</span>
+    <span class="status-dot wait"></span> <span style="font-size:0.75rem;">wait</span>
+  </div>
+</div>
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.peer-role</code>
+    <div class="ref-desc">Small colored pill showing a peer's role.</div>
+  </div>
+  <div class="ref-example ref-example-inline">
+    <span class="peer-role finish">FINISH</span>
+    <span class="peer-role start">START</span>
+    <span class="peer-role speedtrap">SPEEDTRAP</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>19. Role Cards (Config Setup)</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.role-card</code>
+    <div class="ref-desc">Selection cards for picking device role during setup. Selected card gets accent glow.</div>
+  </div>
+  <div class="ref-example">
+    <div class="role-cards" style="max-width:600px;">
+      <div class="role-card selected">
+        <div class="role-icon">🏁</div>
+        <h3>FINISH GATE</h3>
+        <p>Main dashboard, race timing, physics calculations</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">🚦</div>
+        <h3>START GATE</h3>
+        <p>IR trigger, LiDAR auto-arm, sends start signal</p>
+      </div>
+      <div class="role-card">
+        <div class="role-icon">🚓</div>
+        <h3>SPEED TRAP</h3>
+        <p>Mid-track velocity measurement</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>20. Speed Profile Bars</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.speed-bar</code>
+    <div class="ref-desc">Horizontal comparison bars for speed breakdown (actual vs scale).</div>
+  </div>
+  <div class="ref-example" style="max-width:500px;">
+    <div class="speed-bar">
+      <span class="speed-bar-label">ACTUAL</span>
+      <div class="speed-bar-fill"><div style="width:60%; height:100%; background:var(--secondary); border-radius:4px;"></div></div>
+    </div>
+    <div class="speed-bar" style="margin-top:6px;">
+      <span class="speed-bar-label">SCALE</span>
+      <div class="speed-bar-fill"><div style="width:85%; height:100%; background:var(--accent); border-radius:4px;"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>21. Physics / Formula Cards</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.formula-card</code>
+    <div class="ref-desc">Physics equation display. Shows formula name, the equation, description, and live calculated values.</div>
+  </div>
+  <div class="ref-example">
+    <div class="formula-grid" style="max-width:600px;">
+      <div class="formula-card">
+        <div class="formula-title">MOMENTUM</div>
+        <div class="formula-eq">p = mv</div>
+        <div class="formula-desc">Mass times velocity</div>
+        <div class="formula-values">p = 0.035 &times; 4.87 = 0.170 kg&middot;m/s</div>
+      </div>
+      <div class="formula-card">
+        <div class="formula-title">KINETIC ENERGY</div>
+        <div class="formula-eq">KE = &frac12;mv&sup2;</div>
+        <div class="formula-desc">Half mass times velocity squared</div>
+        <div class="formula-values">KE = 0.415 mJ</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>22. LiDAR Indicator</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.lidar-indicator</code>
+    <div class="ref-desc">Shows LiDAR distance + staging state. Hidden until a car is detected. Progress bar fills as car approaches threshold.</div>
+  </div>
+  <div class="ref-example" style="max-width:500px;">
+    <div class="lidar-indicator staged" style="display:block;">
+      <div class="lidar-reading">
+        <span class="lidar-distance">42mm</span>
+        <span class="lidar-state-label staged">STAGED</span>
+      </div>
+      <div class="lidar-bar-container">
+        <div class="lidar-bar staged" style="width:78%;"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>23. Console / Serial Output</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.serial-output</code>
+    <div class="ref-desc">Terminal-style log viewer. Green monospace text on dark bg. Color-coded lines: timestamps, errors, warnings, ESP messages, boot.</div>
+  </div>
+  <div class="ref-example">
+    <div class="serial-output">
+<span class="ts">[14:32:01]</span> [BOOT] M.A.S.S. Trap v2.6.0-beta
+<span class="ts">[14:32:01]</span> <span class="boot">[BOOT] Role: finish, ID: 42</span>
+<span class="ts">[14:32:02]</span> <span class="esp">[PEERS] Compatible: mass-start (start)</span>
+<span class="ts">[14:32:05]</span> <span class="warn">[WARN] Clock drift: 1.2ms</span>
+<span class="ts">[14:32:10]</span> <span class="err">[ERROR] WebSocket timeout</span>
+    </div>
+    <div class="ref-note">Colors: <code>.ts</code>=gray, <code>.boot</code>=magenta, <code>.esp</code>=cyan, <code>.warn</code>=orange, <code>.err</code>=red</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>24. File Browser</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.file-item</code>
+    <div class="ref-desc">File card in the LittleFS browser. Shows filename + size. Active = currently open for editing.</div>
+  </div>
+  <div class="ref-example">
+    <div class="file-grid" style="max-width:500px;">
+      <div class="file-item active"><div class="fname">style.css</div><div class="fsize">95,044 bytes</div></div>
+      <div class="file-item"><div class="fname">main.js</div><div class="fsize">33,319 bytes</div></div>
+      <div class="file-item"><div class="fname">config.json</div><div class="fsize">412 bytes</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>25. Status Bars (Fixed Feedback)</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.status-bar</code>
+    <div class="ref-desc">Fixed bottom notification bar for transient feedback. Success (green) or error (red).</div>
+  </div>
+  <div class="ref-example">
+    <div class="status-bar show success" style="border-radius:6px; margin-bottom:8px;">Config saved successfully</div>
+    <div class="status-bar show error" style="border-radius:6px;">Failed to connect to peer</div>
+  </div>
+</div>
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.dry-run-banner</code>
+    <div class="ref-desc">Orange pulsing banner shown during dry-run mode. In-flow (not fixed).</div>
+  </div>
+  <div class="ref-example" style="max-width:500px;">
+    <div class="dry-run-banner">DRY RUN MODE &mdash; No actual race data will be recorded</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>26. Firmware Update UI</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.fw-version-compare</code>
+    <div class="ref-desc">Side-by-side current vs. latest firmware version display.</div>
+  </div>
+  <div class="ref-example" style="max-width:400px;">
+    <div class="fw-version-compare" style="display:flex; gap:24px; justify-content:center;">
+      <div><div class="fw-ver-label">CURRENT</div><div class="fw-ver-value fw-outdated">v2.5.0</div></div>
+      <div style="font-size:1.5rem; color:var(--text-muted);">&rarr;</div>
+      <div><div class="fw-ver-label">LATEST</div><div class="fw-ver-value fw-current">v2.6.0</div></div>
+    </div>
+    <div class="ref-note"><code>.fw-outdated</code> = red, <code>.fw-current</code> = green</div>
+  </div>
+</div>
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.fw-drop-zone</code>
+    <div class="ref-desc">Drag-and-drop target for manual firmware upload. Dashed border that glows on hover/drag.</div>
+  </div>
+  <div class="ref-example" style="max-width:400px;">
+    <div class="fw-drop-zone" style="padding:24px; text-align:center;">
+      <span style="font-size:0.85rem; color:var(--text-muted);">Drop .bin file here or click to upload</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>27. Config Sub-Tabs</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.config-tab</code>
+    <div class="ref-desc">Sub-navigation within the config/system page. Folder-tab style. Active tab "opens" into the content below.</div>
+  </div>
+  <div class="ref-example" style="max-width:500px;">
+    <div class="config-tabs">
+      <button class="config-tab" style="color:var(--accent); border-color:var(--border); border-bottom-color:var(--bg-card); z-index:2; font-weight:700;">General</button>
+      <button class="config-tab">WiFi</button>
+      <button class="config-tab">Track</button>
+      <button class="config-tab">Audio</button>
+    </div>
+    <div class="config-tab-content active" style="display:block; border-top:none; border-radius:0 0 8px 8px;">
+      <p style="padding:12px; font-size:0.85rem; color:var(--text-muted);">Tab content area</p>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>28. Utility Classes</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.text-*</code>
+    <div class="ref-desc">Color utility classes for inline text.</div>
+  </div>
+  <div class="ref-example ref-example-inline" style="font-size:0.85rem; font-weight:700;">
+    <span class="text-accent">text-accent</span>
+    <span class="text-success">text-success</span>
+    <span class="text-danger">text-danger</span>
+    <span class="text-muted">text-muted</span>
+  </div>
+</div>
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.hint</code>
+    <div class="ref-desc">Helper text below form fields. Small, muted.</div>
+  </div>
+  <div class="ref-example" style="max-width:400px;">
+    <input type="text" placeholder="Device hostname">
+    <div class="hint">Lowercase letters, numbers, and hyphens only. Used for mDNS discovery.</div>
+  </div>
+</div>
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.divider</code>
+    <div class="ref-desc">Horizontal rule. Thin border line with spacing.</div>
+  </div>
+  <div class="ref-example" style="max-width:400px;">
+    <span style="font-size:0.8rem;">Content above</span>
+    <div class="divider"></div>
+    <span style="font-size:0.8rem;">Content below</span>
+  </div>
+</div>
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>.font-data</code>
+    <div class="ref-desc">Forces monospace data font. Use on any element that shows numbers/codes.</div>
+  </div>
+  <div class="ref-example">
+    <span class="font-data" style="font-size:1.2rem;">1.234567s &mdash; 192.168.1.83 &mdash; MASS26-0042</span>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>29. Daytona-Only Components</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>hr</code> (Daytona)
+    <div class="ref-desc">Mardi Gras bead strand divider. Purple/green/gold dots. Only visible in Daytona theme.</div>
+  </div>
+  <div class="ref-example">
+    <hr>
+    <div class="ref-note">Switch to Daytona theme above to see the bead strand effect.</div>
+  </div>
+</div>
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>body::after</code> (Daytona)
+    <div class="ref-desc">Track silhouette watermark. A faint tri-oval SVG fixed behind all content. Nearly invisible by design (opacity: 0.025).</div>
+  </div>
+  <div class="ref-example">
+    <div class="ref-note">Switch to Daytona theme &mdash; look at the page background. The faint oval shape is the Daytona tri-oval track outline.</div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>30. Theme Backgrounds</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>body</code> per theme
+    <div class="ref-desc">Each theme has a unique body background texture. Switch themes above to see them.</div>
+  </div>
+  <div class="ref-example">
+    <table style="font-size:0.8rem;">
+      <thead><tr><th>THEME</th><th>BODY TEXTURE</th></tr></thead>
+      <tbody>
+        <tr><td>Interceptor</td><td>Graph paper grid (subtle blue lines, 40px spacing)</td></tr>
+        <tr><td>Classic</td><td>Flame orange gradient (#FF4400 &rarr; #ff8800)</td></tr>
+        <tr><td>Daytona</td><td>Tire skid marks + asphalt grain + track watermark</td></tr>
+        <tr><td>Case File</td><td>Ruled paper lines + coffee stain ring + aged parchment</td></tr>
+        <tr><td>Cyber</td><td>CRT scan lines + navy/magenta corner radial glows</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<h2>Quick Reference — Color Variables</h2>
+<!-- ============================================================ -->
+
+<div class="ref-row">
+  <div class="ref-label">
+    <code>var(--*)</code>
+    <div class="ref-desc">These CSS variables change per theme. They're the building blocks of everything above.</div>
+  </div>
+  <div class="ref-example">
+    <div class="grid-2" style="gap:4px; font-size:0.75rem; max-width:500px;">
+      <div style="padding:8px; border-radius:4px; background:var(--bg); border:1px solid var(--border);">--bg</div>
+      <div style="padding:8px; border-radius:4px; background:var(--bg-card); border:1px solid var(--border);">--bg-card</div>
+      <div style="padding:8px; border-radius:4px; background:var(--bg-dark); border:1px solid var(--border);">--bg-dark</div>
+      <div style="padding:8px; border-radius:4px; background:var(--bg-input); border:1px solid var(--border);">--bg-input</div>
+      <div style="padding:8px; border-radius:4px; background:var(--accent); color:var(--bg); font-weight:700;">--accent</div>
+      <div style="padding:8px; border-radius:4px; background:var(--secondary); color:white; font-weight:700;">--secondary</div>
+      <div style="padding:8px; border-radius:4px; background:var(--success); color:white; font-weight:700;">--success</div>
+      <div style="padding:8px; border-radius:4px; background:var(--danger); color:white; font-weight:700;">--danger</div>
+      <div style="padding:8px; border-radius:4px; color:var(--text); border:1px solid var(--border);">--text <span style="color:var(--text);">sample</span></div>
+      <div style="padding:8px; border-radius:4px; color:var(--text-muted); border:1px solid var(--border);">--text-muted <span style="color:var(--text-muted);">sample</span></div>
+      <div style="padding:8px; border-radius:4px; border:2px solid var(--border);">--border</div>
+      <div style="padding:8px; border-radius:4px; border:2px solid var(--nav-border); background:var(--nav-bg); color:var(--nav-link);">--nav-*</div>
+    </div>
+  </div>
+</div>
+
+</div><!-- .css-map -->
+
+<script src="/main.js"></script>
+<script>
+  // Restore theme from localStorage if set
+  var saved = localStorage.getItem('theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('mapTheme').value = saved;
+  }
+</script>
+</body>
+</html>

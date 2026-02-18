@@ -13,6 +13,33 @@ var METERS_TO_FEET = 3.28084;
 var MAX_RACE_DURATION_US = 60000000;  // 60s sanity check
 
 // ====================================================================
+// TOAST NOTIFICATIONS — slides in from top, auto-dismisses
+// Types: 'success' (green), 'error' (red), 'info' (yellow), 'warn' (deep red)
+// ====================================================================
+function massToast(msg, type, duration) {
+  type = type || 'success';
+  duration = duration || 2500;
+  var container = document.getElementById('toastContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.className = 'mass-toast-container';
+    container.id = 'toastContainer';
+    document.body.appendChild(container);
+  }
+  var t = document.createElement('div');
+  t.className = 'mass-toast ' + type;
+  t.textContent = msg;
+  container.appendChild(t);
+  // Force reflow then animate in
+  t.offsetHeight;
+  t.classList.add('show');
+  setTimeout(function() {
+    t.classList.remove('show');
+    setTimeout(function() { t.remove(); }, 300);
+  }, duration);
+}
+
+// ====================================================================
 // UNIT SYSTEM — "imperial" (mph, ft) or "metric" (km/h, m)
 // Loaded from firmware config via WebSocket or /api/config
 // ====================================================================
@@ -84,7 +111,7 @@ function setTheme(theme) {
   var themeHeaders = {
     interceptor: { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'COMMAND CENTER' },
     classic:     { title: 'SPEED LAB', subtitle: 'REAL-TIME RACE TIMING SYSTEM', tagline: '' },
-    daytona:     { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'RACE CONTROL' },
+    daytona:     { title: 'M.A.S.S. TRAP', subtitle: 'WORLD CENTER OF RACING', tagline: 'RACE CONTROL' },
     casefile:    { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'COMMAND CENTER' },
     cyber:       { title: 'M.A.S.S. TRAP', subtitle: 'MOTION ANALYSIS & SPEED SYSTEM', tagline: 'COMMAND CENTER' }
   };
@@ -95,6 +122,25 @@ function setTheme(theme) {
   if (h1) h1.textContent = hdr.title;
   if (sub) sub.textContent = hdr.subtitle;
   if (tag) { tag.textContent = hdr.tagline; tag.style.display = hdr.tagline ? '' : 'none'; }
+  // Daytona: 76 ball version badge — show/hide + transform text
+  var vBadge = document.querySelector('.version-badge');
+  if (vBadge) {
+    var hasFleetBar = !!document.getElementById('fleetBar');
+    if (theme === 'daytona') {
+      vBadge.style.display = '';
+    } else if (hasFleetBar) {
+      vBadge.style.display = 'none';
+    }
+    apply76Ball(vBadge);
+  }
+  // Dynamic theme-color for mobile browser chrome (address bar matches theme)
+  var themeColors = {
+    interceptor: '#1a1a2e', classic: '#1a1a1a', daytona: '#0d0d0d',
+    casefile: '#f4f1eb', cyber: '#0a0a14'
+  };
+  var metaTC = document.querySelector('meta[name="theme-color"]');
+  if (!metaTC) { metaTC = document.createElement('meta'); metaTC.name = 'theme-color'; document.head.appendChild(metaTC); }
+  metaTC.content = themeColors[theme] || themeColors.interceptor;
 }
 
 function initTheme() {
@@ -296,6 +342,30 @@ function checkGitHubRelease(forceRefresh) {
   });
 }
 
+// Daytona 76 ball — transform version badge into an orange sphere
+function apply76Ball(badge) {
+  if (!badge) return;
+  var theme = getTheme();
+  var vLink = badge.querySelector('a');
+  if (theme === 'daytona') {
+    badge.title = 'Sunoco 76 \u2014 Turn 3';
+    if (vLink) {
+      var fullText = vLink.textContent.trim();
+      if (!vLink.getAttribute('data-full-ver')) {
+        vLink.setAttribute('data-full-ver', fullText);
+      }
+      // Extract just major.minor from "FW v2.6.0-beta" → "2.6"
+      var match = fullText.match(/(\d+\.\d+)/);
+      if (match) vLink.textContent = match[1];
+    }
+  } else {
+    badge.title = '';
+    if (vLink && vLink.getAttribute('data-full-ver')) {
+      vLink.textContent = vLink.getAttribute('data-full-ver');
+    }
+  }
+}
+
 function loadVersion() {
   fetch('/api/version').then(function(r) { return r.json(); }).then(function(v) {
     var badge = document.getElementById('versionBadge');
@@ -305,11 +375,15 @@ function loadVersion() {
     if (badge) {
       badge.innerHTML = '<a href="/about.html" title="About M.A.S.S. Trap">' +
         'FW v' + currentFw + '</a>';
+      // Daytona: Transform to 76 ball (short version text)
+      apply76Ball(badge);
     }
 
     // Then check GitHub for updates (uses 24hr cache)
     checkGitHubRelease(false).then(function(releaseInfo) {
       applyVersionBadge(badge, currentFw, releaseInfo);
+      // Re-apply 76 ball after update badge changes
+      apply76Ball(badge);
     });
   }).catch(function() {
     var meta = document.querySelector('meta[name="fw-version"]');
@@ -351,7 +425,8 @@ function formatUptime(s) {
 }
 
 function escHtml(s) {
-  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
 // ====================================================================
@@ -364,7 +439,7 @@ function getNavHTML() {
     '<li><a href="/"><span class="mass-nav-icon">&#x1F3C1;</span><span class="mass-nav-label">Live Monitor</span></a></li>' +
     '<li><a href="/history.html"><span class="mass-nav-icon">&#x1F4CB;</span><span class="mass-nav-label">Evidence Log</span></a></li>' +
     '<li><a href="/config"><span class="mass-nav-icon">&#x2699;&#xFE0F;</span><span class="mass-nav-label">System Config</span></a></li>' +
-    '<li><a href="/console"><span class="mass-nav-icon">&#x1F4DF;</span><span class="mass-nav-label">Terminal</span></a></li>' +
+    '<li><a href="/console"><span class="mass-nav-icon">&#x1F50D;</span><span class="mass-nav-label">Diagnostics</span></a></li>' +
     '</ul></nav>';
 }
 
@@ -379,6 +454,160 @@ function massInit(opts) {
   initAnnouncer();
   initHotkeys();
   if (opts.ws !== false) connectWebSocket();
+  initFleetBar();
+}
+
+// ====================================================================
+// FLEET DISPATCH BAR — zsh-style persistent bottom status bar
+// Shows: hostname │ ● Start ● Trap ● Telem │ drift | RSSI | heap | uptime | FW
+// ====================================================================
+var _fleetBarTimer = null;
+var _fleetBarRole = '';    // This device's role (set on first poll)
+var _fleetBarFw = '';      // Firmware version (set on first poll)
+
+function initFleetBar() {
+  // Don't double-init
+  if (document.getElementById('fleetBar')) return;
+
+  // Hide the old version badge — fleet bar replaces it
+  // Exception: Daytona theme shows it as the 76 ball
+  var oldBadge = document.getElementById('versionBadge');
+  var curTheme = getTheme();
+  if (oldBadge) oldBadge.style.display = (curTheme === 'daytona') ? '' : 'none';
+
+  var bar = document.createElement('div');
+  bar.id = 'fleetBar';
+  bar.className = 'fleet-bar';
+  bar.innerHTML =
+    '<a class="fleet-bar-host" id="fbHost" href="/" title="Dashboard">--</a>' +
+    '<span class="fleet-bar-sep">\u2502</span>' +
+    '<a class="fleet-bar-roster" id="fbRoster" href="/console#fleet" title="Fleet Status"></a>' +
+    '<span class="fleet-bar-sep">\u2502</span>' +
+    '<span class="fleet-bar-metrics" id="fbMetrics">--</span>';
+  document.body.appendChild(bar);
+
+  // First poll immediately, then every 10s
+  pollFleetBar();
+  _fleetBarTimer = setInterval(pollFleetBar, 10000);
+}
+
+function pollFleetBar() {
+  // Fetch /api/info and /api/peers in parallel
+  var infoData = null;
+  var peersData = null;
+  var done = 0;
+
+  function tryRender() {
+    done++;
+    if (done >= 2) updateFleetBar(infoData, peersData);
+  }
+
+  fetch('/api/info').then(function(r) { return r.json(); }).then(function(d) {
+    infoData = d;
+    tryRender();
+  }).catch(function() { tryRender(); });
+
+  fetch('/api/peers').then(function(r) { return r.json(); }).then(function(d) {
+    peersData = d;
+    tryRender();
+  }).catch(function() { tryRender(); });
+}
+
+function updateFleetBar(info, peers) {
+  // Host section
+  var hostEl = document.getElementById('fbHost');
+  var rosterEl = document.getElementById('fbRoster');
+  var metricsEl = document.getElementById('fbMetrics');
+  if (!hostEl) return;
+
+  if (info) {
+    _fleetBarRole = (info.role || '').toLowerCase();
+    _fleetBarFw = info.firmware || '';
+    hostEl.textContent = info.hostname || 'unknown';
+  }
+
+  // Roster section — always show all 4 fleet roles in track flow order
+  // Dedup peers: keep only the BEST status per role (online > stale > offline)
+  // Show grayed "unknown" placeholder for roles not yet discovered
+  if (peers && Array.isArray(peers)) {
+    var statusRank = { online: 0, stale: 1, offline: 2 };
+    var allRoles = ['start', 'speedtrap', 'finish', 'telemetry'];
+    var roleLabel = { start: 'Start', speedtrap: 'Trap', finish: 'Finish', telemetry: 'Telem' };
+
+    // Dedup: group by role, keep best status per role
+    var bestByRole = {};
+    for (var i = 0; i < peers.length; i++) {
+      var p = peers[i];
+      var role = p.role || 'unknown';
+      var st = (p.status || 'offline').toLowerCase();
+      var rank = statusRank[st] !== undefined ? statusRank[st] : 9;
+      if (!bestByRole[role] || rank < bestByRole[role]._rank) {
+        p._rank = rank;
+        bestByRole[role] = p;
+      }
+    }
+
+    // Render all 4 roles — skip our own role (we ARE that node)
+    var html = '';
+    for (var r = 0; r < allRoles.length; r++) {
+      var role = allRoles[r];
+      if (role === _fleetBarRole) continue;  // don't show self
+      var label = roleLabel[role];
+      var p = bestByRole[role];
+      if (p) {
+        var status = (p.status || 'offline').toLowerCase();
+        var host = p.hostname || '';
+        html += '<span class="fb-peer ' + status + '" title="' + host + '">' +
+          '\u25CF ' + label + '</span>';
+      } else {
+        html += '<span class="fb-peer unknown" title="Not discovered">' +
+          '\u25CF ' + label + '</span>';
+      }
+    }
+    rosterEl.innerHTML = html;
+  }
+
+  // Metrics section
+  if (info) {
+    var parts = [];
+
+    // Clock sync status (finish gate only — it's the one doing sync)
+    // offset != 0 means sync has happened. Show the actual value so user sees it change.
+    if (_fleetBarRole === 'finish' && info.clock_offset_us !== undefined) {
+      var offset = info.clock_offset_us;
+      if (offset !== 0) {
+        var absMs = Math.abs(offset / 1000);
+        var driftLabel = absMs >= 1000 ? (absMs / 1000).toFixed(1) + 's' :
+                         absMs >= 1 ? absMs.toFixed(0) + 'ms' :
+                         Math.abs(offset).toFixed(0) + '\u00B5s';
+        parts.push('<a class="fb-sync synced" href="/console" title="Clock sync active (' +
+          (offset > 0 ? '+' : '') + (offset / 1000).toFixed(0) + 'ms offset)">' +
+          '\u2705 ' + driftLabel + '</a>');
+      } else {
+        parts.push('<a class="fb-sync no-sync" href="/console" title="No clock sync yet \u2014 click SYNC on dashboard">' +
+          '\u23F1 unsync\u2019d</a>');
+      }
+    }
+
+    // WiFi RSSI
+    var rssi = info.wifi_rssi || 0;
+    var rssiClass = rssi > -50 ? 'fb-heap' : (rssi > -70 ? 'fb-rssi' : 'text-danger');
+    parts.push('<span class="' + rssiClass + '">' + rssi + 'dBm</span>');
+
+    // Free heap
+    parts.push('<span class="fb-heap">' + formatBytes(info.free_heap) + '</span>');
+
+    // Uptime
+    parts.push('<span class="fb-uptime">' + formatUptime(info.uptime_s) + '</span>');
+
+    // Firmware version — links to About page (replaces version badge)
+    if (_fleetBarFw) {
+      parts.push('<a class="fb-fw" href="/about.html" title="Firmware version">v' +
+        _fleetBarFw + '</a>');
+    }
+
+    metricsEl.innerHTML = parts.join('<span class="fb-sep">|</span>');
+  }
 }
 
 // ====================================================================

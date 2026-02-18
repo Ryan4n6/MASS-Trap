@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="theme-color" content="#091B2F">
+<meta name="color-scheme" content="dark">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none';">
 <title>The Special K Report™ — M.A.S.S. Trap</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
@@ -66,7 +69,7 @@ a:hover{text-decoration:underline}
 
 /* Announcer */
 .announcer{background:linear-gradient(135deg,var(--navy-light),var(--navy-mid));border:2px solid var(--gold);border-radius:12px;padding:20px 24px;text-align:center;font-size:1rem;color:var(--cyan);font-style:italic;line-height:1.6;position:relative}
-.announcer::before{content:"⚾";font-size:1.4rem;display:block;margin-bottom:8px;font-style:normal}
+.announcer::before{display:none}
 
 /* Timeline */
 .timeline{font-size:0.82rem}
@@ -98,6 +101,15 @@ a:hover{text-decoration:underline}
 <body>
 <div class="container">
 
+<!-- Breadcrumb nav -->
+<div style="padding:12px 0 0;font-family:'Courier New',monospace;font-size:0.85rem">
+  <a href="/" style="color:var(--gold,#D4AF37);text-decoration:none">&larr; Dashboard</a>
+  <span style="color:#666;margin:0 8px">|</span>
+  <a href="/console" style="color:#888;text-decoration:none">Diagnostics</a>
+  <span style="color:#666;margin:0 8px">|</span>
+  <a href="/history.html" style="color:#888;text-decoration:none">Evidence Log</a>
+</div>
+
 <!-- Update Notice (hidden unless update detected) -->
 <div class="update-notice" id="updateNotice">
   A firmware update is available: <a href="https://github.com/Ryan4n6/MASS-Trap/releases/latest" target="_blank" id="updateLink">Download</a>
@@ -106,7 +118,7 @@ a:hover{text-decoration:underline}
 <!-- Hero -->
 <div class="hero">
   <div class="hero-badge">Est. 2026</div>
-  <h1>THE KRISTINA REPORT&trade;</h1>
+  <h1>THE SPECIAL K REPORT&trade;</h1>
   <h2>M.A.S.S. Trap &mdash; Motion Analysis &amp; Speed System</h2>
   <p class="subtitle">&ldquo;Are you guys even getting anything done?&rdquo;</p>
 </div>
@@ -174,6 +186,10 @@ a:hover{text-decoration:underline}
     <div class="live-card"><div class="label">Cars in Garage</div><div class="value" id="garageCount">--</div></div>
     <div class="live-card"><div class="label">Fastest Time</div><div class="value" id="fastestTime">--</div></div>
     <div class="live-card"><div class="label">Top Speed</div><div class="value" id="topSpeed">--</div></div>
+    <div class="live-card"><div class="label">Slowest Time</div><div class="value" id="slowestTime">--</div></div>
+    <div class="live-card"><div class="label">Avg Speed</div><div class="value" id="avgSpeed">--</div></div>
+    <div class="live-card"><div class="label">Scale Top Speed</div><div class="value" id="scaleSpeed">--</div></div>
+    <div class="live-card"><div class="label">Total Distance</div><div class="value" id="totalDistance">--</div></div>
   </div>
 </div>
 
@@ -228,25 +244,25 @@ a:hover{text-decoration:underline}
       </div>
       <div class="builder">
         <div class="builder-name">Richard Massfeller</div>
-        <div class="builder-role">Dad &bull; Formula Vee Racer &bull; The 7-Foot Pencil Legend</div>
+        <div class="builder-role">Dad &bull; Built More Than Just Homes &bull; Formula Vee Racer &bull; The 7-Foot Pencil Legend</div>
       </div>
       <div class="builder">
         <div class="builder-name">Sam Troia</div>
-        <div class="builder-role">Uncle Sam &bull; Columbia University &bull; Concert Pianist &bull; In Memoriam</div>
+        <div class="builder-role">Uncle Sam &bull; Brilliant Mind &bull; Columbia University &bull; Concert Pianist &bull; In Memoriam</div>
       </div>
       <div class="builder">
         <div class="builder-name">Stephen Massfeller</div>
-        <div class="builder-role">Uncle Beaver &bull; Pipeline Welder &bull; Built Things That Last &bull; In Memoriam</div>
+        <div class="builder-role">Uncle Beaver &bull; Pipeline Master &bull; Champion Surfer &bull; In Memoriam</div>
       </div>
     </div>
     <div class="dedication">
       This project was built at kitchen tables and workbenches between the hours of
       midnight and sunrise. A dad, his two sons, a stepmom who keeps the whole operation running,
-      and an AI &mdash; carrying forward the legacy of Richard&rsquo;s Formula Vees, Uncle Sam&rsquo;s
-      perfect pitch, and Uncle Beaver&rsquo;s pipeline welds. The best tools in the world are
+      and an AI &mdash; carrying forward the legacy of Richard&rsquo;s builds, Uncle Sam&rsquo;s
+      brilliant mind, and Uncle Beaver&rsquo;s waves. The best tools in the world are
       worthless without the people willing to stay up all night using them.
       <br><br>
-      <em>For Sam Troia and Stephen Massfeller &mdash; who built things that mattered.</em>
+      <em>For Sam Troia and Stephen Massfeller &mdash; who showed us that what you build matters more than what you have.</em>
       <br><br>
       <span id="convoHoursNote">Built with love, caffeine, and approximately -- hours of conversation.</span>
     </div>
@@ -323,6 +339,9 @@ var FEATURES = [
   {name:"Live Leaderboard",desc:"Most Wanted list ranks all cars by speed with criminal verdicts",status:"done"},
   {name:"Kiosk Mode",desc:"Display-only presentation mode for science fair booth",status:"done"},
   {name:"The Special K Report",desc:"Click version badge on any page to see this — you are here",status:"done"},
+  {name:"Fleet Management",desc:"Remote reboot, identify, WiFi push, and beacon diagnostics across all nodes",status:"done"},
+  {name:"Fleet Dispatch Bar",desc:"zsh-style status bar on every page — live peer roster, sync, heap, uptime, FW",status:"done"},
+  {name:"Diagnostics Page",desc:"Node health, fleet status, serial monitor, file browser — all in one place",status:"done"},
   {name:"Logo and Badge",desc:"Judge Dredd shield design for the project identity",status:"wip"},
 ];
 
@@ -427,7 +446,7 @@ function init() {
 
   // Announcer
   var idx = Math.floor(Math.random() * ANNOUNCER_STATS.length);
-  document.getElementById('announcerBooth').innerHTML = '⚾<br>&ldquo;' + ANNOUNCER_STATS[idx] + '&rdquo;';
+  document.getElementById('announcerBooth').innerHTML = '&ldquo;' + ANNOUNCER_STATS[idx] + '&rdquo;';
 
   // Generated timestamp
   document.getElementById('generatedAt').textContent = 'Stats generated: ' + STATS.generatedHuman;
@@ -447,18 +466,21 @@ function toggleTimeline() {
 }
 
 function fetchLiveData() {
-  // Device info
+  // Device info — field names match /api/info response
+  var trackLen = 0; var scaleFactor = 0;
   fetch('/api/info').then(function(r){return r.json()}).then(function(d) {
     document.getElementById('liveStatus').innerHTML = '<span class="live-pulse"></span>Online';
     document.getElementById('liveStatus').className = 'value online';
     document.getElementById('liveFirmware').textContent = 'v' + (d.firmware || d.version || '--');
-    if (d.uptime_seconds) {
-      var h = Math.floor(d.uptime_seconds / 3600);
-      var m = Math.floor((d.uptime_seconds % 3600) / 60);
+    var up = d.uptime_s || d.uptime_seconds || 0;
+    if (up) {
+      var h = Math.floor(up / 3600);
+      var m = Math.floor((up % 3600) / 60);
       document.getElementById('liveUptime').textContent = h + 'h ' + m + 'm';
     }
-    if (d.heap_free) {
-      document.getElementById('liveHeap').textContent = Math.round(d.heap_free / 1024) + ' KB';
+    var heap = d.free_heap || d.heap_free || 0;
+    if (heap) {
+      document.getElementById('liveHeap').textContent = Math.round(heap / 1024) + ' KB';
     }
     if (d.wifi_rssi) {
       var rssi = d.wifi_rssi;
@@ -476,18 +498,50 @@ function fetchLiveData() {
     document.getElementById('liveStatus').className = 'value offline';
   });
 
-  // Race history
-  fetch('/api/history').then(function(r){return r.json()}).then(function(h) {
-    var races = h.races || h.history || [];
+  // Race history + config — chain config first so track/scale are available
+  fetch('/api/config').then(function(r){return r.json()}).then(function(c) {
+    var tr = c.track || {};
+    trackLen = tr.length_m || c.track_length_m || 0;
+    scaleFactor = tr.scale_factor || c.scale_factor || 64;
+  }).catch(function(){}).then(function() {
+    return fetch('/api/history').then(function(r){return r.json()});
+  }).then(function(h) {
+    var races = Array.isArray(h) ? h : (h.races || h.history || []);
     document.getElementById('racesTotal').textContent = races.length;
     if (races.length > 0) {
-      var fastest = Infinity, topSpd = 0;
+      var fastest = Infinity, slowest = 0, topSpd = 0, spdSum = 0, spdCount = 0;
+      var topScaleMph = 0;
       for (var i = 0; i < races.length; i++) {
-        if (races[i].time && races[i].time < fastest) fastest = races[i].time;
-        if (races[i].speed && races[i].speed > topSpd) topSpd = races[i].speed;
+        var t = races[i].time;
+        var s = races[i].speed_mps || races[i].speed || 0;
+        if (t && t > 0 && t < fastest) fastest = t;
+        if (t && t > 0 && t > slowest) slowest = t;
+        if (s > 0) { if (s > topSpd) topSpd = s; spdSum += s; spdCount++; }
+        // Track best scale speed from pre-computed field if available
+        if (races[i].scale_mph && races[i].scale_mph > topScaleMph) topScaleMph = races[i].scale_mph;
       }
       document.getElementById('fastestTime').textContent = fastest < Infinity ? fastest.toFixed(3) + 's' : '--';
       document.getElementById('topSpeed').textContent = topSpd > 0 ? topSpd.toFixed(2) + ' m/s' : '--';
+      document.getElementById('slowestTime').textContent = slowest > 0 ? slowest.toFixed(3) + 's' : '--';
+      document.getElementById('avgSpeed').textContent = spdCount > 0 ? (spdSum / spdCount).toFixed(2) + ' m/s' : '--';
+
+      // Scale speed: use pre-computed field, or calculate from top speed
+      if (topScaleMph > 0) {
+        document.getElementById('scaleSpeed').textContent = topScaleMph.toFixed(0) + ' mph (1:' + (scaleFactor || 64) + ')';
+      } else if (topSpd > 0 && scaleFactor > 0) {
+        var scaleMph = topSpd * scaleFactor * 2.23694;
+        document.getElementById('scaleSpeed').textContent = Math.round(scaleMph) + ' mph (1:' + scaleFactor + ')';
+      }
+
+      // Total track distance covered
+      if (trackLen > 0) {
+        var totalM = races.length * trackLen;
+        if (totalM >= 1000) {
+          document.getElementById('totalDistance').textContent = (totalM / 1000).toFixed(2) + ' km';
+        } else {
+          document.getElementById('totalDistance').textContent = totalM.toFixed(1) + ' m';
+        }
+      }
     }
   }).catch(function(){});
 
@@ -506,7 +560,15 @@ function checkUpdate(currentFw) {
       if (rel.tag_name) {
         var latest = rel.tag_name.replace(/^v/,'').replace(/-.*$/,'');
         var current = currentFw.replace(/-.*$/,'');
-        if (latest !== current) {
+        // Only show if latest is GREATER (not just different — avoids downgrade prompt on pre-release)
+        var lp = latest.split('.').map(Number);
+        var cp = current.split('.').map(Number);
+        var isNewer = false;
+        for (var i = 0; i < 3; i++) {
+          if ((lp[i]||0) > (cp[i]||0)) { isNewer = true; break; }
+          if ((lp[i]||0) < (cp[i]||0)) break;
+        }
+        if (isNewer) {
           var notice = document.getElementById('updateNotice');
           var link = document.getElementById('updateLink');
           link.textContent = 'v' + latest + ' available — Download';

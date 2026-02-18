@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ibb.co https://api.qrserver.com; connect-src 'self' ws: wss:; frame-ancestors 'none';">
   <meta name="fw-version" content="2.4.0">
   <title>M.A.S.S. Trap Command Center</title>
   <style>
@@ -891,6 +894,11 @@
     let currentScaleFactor = 64;
     let configSheetsUrl = '';
 
+    function escHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
     function setCurrentCarDisplay(car) {
       const el = document.getElementById('currentCar');
       el.textContent = '';
@@ -921,7 +929,7 @@
 
     function send(data) {
       if (ws && ws.readyState === WebSocket.OPEN) { ws.send(JSON.stringify(data)); }
-      else { alert('Not connected to M.A.S.S. Trap!'); }
+      else { massToast('Not connected to M.A.S.S. Trap!', 'error'); }
     }
 
     // ========================================================================
@@ -1208,7 +1216,7 @@
 
         return '<div class="mw-card' + rankClass + (isActive ? ' mw-new-record' : '') + '">' +
           '<div class="mw-rank">' + rankTitle + '</div>' +
-          '<div class="mw-name">' + item.name + '</div>' +
+          '<div class="mw-name">' + escHtml(item.name) + '</div>' +
           '<div class="mw-stats">' +
             '<div>Time: <strong>' + (item.bestTime != null ? item.bestTime.toFixed(3) + 's' : '--') + '</strong></div>' +
             '<div>Speed: <strong>' + item.bestSpeed.toFixed(1) + ' mph</strong></div>' +
@@ -1227,7 +1235,10 @@
     // ========================================================================
     function armRace() { send({ cmd: 'arm' }); }
     function resetRace() { send({ cmd: 'reset' }); }
-    function syncClock() { send({ cmd: 'syncClock' }); alert('Clock sync requested!'); }
+    function syncClock() {
+      send({ cmd: 'syncClock' });
+      massToast('\u2713 Clock sync requested', 'success', 2000);
+    }
     function updateTrackLength() {
       const length = parseFloat(document.getElementById('trackLength').value);
       if (length > 0 && length < 100) { send({ cmd: 'setTrack', length: length }); }
@@ -1288,7 +1299,7 @@
     }
 
     async function clearGarage() {
-      if (garage.length === 0) { alert('Garage is already empty!'); return; }
+      if (garage.length === 0) { massToast('Garage is already empty!', 'error'); return; }
       const c = prompt('Type CLEAR to delete all ' + garage.length + ' cars:');
       if (c !== 'CLEAR') return;
       garage = [];
@@ -1302,7 +1313,7 @@
     }
 
     function exportGarage() {
-      if (garage.length === 0) { alert('No cars to export!'); return; }
+      if (garage.length === 0) { massToast('No cars to export!', 'error'); return; }
       const blob = new Blob([JSON.stringify(garage, null, 2)], { type: 'application/json' });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -1320,9 +1331,9 @@
       reader.onload = async function(e) {
         try {
           const imported = JSON.parse(e.target.result);
-          if (!Array.isArray(imported)) { alert('Invalid garage file'); return; }
+          if (!Array.isArray(imported)) { massToast('Invalid garage file', 'error'); return; }
           for (const car of imported) {
-            if (!car.name || !car.weight) { alert('Invalid car data'); return; }
+            if (!car.name || !car.weight) { massToast('Invalid car data', 'error'); return; }
             if (!car.stats) car.stats = { runs: 0, bestTime: null, bestSpeed: 0 };
             if (!car.id) car.id = Date.now() + Math.random();
           }
@@ -1339,7 +1350,7 @@
           } else { garage = imported; }
           await saveGarage();
           showGarageStatus('Imported ' + imported.length + ' cars!', true);
-        } catch (err) { alert('Failed to parse: ' + err.message); }
+        } catch (err) { massToast('Failed to parse: ' + err.message, 'error'); }
       };
       reader.readAsText(file);
       event.target.value = '';
@@ -1349,8 +1360,8 @@
       const name = document.getElementById('carName').value.trim();
       const color = document.getElementById('carColor').value.trim();
       const weight = parseFloat(document.getElementById('carWeight').value);
-      if (!name || name.length < 1 || name.length > 30) { alert('Name must be 1-30 characters!'); return; }
-      if (!weight || weight < 1 || weight > 200) { alert('Mass must be 1-200 grams!'); return; }
+      if (!name || name.length < 1 || name.length > 30) { massToast('Name must be 1-30 characters!', 'error'); return; }
+      if (!weight || weight < 1 || weight > 200) { massToast('Mass must be 1-200 grams!', 'error'); return; }
 
       if (editingCarIndex >= 0) {
         garage[editingCarIndex].name = name;
@@ -1366,7 +1377,7 @@
         document.getElementById('addCarBtn').textContent = 'ADD TO GARAGE';
       } else {
         if (garage.some(c => c.name.toLowerCase() === name.toLowerCase())) {
-          alert('Car already exists! Click pencil to edit.'); return;
+          massToast('Car already exists! Click pencil to edit.', 'error'); return;
         }
         garage.push({ id: Date.now(), name: name, color: color || 'N/A', weight: weight,
           stats: { runs: 0, bestTime: null, bestSpeed: 0 }, notes: [] });
@@ -1458,13 +1469,13 @@
         const hasBest = car.stats.bestTime != null && car.stats.bestTime !== Infinity && isFinite(car.stats.bestTime);
         const notes = car.notes || [];
         const notesHtml = notes.slice(-3).map(n =>
-          '<div class="mech-note">' + new Date(n.ts).toLocaleDateString() + ': ' + n.text + '</div>'
+          '<div class="mech-note">' + new Date(n.ts).toLocaleDateString() + ': ' + escHtml(n.text) + '</div>'
         ).join('');
         return '<div class="garage-car ' + (activeCar && activeCar.id === car.id ? 'active' : '') + '" onclick="selectCar(' + i + ')">' +
           '<button class="delete-btn" onclick="deleteCar(' + i + ', event)" title="Delete">x</button>' +
           '<button class="edit-btn" onclick="editCar(' + i + ', event)" title="Edit">&#9998;</button>' +
-          '<h3>' + car.name + '</h3>' +
-          '<p>' + (car.color || '') + '</p>' +
+          '<h3>' + escHtml(car.name) + '</h3>' +
+          '<p>' + escHtml(car.color || '') + '</p>' +
           '<p>' + car.weight + 'g</p>' +
           '<div class="garage-stats">' +
             '<span>Runs: ' + (car.stats.runs || 0) + '</span>' +
@@ -1546,7 +1557,7 @@
       tbody.innerHTML = history.slice(0, 20).map(h =>
         '<tr>' +
           '<td>#' + h.run + '</td>' +
-          '<td><strong style="color:var(--mass-gold);">' + h.car + '</strong></td>' +
+          '<td><strong style="color:var(--mass-gold);">' + escHtml(h.car) + '</strong></td>' +
           '<td>' + h.weight + 'g</td>' +
           '<td style="font-family:monospace;">' + h.time.toFixed(3) + 's</td>' +
           '<td>' + h.speed_mph.toFixed(1) + '</td>' +
@@ -1566,7 +1577,7 @@
     // DATA EXPORT
     // ========================================================================
     function exportCSV() {
-      if (history.length === 0) { alert('No data!'); return; }
+      if (history.length === 0) { massToast('No data!', 'warn'); return; }
       let csv = 'Run,Timestamp,Car,Weight(g),Time(s),Speed(mph),Scale(mph),Momentum,KE\n';
       history.forEach(h => {
         csv += h.run + ',' + new Date(h.timestamp).toISOString() + ',' + h.car + ',' + h.weight + ',' + h.time + ',' + h.speed_mph + ',' + h.scale_mph + ',' + h.momentum + ',' + h.ke + '\n';
@@ -1606,7 +1617,7 @@
 
     function testSheetsUpload() {
       const url = document.getElementById('sheetsUrl').value.trim() || configSheetsUrl;
-      if (!url) { alert('Enter a Google Sheets URL first!'); return; }
+      if (!url) { massToast('Enter a Google Sheets URL first!', 'error'); return; }
       uploadToSheets({ car: 'TEST', weight: 35, time: 1.234, speed_mph: 1.62, scale_mph: 103.7, momentum: 0.057, ke: 0.023 }, url);
     }
 
@@ -1764,6 +1775,7 @@
       } catch (e) {}
     });
   </script>
+  <script src="/main.js"></script>
   <script src="/chart.min.js"></script>
 </body>
 </html>

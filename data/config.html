@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws: wss: https://api.github.com https://github.com https://objects.githubusercontent.com; frame-ancestors 'none';">
   <meta name="fw-version" content="2.4.0">
   <title>M.A.S.S. Trap - Configuration</title>
   <style>
@@ -386,6 +389,27 @@
       .tab { padding: 8px 8px; font-size: 0.65rem; letter-spacing: 0; }
       .header h1 { font-size: 1.3rem; letter-spacing: 1px; }
     }
+
+    /* ===== Toast Notifications ===== */
+    .mass-toast-container {
+      position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+      z-index: 99999; display: flex; flex-direction: column;
+      align-items: center; gap: 8px; pointer-events: none;
+    }
+    .mass-toast {
+      padding: 10px 24px; border-radius: 8px; font-weight: 700;
+      font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase;
+      color: #fff; opacity: 0; transform: translateY(-20px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      pointer-events: auto; text-align: center;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+      max-width: 90vw;
+    }
+    .mass-toast.show { opacity: 1; transform: translateY(0); }
+    .mass-toast.success { background: var(--mass-green); }
+    .mass-toast.error { background: var(--mass-red); }
+    .mass-toast.info { background: var(--mass-gold); color: var(--mass-navy); }
+    .mass-toast.warn { background: #cc0000; }
   </style>
 </head>
 <body>
@@ -740,6 +764,38 @@
 
   <script>
     // ====================================================================
+    // XSS SANITIZER (inline — config.html does not load main.js)
+    // ====================================================================
+    function escHtml(s) {
+      return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    // TOAST NOTIFICATIONS (inline — config.html does not load main.js)
+    // ====================================================================
+    function massToast(msg, type, duration) {
+      type = type || 'success';
+      duration = duration || 2500;
+      var container = document.getElementById('toastContainer');
+      if (!container) {
+        container = document.createElement('div');
+        container.className = 'mass-toast-container';
+        container.id = 'toastContainer';
+        document.body.appendChild(container);
+      }
+      var t = document.createElement('div');
+      t.className = 'mass-toast ' + type;
+      t.textContent = msg;
+      container.appendChild(t);
+      t.offsetHeight;
+      t.classList.add('show');
+      setTimeout(function() {
+        t.classList.remove('show');
+        setTimeout(function() { t.remove(); }, 300);
+      }, duration);
+    }
+
+    // ====================================================================
     // TAB NAVIGATION
     // ====================================================================
     function showTab(name) {
@@ -782,7 +838,7 @@
         sel.innerHTML = '<option value="">-- Select network --</option>';
         networks.forEach(n => {
           const sec = n.secure ? ' (secured)' : ' (open)';
-          sel.innerHTML += '<option value="' + n.ssid + '">' + n.ssid + ' (' + n.rssi + 'dBm)' + sec + '</option>';
+          sel.innerHTML += '<option value="' + escHtml(n.ssid) + '">' + escHtml(n.ssid) + ' (' + n.rssi + 'dBm)' + sec + '</option>';
         });
       } catch (e) {
         sel.innerHTML = '<option value="">Scan failed - try again</option>';
@@ -811,10 +867,10 @@
           return;
         }
         list.innerHTML = devices.map(d => {
-          const link = d.hostname ? '<a href="http://' + d.hostname + '.local/" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:underline;">' + d.hostname + '</a>' : d.mac;
-          return '<div class="device-item" onclick="document.getElementById(\'peerMac\').value=\'' + d.mac + '\'" style="cursor:pointer;">' +
-          '<div><span class="device-role">' + d.role.toUpperCase() + '</span><span> - ' + link + '</span></div>' +
-          '<span class="device-mac">' + d.mac + '</span></div>';
+          const link = d.hostname ? '<a href="http://' + escHtml(d.hostname) + '.local/" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:underline;">' + escHtml(d.hostname) + '</a>' : escHtml(d.mac);
+          return '<div class="device-item" onclick="document.getElementById(\'peerMac\').value=\'' + escHtml(d.mac) + '\'" style="cursor:pointer;">' +
+          '<div><span class="device-role">' + escHtml(d.role).toUpperCase() + '</span><span> - ' + link + '</span></div>' +
+          '<span class="device-mac">' + escHtml(d.mac) + '</span></div>';
         }).join('');
       } catch (e) {
         list.innerHTML = '<div class="hint">Discovery failed. Try again.</div>';
@@ -849,7 +905,7 @@
     async function loadWledEffects() {
       try {
         const resp = await fetch('/api/wled/effects');
-        if (!resp.ok) { alert('Could not load effects. Test WLED connection first.'); return; }
+        if (!resp.ok) { massToast('Could not load effects. Test WLED connection first.', 'error'); return; }
         const effects = await resp.json();
         document.querySelectorAll('.wled-effect').forEach(sel => {
           const currentVal = sel.value;
@@ -859,7 +915,7 @@
         });
         showStatus('Effects loaded from WLED!', 'success');
       } catch (e) {
-        alert('Failed to load effects: ' + e.message);
+        massToast('Failed to load effects: ' + e.message, 'error');
       }
     }
 

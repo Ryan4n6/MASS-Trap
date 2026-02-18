@@ -21,6 +21,7 @@
 12. [#12 — WLED Update (v0.14.4 → v0.15.x)](#12--wled-update-v0144--v015x)
 13. [#13 — Fleet Update Phase 2 (LAN-Cached .bin)](#13--fleet-update-phase-2-lan-cached-bin)
 14. [#14 — Google Sheets AppScript Debugging](#14--google-sheets-appscript-debugging)
+15. [#15 — Firmware Security Hardening (Compile-Required)](#15--firmware-security-hardening-compile-required)
 
 ---
 
@@ -1697,18 +1698,214 @@ Standalone:
 ### Suggested Implementation Order
 
 1. **#4** Password toggle (trivial, immediate UX win)
-2. **#5** Brother rename (cosmetic, quick)
-3. **#14** Google Sheets debugging (diagnose first, may be a quick fix)
-4. **#2 + #10** Hidden SSIDs + AP password (both touch same code, 30 lines total)
-5. **#7** ID collision detection (small, independent)
-6. **#1** Server-side auth gate (biggest security win, ~150 lines)
-7. **#3** PMK encryption (ESP-NOW security, ~30 lines)
-8. **#8** Clone peer safety (requires #1 for approval API)
-9. **#6** Setup wizard visuals (can defer, only seen on first boot)
-10. **#9** FNG module (requires #3 and #8)
-11. **#11** Speedtrap update (operational, do after firmware stabilizes)
-12. **#12** WLED update (operational, independent)
-13. **#13** Fleet update Phase 2 (most complex, do last)
+2. **#15** Firmware security hardening (~80 lines, closes auth gaps found in XSS audit)
+3. **#5** Brother rename (cosmetic, quick)
+4. **#14** Google Sheets debugging (diagnose first, may be a quick fix)
+5. **#2 + #10** Hidden SSIDs + AP password (both touch same code, 30 lines total)
+6. **#7** ID collision detection (small, independent)
+7. **#1** Server-side auth gate (biggest security win, ~150 lines — #15 is the quick version of this)
+8. **#3** PMK encryption (ESP-NOW security, ~30 lines)
+9. **#8** Clone peer safety (requires #1 for approval API)
+10. **#6** Setup wizard visuals (can defer, only seen on first boot)
+11. **#9** FNG module (requires #3 and #8)
+12. **#11** Speedtrap update (operational, do after firmware stabilizes)
+13. **#12** WLED update (operational, independent)
+14. **#13** Fleet update Phase 2 (most complex, do last)
+
+---
+
+## #15 — Firmware Security Hardening (Compile-Required)
+
+*Added 2026-02-18. These are the firmware-side counterparts to the XSS/CSP hardening already deployed via hot-push. All require a recompile + OTA flash.*
+
+### What Was Already Fixed (Hot-Push, No Recompile)
+
+The following XSS and CSP hardening was deployed to all 3 devices on 2026-02-18 via LittleFS hot-push:
+
+1. **`escHtml()` quote escaping** — Added `"` and `'` escaping to prevent attribute-context XSS breakout (`main.js`)
+2. **15 XSS injection points fixed** — All car names, notes, colors, WiFi SSIDs, peer hostnames/roles/MACs now escaped via `escHtml()` across dashboard.html, index.html, history.html, system.html, config.html
+3. **Hardcoded API keys removed** — 8 instances of `'admin'` in dashboard.html XHR calls replaced with `getApiKey()` from main.js
+4. **Content-Security-Policy meta tags** — All 11 HTML files now have CSP restricting script/style/img/connect sources and blocking framing (`frame-ancestors 'none'`)
+
+### What Still Needs Firmware Changes
+
+#### 15a — Auth on Sensitive GET Endpoints
+
+**Problem**: Several GET endpoints leak sensitive data without authentication.
+
+| Endpoint | Risk | Fix |
+|----------|------|-----|
+| `GET /api/config` | Leaks WiFi passwords, OTA password, viewer password, WLED host — **everything** | Add `requireAuth()` before handler |
+| `GET /api/system/backup` | Returns full config + garage + history as JSON — complete system dump | Add `requireAuth()` before handler |
+| `GET /api/files` | Lists all LittleFS files with sizes — information disclosure | Add `requireAuth()` before handler |
+| `GET /api/diagnostics` | Exposes GPIO states, peer MACs, memory layout | Add `requireAuth()` before handler |
+
+**Implementation** (web_server.cpp):
+```cpp
+// Line ~303: GET /api/config
+server.on("/api/config", HTTP_GET, [](AsyncWebServerRequest *req) {
+    if (!requireAuth(req)) return;  // ADD THIS LINE
+    // ... existing handler
+});
+
+// Line ~413: GET /api/system/backup
+server.on("/api/system/backup", HTTP_GET, [](AsyncWebServerRequest *req) {
+    if (!requireAuth(req)) return;  // ADD THIS LINE
+    // ... existing handler
+});
+
+// Line ~1735: GET /api/files
+server.on("/api/files", HTTP_GET, [](AsyncWebServerRequest *req) {
+    if (!requireAuth(req)) return;  // ADD THIS LINE
+    // ... existing handler
+});
+
+// Line ~1713: GET /api/diagnostics
+server.on("/api/diagnostics", HTTP_GET, [](AsyncWebServerRequest *req) {
+    if (!requireAuth(req)) return;  // ADD THIS LINE
+    // ... existing handler
+});
+```
+
+**Effort**: ~4 lines. **Risk**: Low — just adding existing `requireAuth()` calls.
+
+#### 15b — WebSocket Authentication
+
+**Problem**: WebSocket on port 81 has **zero authentication**. Anyone on the network can connect and send `{"cmd":"arm"}`, `{"cmd":"reset"}`, or `{"cmd":"setCar"}` to control races.
+
+**Implementation**: Check API key on WebSocket connect. Reject unauthenticated clients.
+
+```cpp
+// In webSocket.onEvent handler, on WStype_CONNECTED:
+case WStype_CONNECTED: {
+    // Check for auth token in URL query string: ws://host:81/?key=PASSWORD
+    String url = String((char*)payload);
+    if (url.indexOf("key=") < 0 || !validateKey(url)) {
+        webSocket.disconnect(num);
+        return;
+    }
+    break;
+}
+```
+
+**Client-side change** (main.js `connectWebSocket()`):
+```javascript
+var wsUrl = 'ws://' + location.hostname + ':81/?key=' + encodeURIComponent(getApiKey());
+```
+
+**Effort**: ~20 lines firmware + 1 line JS. **Risk**: Medium — must handle reconnection gracefully. Test with all 3 page types (dashboard, start_status, speedtrap_status).
+
+#### 15c — Firmware Upload Auth Race Condition
+
+**Problem**: In the firmware upload handler, the binary data is received and processed by the Update library BEFORE the auth check runs. An attacker could upload arbitrary firmware before being rejected.
+
+**Implementation**: Move `requireAuth()` to the beginning of the upload handler, before `Update.write()`:
+
+```cpp
+server.on("/api/firmware/upload", HTTP_POST,
+    // Response handler
+    [](AsyncWebServerRequest *req) { /* ... */ },
+    // Upload handler — auth check FIRST
+    [](AsyncWebServerRequest *req, String filename, size_t index, uint8_t *data, size_t len, bool final) {
+        if (index == 0) {
+            if (!requireAuth(req)) return;  // CHECK BEFORE PROCESSING
+            // ... existing Update.begin() code
+        }
+        // ... existing Update.write() code
+    }
+);
+```
+
+**Effort**: ~5 lines. **Risk**: Low.
+
+#### 15d — Rate Limiting on Auth Check
+
+**Problem**: `POST /api/auth/check` has no rate limiting. An attacker can brute-force the API key by hammering this endpoint.
+
+**Implementation**: Track failed attempts per IP, lockout after 5 failures for 60 seconds:
+
+```cpp
+// In web_server.cpp, before /api/auth/check handler:
+struct AuthAttempt {
+    IPAddress ip;
+    uint8_t failures;
+    unsigned long lockoutUntil;
+};
+static AuthAttempt authAttempts[8];  // Track up to 8 IPs
+
+bool isLockedOut(IPAddress ip) {
+    for (int i = 0; i < 8; i++) {
+        if (authAttempts[i].ip == ip && millis() < authAttempts[i].lockoutUntil) return true;
+    }
+    return false;
+}
+
+void recordFailure(IPAddress ip) {
+    for (int i = 0; i < 8; i++) {
+        if (authAttempts[i].ip == ip) {
+            authAttempts[i].failures++;
+            if (authAttempts[i].failures >= 5) {
+                authAttempts[i].lockoutUntil = millis() + 60000;
+            }
+            return;
+        }
+    }
+    // New IP — find empty slot
+    for (int i = 0; i < 8; i++) {
+        if (authAttempts[i].failures == 0 || millis() > authAttempts[i].lockoutUntil) {
+            authAttempts[i] = {ip, 1, 0};
+            return;
+        }
+    }
+}
+```
+
+**Effort**: ~40 lines. **Risk**: Low — static array, no heap allocation, bounded memory.
+
+#### 15e — HTTP Security Response Headers
+
+**Problem**: The web server doesn't set standard security headers. While CSP is now in meta tags, server-side headers are stronger (can't be removed by page content).
+
+**Implementation**: Add a default response handler or middleware:
+
+```cpp
+// In setupWebServer(), add DefaultHeaders:
+DefaultHeaders::Instance().addHeader("X-Content-Type-Options", "nosniff");
+DefaultHeaders::Instance().addHeader("X-Frame-Options", "DENY");
+DefaultHeaders::Instance().addHeader("X-XSS-Protection", "1; mode=block");
+DefaultHeaders::Instance().addHeader("Referrer-Policy", "no-referrer");
+// CSP as server header (supplements meta tags, takes precedence):
+DefaultHeaders::Instance().addHeader("Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; "
+    "img-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'none';");
+```
+
+**Effort**: ~8 lines. **Risk**: Low. Note: page-specific CSP (dashboard's ImgBB, system's GitHub) will need the broader policy in the server header, or use meta tags to extend.
+
+### Priority Within This Item
+
+1. **15a** — Auth on GET endpoints (4 lines, biggest security gap — config passwords leak)
+2. **15c** — Upload auth race (5 lines, prevents unauthorized firmware flash)
+3. **15e** — Security headers (8 lines, defense-in-depth)
+4. **15d** — Rate limiting (40 lines, brute-force prevention)
+5. **15b** — WebSocket auth (20 lines firmware + JS, most complex, test carefully)
+
+### Bundle Strategy
+
+All five sub-items should ship together in one recompile. Total: ~80 lines of firmware code. Tag as security patch. OTA flash to all devices. Verify with:
+
+```bash
+# 15a — Should return 401 without auth:
+curl -s http://192.168.1.83/api/config
+# 15b — WebSocket without key should disconnect:
+websocat ws://192.168.1.83:81/
+# 15c — Upload without auth should reject at index 0:
+curl -X POST http://192.168.1.83/api/firmware/upload -F "file=@test.bin"
+# 15d — Brute force should lock out:
+for i in {1..6}; do curl -s -X POST http://192.168.1.83/api/auth/check -d '{"password":"wrong"}'; done
+# 15e — Headers present:
+curl -sI http://192.168.1.83/ | grep -i "x-frame\|x-content\|referrer"
+```
 
 ---
 

@@ -3,31 +3,138 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="fw-version" content="2.5.0">
-  <title>M.A.S.S. Trap - Terminal</title>
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'none';">
+  <meta name="fw-version" content="2.6.0-beta">
+  <title>M.A.S.S. Trap - Diagnostics</title>
   <link rel="stylesheet" href="/style.css">
+  <style>
+    /* ================================================================
+       DIAGNOSTICS PAGE — Scoped styles for Node Health + Fleet tabs
+       ================================================================ */
+
+    /* Verdict banner */
+    .diag-verdict {
+      padding: 10px 16px; border-radius: 6px; margin-bottom: 16px;
+      font-weight: 700; font-size: 0.85rem; letter-spacing: 0.5px;
+    }
+    .diag-verdict.clear {
+      background: rgba(var(--success-rgb), 0.12); color: var(--success);
+      border: 1px solid rgba(var(--success-rgb), 0.3);
+    }
+    .diag-verdict.issues {
+      background: rgba(var(--danger-rgb), 0.12); color: var(--danger);
+      border: 1px solid rgba(var(--danger-rgb), 0.3);
+    }
+    .diag-verdict ul { margin: 6px 0 0 16px; padding: 0; font-weight: 400; font-size: 0.8rem; }
+    .diag-verdict li { margin: 2px 0; }
+
+    /* Section blocks */
+    .diag-section {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 6px; padding: 12px 16px; margin-bottom: 12px;
+    }
+    .diag-section-title {
+      font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; color: var(--accent); margin-bottom: 8px;
+      border-bottom: 1px solid var(--border); padding-bottom: 4px;
+    }
+    .diag-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 3px 0; font-size: 0.8rem; border-bottom: 1px solid rgba(var(--accent-rgb), 0.06);
+    }
+    .diag-row:last-child { border-bottom: none; }
+    .diag-label { color: var(--text-muted); font-size: 0.75rem; }
+    .diag-value { font-family: var(--font-data); color: var(--text); font-weight: 600; }
+
+    /* Progress bars for memory/storage */
+    .diag-bar {
+      width: 100%; height: 8px; background: var(--bg-dark);
+      border-radius: 4px; overflow: hidden; margin-top: 4px;
+    }
+    .diag-bar-fill {
+      height: 100%; border-radius: 4px; transition: width 0.4s ease;
+    }
+    .diag-bar-fill.good { background: var(--success); }
+    .diag-bar-fill.warn { background: var(--accent); }
+    .diag-bar-fill.crit { background: var(--danger); }
+
+    /* Fleet peer cards */
+    .peer-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+    .peer-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 6px; padding: 12px 16px;
+    }
+    .peer-card-header {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+      font-weight: 700; font-size: 0.9rem;
+    }
+    .peer-card-header .peer-dot { flex-shrink: 0; }
+    .peer-card-diag { font-size: 0.75rem; color: var(--text-muted); }
+    .peer-card-diag .diag-row { font-size: 0.75rem; }
+
+    /* Status inline chip */
+    .status-chip {
+      display: inline-block; font-size: 0.6rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px;
+      padding: 2px 8px; border-radius: 3px;
+    }
+    .status-chip.online  { background: rgba(var(--success-rgb), 0.2); color: var(--success); }
+    .status-chip.stale   { background: rgba(var(--accent-rgb), 0.2);  color: var(--accent); }
+    .status-chip.offline { background: rgba(var(--danger-rgb), 0.2);  color: var(--danger); }
+
+    /* Two-column layout for diag sections on wide screens */
+    .diag-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 768px) {
+      .diag-grid { grid-template-columns: 1fr; }
+      .peer-cards { grid-template-columns: 1fr; }
+    }
+
+    /* Tab content padding for diagnostics tabs */
+    #tab-health, #tab-fleet { padding-top: 8px; }
+
+    /* Empty state */
+    .diag-empty {
+      text-align: center; padding: 40px 20px; color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+    .diag-empty .diag-empty-icon { font-size: 2rem; margin-bottom: 8px; }
+  </style>
 </head>
 <body class="console-page">
   <div id="navContainer"></div>
   <div class="container">
-    <!-- Device Info Bar -->
+    <!-- Device Info Bar — 6 cards -->
     <div class="info-grid">
       <div class="info-card"><div class="label">Role</div><div class="value" id="infoRole">--</div></div>
-      <div class="info-card"><div class="label">IP Address</div><div class="value" id="infoIP">--</div></div>
-      <div class="info-card"><div class="label">Free Heap</div><div class="value" id="infoHeap">--</div></div>
-      <div class="info-card"><div class="label">Uptime</div><div class="value" id="infoUptime">--</div></div>
-      <div class="info-card"><div class="label">WiFi RSSI</div><div class="value" id="infoRSSI">--</div></div>
-      <div class="info-card"><div class="label">Peer</div><div class="value" id="infoPeer">--</div></div>
+      <div class="info-card"><div class="label">Verdict</div><div class="value" id="infoVerdict">--</div></div>
+      <div class="info-card"><div class="label">Heap</div><div class="value" id="infoHeap">--</div></div>
+      <div class="info-card"><div class="label">Storage</div><div class="value" id="infoStorage">--</div></div>
+      <div class="info-card"><div class="label">WiFi</div><div class="value" id="infoWiFi">--</div></div>
+      <div class="info-card"><div class="label">Fleet</div><div class="value" id="infoFleet">--</div></div>
     </div>
 
-    <!-- Tabs: Serial Monitor | File Browser -->
+    <!-- Tabs: Node Health | Fleet Status | Serial Monitor | File Browser -->
     <div class="config-tabs">
-      <button class="config-tab active" onclick="showTab('serial')">Serial Monitor</button>
-      <button class="config-tab" onclick="showTab('files')">File Browser</button>
+      <button class="config-tab active" onclick="showTab('health', this)">Node Health</button>
+      <button class="config-tab" onclick="showTab('fleet', this)">Fleet Status</button>
+      <button class="config-tab" onclick="showTab('serial', this)">Serial Monitor</button>
+      <button class="config-tab" onclick="showTab('files', this)">File Browser</button>
     </div>
 
-    <!-- Serial Monitor -->
-    <div id="tab-serial" class="config-tab-content active">
+    <!-- Tab 1: Node Health -->
+    <div id="tab-health" class="config-tab-content active">
+      <div id="healthContent"><p class="text-muted">Loading diagnostics...</p></div>
+    </div>
+
+    <!-- Tab 2: Fleet Status -->
+    <div id="tab-fleet" class="config-tab-content">
+      <div id="fleetContent"><p class="text-muted">Loading fleet status...</p></div>
+    </div>
+
+    <!-- Tab 3: Serial Monitor (unchanged) -->
+    <div id="tab-serial" class="config-tab-content">
       <div class="console-controls">
         <button class="btn btn-success btn-sm" onclick="fetchLog()">Refresh</button>
         <button class="btn btn-danger btn-sm" onclick="clearLog()">Clear Log</button>
@@ -39,7 +146,7 @@
       <div id="serialOutput" class="serial-output">Connecting...</div>
     </div>
 
-    <!-- File Browser -->
+    <!-- Tab 4: File Browser (unchanged) -->
     <div id="tab-files" class="config-tab-content">
       <div class="console-controls">
         <button class="btn btn-success btn-sm" onclick="loadFileList()">Refresh Files</button>
@@ -55,54 +162,394 @@
     </div>
   </div>
 
-  <!-- Console Status Bar (fixed bottom) -->
-  <div class="console-status-bar">
-    <span id="statusMsg">Initializing...</span>
-    <span>
-      <span class="text-muted" id="statusVersion">v--</span> |
-      <span class="heap" id="statusHeap">--</span> free |
-      <span class="uptime" id="statusUptime">--</span>
-    </span>
-  </div>
-
   <script src="/main.js"></script>
   <script>
     // ====================================================================
-    // M.A.S.S. TRAP — TERMINAL / DEBUG CONSOLE  v2.5.0
+    // M.A.S.S. TRAP — DIAGNOSTICS CONSOLE  v2.6.0
     // ====================================================================
 
-    // ====================================================================
-    // DEVICE INFO
-    // ====================================================================
-    function loadDeviceInfo() {
-      fetch('/api/info').then(function(resp) {
-        return resp.json();
-      }).then(function(info) {
-        // Update tab title with role
-        if (info.role) {
-          var rn = info.role.charAt(0).toUpperCase() + info.role.slice(1);
-          document.title = rn + ' - M.A.S.S. Trap Terminal';
-        }
+    var activeTab = 'health';
+    var tabRefreshTimer = null;
 
-        document.getElementById('infoRole').textContent = (info.role || 'unknown').toUpperCase();
-        document.getElementById('infoIP').textContent = info.ip || 'N/A';
-        document.getElementById('infoHeap').textContent = formatBytes(info.free_heap);
-        document.getElementById('infoUptime').textContent = formatUptime(info.uptime_s);
-        document.getElementById('infoRSSI').textContent = (info.wifi_rssi || 0) + ' dBm';
-        document.getElementById('infoPeer').textContent = info.peer_connected ? 'Connected' : 'Disconnected';
-        document.getElementById('infoPeer').style.color = info.peer_connected ? '#28a745' : '#dc3545';
+    // ====================================================================
+    // TAB MANAGEMENT
+    // ====================================================================
+    function showTab(name, btnEl) {
+      // Deactivate all
+      var panels = document.querySelectorAll('.config-tab-content');
+      for (var i = 0; i < panels.length; i++) panels[i].classList.remove('active');
+      var tabs = document.querySelectorAll('.config-tab');
+      for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
 
-        // Status bar
-        document.getElementById('statusHeap').textContent = formatBytes(info.free_heap);
-        document.getElementById('statusUptime').textContent = formatUptime(info.uptime_s);
-        document.getElementById('statusMsg').textContent = 'Connected to ' + (info.hostname || 'device');
-      }).catch(function() {
-        document.getElementById('statusMsg').textContent = 'Connection error';
-      });
+      // Activate selected
+      document.getElementById('tab-' + name).classList.add('active');
+      if (btnEl) btnEl.classList.add('active');
+
+      activeTab = name;
+      stopTabRefresh();
+
+      // Load data for selected tab
+      if (name === 'health') {
+        loadDiagnostics();
+        tabRefreshTimer = setInterval(loadDiagnostics, 5000);
+      } else if (name === 'fleet') {
+        loadFleetStatus();
+        tabRefreshTimer = setInterval(loadFleetStatus, 5000);
+      } else if (name === 'serial') {
+        fetchLog();
+        toggleAutoRefresh();
+      } else if (name === 'files') {
+        loadFileList();
+      }
+    }
+
+    function stopTabRefresh() {
+      if (tabRefreshTimer) { clearInterval(tabRefreshTimer); tabRefreshTimer = null; }
+      // Stop serial auto-refresh when leaving serial tab
+      if (autoRefreshTimer) { clearInterval(autoRefreshTimer); autoRefreshTimer = null; }
     }
 
     // ====================================================================
-    // SERIAL MONITOR
+    // TAB 1: NODE HEALTH — Renders /api/diagnostics
+    // ====================================================================
+    function loadDiagnostics() {
+      fetch('/api/diagnostics', { headers: authHeaders() }).then(function(r) {
+        return r.json();
+      }).then(function(d) {
+        renderDiagnostics(d);
+        updateInfoCards(d, null);
+      }).catch(function(e) {
+        document.getElementById('healthContent').innerHTML =
+          '<p class="text-danger">Failed to load diagnostics: ' + e.message + '</p>';
+      });
+    }
+
+    function renderDiagnostics(d) {
+      var html = '';
+
+      // Verdict banner
+      var v = d.verdict || {};
+      if (v.issue_count > 0) {
+        html += '<div class="diag-verdict issues">' +
+          '\u26A0 ' + v.issue_count + ' ISSUE' + (v.issue_count > 1 ? 'S' : '') + ' DETECTED';
+        if (v.issues && v.issues.length) {
+          html += '<ul>';
+          for (var i = 0; i < v.issues.length; i++) {
+            html += '<li>' + escHtml(v.issues[i]) + '</li>';
+          }
+          html += '</ul>';
+        }
+        html += '</div>';
+      } else {
+        html += '<div class="diag-verdict clear">\u2705 ALL CLEAR \u2014 No issues detected</div>';
+      }
+
+      html += '<div class="diag-grid">';
+
+      // System section
+      var sys = d.system || {};
+      html += diagSection('System', [
+        ['Firmware', sys.firmware || '--'],
+        ['Role', (sys.role || '--').toUpperCase()],
+        ['Hostname', sys.hostname || '--'],
+        ['Board', sys.board || '--'],
+        ['CPU', (sys.cpu_freq_mhz || '--') + ' MHz'],
+        ['Flash', formatBytes(sys.flash_size)],
+        ['SDK', sys.sdk || '--'],
+        ['Uptime', sys.uptime_str || formatUptime(sys.uptime_s)]
+      ]);
+
+      // Memory section
+      var mem = d.memory || {};
+      var heapPct = mem.heap_pct_free || 0;
+      var heapUsed = 100 - heapPct;
+      html += '<div class="diag-section"><div class="diag-section-title">Memory</div>';
+      html += diagRow('Free Heap', formatBytes(mem.free_heap) + ' / ' + formatBytes(mem.total_heap));
+      html += diagBarHTML(heapUsed, heapPct + '% free');
+      html += diagRow('Min Free', formatBytes(mem.min_free_heap));
+      html += diagRow('Max Alloc', formatBytes(mem.max_alloc_heap));
+      if (mem.psram_total > 0) {
+        html += diagRow('PSRAM', formatBytes(mem.psram_free) + ' / ' + formatBytes(mem.psram_total));
+        html += diagBarHTML(100 - (mem.psram_pct_free || 0), (mem.psram_pct_free || 0) + '% free');
+      }
+      html += '</div>';
+
+      // Filesystem section
+      var fs = d.filesystem || {};
+      var fsPct = fs.pct_used || 0;
+      html += '<div class="diag-section"><div class="diag-section-title">Filesystem</div>';
+      html += diagRow('Used', formatBytes(fs.used_bytes) + ' / ' + formatBytes(fs.total_bytes));
+      html += diagBarHTML(fsPct, fsPct + '% used');
+      html += diagRow('Free', formatBytes(fs.free_bytes));
+      html += '</div>';
+
+      // WiFi section
+      var wifi = d.wifi || {};
+      html += diagSection('WiFi', [
+        ['Mode', wifi.mode || '--'],
+        ['STA IP', wifi.sta_ip || 'N/A'],
+        ['AP IP', wifi.ap_ip || 'N/A'],
+        ['RSSI', (wifi.rssi || 0) + ' dBm (' + (wifi.signal_quality || 0) + '%)'],
+        ['Channel', wifi.channel || '--'],
+        ['MAC', wifi.mac_sta || '--'],
+        ['AP Clients', wifi.ap_clients !== undefined ? wifi.ap_clients : '--']
+      ]);
+
+      // Race section
+      var race = d.race || {};
+      html += diagSection('Race State', [
+        ['State', raceStateBadge(race.state)],
+        ['Current Car', race.current_car || '(none)'],
+        ['Weight', race.current_weight ? race.current_weight + 'g' : '--'],
+        ['Total Runs', race.total_runs !== undefined ? race.total_runs : '--'],
+        ['Dry Run', race.dry_run ? 'YES' : 'No']
+      ]);
+
+      // ESP-NOW / Clock section
+      var espnow = d.espnow || {};
+      html += diagSection('ESP-NOW', [
+        ['Peer Connected', espnow.peer_connected ? '<span class="text-success">Yes</span>' : '<span class="text-danger">No</span>'],
+        ['Peer Count', espnow.peer_count !== undefined ? espnow.peer_count : '--'],
+        ['Clock Offset', formatDrift(espnow.clock_offset_us)]
+      ]);
+
+      // Pins section
+      var pins = d.pins || {};
+      var pinRows = [];
+      if (pins.ir_sensor) {
+        var ir = pins.ir_sensor;
+        var irOk = ir.ok !== false;
+        pinRows.push(['IR Sensor (GPIO ' + ir.gpio + ')', irOk ?
+          '<span class="text-success">\u2713 OK (' + ir.state + ')</span>' :
+          '<span class="text-danger">\u2717 BLOCKED (' + ir.state + ')</span>']);
+      }
+      if (pins.ir_sensor_2) {
+        var ir2 = pins.ir_sensor_2;
+        var ir2Ok = ir2.ok !== false;
+        pinRows.push(['IR Sensor 2 (GPIO ' + ir2.gpio + ')', ir2Ok ?
+          '<span class="text-success">\u2713 OK</span>' :
+          '<span class="text-danger">\u2717 BLOCKED</span>']);
+      }
+      if (pins.led) pinRows.push(['LED (GPIO ' + pins.led.gpio + ')', pins.led.configured ? 'Configured' : 'Not set']);
+      if (pins.audio) {
+        pinRows.push(['Audio', pins.audio.enabled ? 'Enabled (vol ' + pins.audio.volume + ')' : 'Disabled']);
+      }
+      if (pins.lidar) {
+        var lid = pins.lidar;
+        pinRows.push(['LiDAR', lid.enabled ?
+          (lid.ok !== false ? '<span class="text-success">' + lid.distance_mm + 'mm (' + lid.state + ')</span>' :
+            '<span class="text-danger">No reading</span>') : 'Disabled']);
+      }
+      if (pinRows.length) html += diagSection('Pins & Sensors', pinRows);
+
+      // I2C section
+      var i2c = d.i2c || {};
+      if (i2c.device_count > 0 && i2c.devices) {
+        html += '<div class="diag-section"><div class="diag-section-title">I\u00B2C Devices (' + i2c.device_count + ')</div>';
+        for (var k = 0; k < i2c.devices.length; k++) {
+          html += diagRow(i2c.devices[k].address, i2c.devices[k].device || 'Unknown');
+        }
+        html += '</div>';
+      }
+
+      // WLED section
+      var wled = d.wled;
+      if (wled) {
+        html += diagSection('WLED', [
+          ['Host', wled.host || '--'],
+          ['Reachable', wled.reachable ? '<span class="text-success">Yes</span>' : '<span class="text-danger">No</span>']
+        ]);
+      }
+
+      // Config summary
+      var cfg = d.config || {};
+      html += diagSection('Config Summary', [
+        ['Track Length', cfg.track_length_m ? cfg.track_length_m + 'm' : '--'],
+        ['Scale Factor', cfg.scale_factor ? '1:' + cfg.scale_factor : '--'],
+        ['Units', cfg.units || '--'],
+        ['Audio', cfg.audio_enabled ? 'Enabled' : 'Disabled'],
+        ['LiDAR', cfg.lidar_enabled ? 'Enabled' : 'Disabled'],
+        ['WLED', cfg.has_wled ? 'Configured' : 'None'],
+        ['Viewer Auth', cfg.has_viewer_auth ? 'Enabled' : 'Open']
+      ]);
+
+      html += '</div>'; // end diag-grid
+
+      document.getElementById('healthContent').innerHTML = html;
+    }
+
+    // Helper: build a diagnostics section from an array of [label, value] pairs
+    function diagSection(title, rows) {
+      var html = '<div class="diag-section"><div class="diag-section-title">' + escHtml(title) + '</div>';
+      for (var i = 0; i < rows.length; i++) {
+        html += '<div class="diag-row"><span class="diag-label">' + escHtml(rows[i][0]) +
+          '</span><span class="diag-value">' + rows[i][1] + '</span></div>';
+      }
+      return html + '</div>';
+    }
+
+    // Helper: single row
+    function diagRow(label, value) {
+      return '<div class="diag-row"><span class="diag-label">' + escHtml(label) +
+        '</span><span class="diag-value">' + value + '</span></div>';
+    }
+
+    // Helper: progress bar
+    function diagBarHTML(pct, label) {
+      var cls = pct < 60 ? 'good' : (pct < 85 ? 'warn' : 'crit');
+      return '<div class="diag-row"><span class="diag-label">' + label + '</span></div>' +
+        '<div class="diag-bar"><div class="diag-bar-fill ' + cls + '" style="width:' + Math.min(pct, 100) + '%"></div></div>';
+    }
+
+    // Helper: format clock drift
+    function formatDrift(us) {
+      if (us === undefined || us === null) return '<span class="text-muted">N/A</span>';
+      var abs = Math.abs(us);
+      var str;
+      if (abs > 1000) str = (us / 1000).toFixed(1) + 'ms';
+      else str = Math.round(us) + '\u00B5s';
+      var cls = abs < 500 ? 'text-success' : (abs < 2000 ? 'text-accent' : 'text-danger');
+      return '<span class="' + cls + '">\u0394' + str + '</span>';
+    }
+
+    // Helper: race state badge
+    function raceStateBadge(state) {
+      var colors = { IDLE: 'text-muted', ARMED: 'text-accent', RACING: 'text-success', FINISHED: 'text-success' };
+      var cls = colors[state] || 'text-muted';
+      return '<span class="' + cls + '" style="font-weight:700">' + (state || '--') + '</span>';
+    }
+
+    // ====================================================================
+    // TAB 2: FLEET STATUS — Renders /api/peers
+    // ====================================================================
+    function loadFleetStatus() {
+      fetch('/api/peers', { headers: authHeaders() }).then(function(r) {
+        return r.json();
+      }).then(function(peers) {
+        renderFleet(peers);
+        updateInfoCards(null, peers);
+      }).catch(function(e) {
+        document.getElementById('fleetContent').innerHTML =
+          '<p class="text-danger">Failed to load fleet status: ' + e.message + '</p>';
+      });
+    }
+
+    function renderFleet(peers) {
+      if (!peers || !peers.length) {
+        document.getElementById('fleetContent').innerHTML =
+          '<div class="diag-empty">' +
+          '<div class="diag-empty-icon">\uD83D\uDCE1</div>' +
+          '<p>No peers discovered.</p>' +
+          '<p class="text-muted">Make sure other M.A.S.S. Trap devices are powered on and within range.</p>' +
+          '</div>';
+        return;
+      }
+
+      var roleOrder = { start: 0, speedtrap: 1, finish: 2, telemetry: 3 };
+      peers.sort(function(a, b) {
+        var oa = roleOrder[a.role] !== undefined ? roleOrder[a.role] : 9;
+        var ob = roleOrder[b.role] !== undefined ? roleOrder[b.role] : 9;
+        return oa - ob;
+      });
+
+      var html = '<div class="peer-cards">';
+      for (var i = 0; i < peers.length; i++) {
+        var p = peers[i];
+        var status = (p.status || 'offline').toLowerCase();
+        var roleEmoji = { start: '\uD83D\uDEA6', finish: '\uD83C\uDFC1', speedtrap: '\uD83D\uDE93', telemetry: '\uD83D\uDCCA' };
+        var emoji = roleEmoji[p.role] || '\uD83D\uDD34';
+
+        html += '<div class="peer-card">';
+        html += '<div class="peer-card-header">';
+        html += '<span class="peer-dot ' + status + '"></span>';
+        html += '<span>' + emoji + ' ' + escHtml((p.role || '??').toUpperCase()) + '</span>';
+        html += '<span class="status-chip ' + status + '">' + status.toUpperCase() + '</span>';
+        html += '</div>';
+
+        html += '<div class="peer-card-diag">';
+        html += diagRow('Hostname', escHtml(p.hostname || '--'));
+        html += diagRow('MAC', escHtml(p.mac || '--'));
+        html += diagRow('Last Seen', p.lastSeen >= 0 ? p.lastSeen + 's ago' : 'Never');
+
+        if (p.diag) {
+          html += '<div style="margin-top:6px; padding-top:6px; border-top:1px solid var(--border);">';
+          html += diagRow('Uptime', p.diag.uptimeMin !== undefined ? p.diag.uptimeMin + ' min' : '--');
+          html += diagRow('Free Heap', p.diag.freeHeapKB !== undefined ? p.diag.freeHeapKB + ' KB' : '--');
+          html += diagRow('WiFi RSSI', p.diag.rssi !== undefined ? p.diag.rssi + ' dBm' : '--');
+          html += diagRow('Race State', raceStateBadge(p.diag.raceState || '--'));
+          html += diagRow('Firmware', p.diag.fwVersion || '--');
+          // Future: battery (XIAO telemetry)
+          // html += diagRow('Battery', p.diag.batteryPct !== undefined ? p.diag.batteryPct + '%' : '--');
+          html += '</div>';
+        } else {
+          html += '<div class="text-muted" style="margin-top:6px; font-size:0.7rem; font-style:italic;">Awaiting beacon data\u2026</div>';
+        }
+
+        html += '</div>'; // peer-card-diag
+        html += '</div>'; // peer-card
+      }
+      html += '</div>'; // peer-cards
+
+      document.getElementById('fleetContent').innerHTML = html;
+    }
+
+    // ====================================================================
+    // INFO CARDS — Updated from diagnostics or peers data
+    // ====================================================================
+    function updateInfoCards(diag, peers) {
+      if (diag) {
+        // Role
+        var role = (diag.system && diag.system.role) || '--';
+        document.getElementById('infoRole').textContent = role.toUpperCase();
+
+        // Set page title
+        if (role && role !== '--') {
+          document.title = role.charAt(0).toUpperCase() + role.slice(1) + ' - M.A.S.S. Trap Diagnostics';
+        }
+
+        // Verdict
+        var vEl = document.getElementById('infoVerdict');
+        var v = diag.verdict || {};
+        if (v.issue_count > 0) {
+          vEl.textContent = v.issue_count + ' ISSUE' + (v.issue_count > 1 ? 'S' : '');
+          vEl.style.color = 'var(--danger)';
+        } else {
+          vEl.textContent = 'ALL CLEAR';
+          vEl.style.color = 'var(--success)';
+        }
+
+        // Heap
+        var mem = diag.memory || {};
+        var heapEl = document.getElementById('infoHeap');
+        heapEl.textContent = (mem.heap_pct_free || 0) + '% free';
+        heapEl.style.color = mem.heap_pct_free > 50 ? 'var(--success)' : (mem.heap_pct_free > 25 ? 'var(--accent)' : 'var(--danger)');
+
+        // Storage
+        var fs = diag.filesystem || {};
+        var storEl = document.getElementById('infoStorage');
+        storEl.textContent = (fs.pct_used || 0) + '% used';
+        storEl.style.color = fs.pct_used < 70 ? 'var(--success)' : (fs.pct_used < 90 ? 'var(--accent)' : 'var(--danger)');
+
+        // WiFi
+        var wifi = diag.wifi || {};
+        var wifiEl = document.getElementById('infoWiFi');
+        wifiEl.textContent = (wifi.signal_quality || 0) + '% (' + (wifi.rssi || 0) + 'dBm)';
+        wifiEl.style.color = wifi.signal_quality > 60 ? 'var(--success)' : (wifi.signal_quality > 30 ? 'var(--accent)' : 'var(--danger)');
+      }
+
+      if (peers && Array.isArray(peers)) {
+        var online = 0;
+        for (var i = 0; i < peers.length; i++) {
+          if (peers[i].status === 'online') online++;
+        }
+        var fleetEl = document.getElementById('infoFleet');
+        fleetEl.textContent = online + '/' + peers.length + ' Online';
+        fleetEl.style.color = online === peers.length ? 'var(--success)' : (online > 0 ? 'var(--accent)' : 'var(--danger)');
+      }
+    }
+
+    // ====================================================================
+    // SERIAL MONITOR (preserved from original)
     // ====================================================================
     var rawLog = '';
     var autoRefreshTimer = null;
@@ -133,6 +580,7 @@
       output.innerHTML = lines.map(function(line) {
         if (line.indexOf('[WIFI]') !== -1 || line.indexOf('WiFi') !== -1) return '<span class="esp">' + escHtml(line) + '</span>';
         if (line.indexOf('[ESP-NOW]') !== -1 || line.indexOf('[DISCOVER]') !== -1) return '<span class="esp">' + escHtml(line) + '</span>';
+        if (line.indexOf('[FLEET]') !== -1) return '<span class="esp">' + escHtml(line) + '</span>';
         if (line.indexOf('[BOOT]') !== -1 || line.indexOf('========') !== -1) return '<span class="boot">' + escHtml(line) + '</span>';
         if (line.indexOf('ERROR') !== -1 || line.indexOf('FAIL') !== -1 || line.indexOf('error') !== -1) return '<span class="err">' + escHtml(line) + '</span>';
         if (line.indexOf('WARN') !== -1 || line.indexOf('warn') !== -1) return '<span class="warn">' + escHtml(line) + '</span>';
@@ -166,10 +614,9 @@
         clearInterval(autoRefreshTimer);
         autoRefreshTimer = null;
       }
-      if (document.getElementById('autoRefresh').checked) {
+      if (document.getElementById('autoRefresh').checked && activeTab === 'serial') {
         autoRefreshTimer = setInterval(function() {
           fetchLog();
-          loadDeviceInfo();
         }, 2000);
       }
     }
@@ -178,7 +625,7 @@
     document.getElementById('logFilter').addEventListener('input', renderLog);
 
     // ====================================================================
-    // FILE BROWSER
+    // FILE BROWSER (preserved from original)
     // ====================================================================
     var currentFilePath = '';
     var fileList = [];
@@ -214,7 +661,7 @@
         return resp.json();
       }).then(function(data) {
         if (data.error) {
-          alert('Error: ' + data.error);
+          massToast('Error: ' + data.error, 'error');
           return;
         }
         currentFilePath = path;
@@ -225,7 +672,7 @@
         document.getElementById('btnDeleteFile').style.display = 'inline-block';
         renderFileList();
       }).catch(function(e) {
-        alert('Failed to open file: ' + e.message);
+        massToast('Failed to open file: ' + e.message, 'error');
       });
     }
 
@@ -241,13 +688,12 @@
       }).then(function(result) {
         if (result.status === 'ok') {
           document.getElementById('currentFile').textContent = currentFilePath + ' (saved - ' + formatBytes(result.size) + ')';
-          document.getElementById('statusMsg').textContent = 'Saved ' + currentFilePath;
           loadFileList();
         } else {
-          alert('Save failed: ' + (result.error || 'unknown'));
+          massToast('Save failed: ' + (result.error || 'unknown'), 'error');
         }
       }).catch(function(e) {
-        alert('Save failed: ' + e.message);
+        massToast('Save failed: ' + e.message, 'error');
       });
     }
 
@@ -268,37 +714,10 @@
           document.getElementById('btnDeleteFile').style.display = 'none';
           loadFileList();
         } else {
-          alert('Delete failed: ' + (result.error || 'unknown'));
+          massToast('Delete failed: ' + (result.error || 'unknown'), 'error');
         }
       }).catch(function(e) {
-        alert('Delete failed: ' + e.message);
-      });
-    }
-
-    // ====================================================================
-    // TABS
-    // ====================================================================
-    function showTab(name) {
-      var panels = document.querySelectorAll('.config-tab-content');
-      for (var i = 0; i < panels.length; i++) panels[i].classList.remove('active');
-      var tabs = document.querySelectorAll('.config-tab');
-      for (var j = 0; j < tabs.length; j++) tabs[j].classList.remove('active');
-
-      document.getElementById('tab-' + name).classList.add('active');
-      event.target.classList.add('active');
-
-      if (name === 'files') loadFileList();
-    }
-
-    // ====================================================================
-    // CONSOLE STATUS BAR VERSION
-    // ====================================================================
-    function loadConsoleVersion() {
-      fetch('/api/version').then(function(r) { return r.json(); }).then(function(v) {
-        document.getElementById('statusVersion').textContent = 'FW v' + v.firmware;
-      }).catch(function() {
-        var meta = document.querySelector('meta[name="fw-version"]');
-        if (meta) document.getElementById('statusVersion').textContent = 'v' + meta.content;
+        massToast('Delete failed: ' + e.message, 'error');
       });
     }
 
@@ -310,10 +729,11 @@
       massInit({ws: false});
       // Internal Affairs gate — admin password check
       checkAuthGate('admin');
-      loadDeviceInfo();
-      loadConsoleVersion();
-      fetchLog();
-      toggleAutoRefresh();
+      // Load default tab (Node Health)
+      loadDiagnostics();
+      tabRefreshTimer = setInterval(loadDiagnostics, 5000);
+      // Also load fleet data for the info card
+      loadFleetStatus();
     };
   </script>
 </body>

@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://i.ibb.co https://api.qrserver.com; connect-src 'self' ws: wss:; frame-ancestors 'none';">
   <meta name="fw-version" content="2.5.0">
   <title>M.A.S.S. Trap Command Center</title>
   <link rel="stylesheet" href="/style.css">
@@ -125,11 +128,20 @@
       <li><a href="/"><span class="mass-nav-icon">&#x1F3C1;</span><span class="mass-nav-label">Live Monitor</span></a></li>
       <li><a href="/history.html"><span class="mass-nav-icon">&#x1F4CB;</span><span class="mass-nav-label">Evidence Log</span></a></li>
       <li><a href="/config"><span class="mass-nav-icon">&#x2699;&#xFE0F;</span><span class="mass-nav-label">System Config</span></a></li>
-      <li><a href="/console"><span class="mass-nav-icon">&#x1F4DF;</span><span class="mass-nav-label">Terminal</span></a></li>
+      <li><a href="/console"><span class="mass-nav-icon">&#x1F50D;</span><span class="mass-nav-label">Diagnostics</span></a></li>
     </ul>
   </nav>
 
   <!-- Connection Badge (fixed, top-right) -->
+  <div class="theme-selector">
+    <select id="themePicker" onchange="setTheme(this.value)" title="Theme">
+      <option value="interceptor">Interceptor</option>
+      <option value="classic">Classic</option>
+      <option value="daytona">Daytona</option>
+      <option value="casefile">Case File</option>
+      <option value="cyber">Cyber</option>
+    </select>
+  </div>
   <div id="connBadge" class="conn-badge disconnected" role="status" aria-live="assertive">OFFLINE</div>
 
   <div class="container">
@@ -139,16 +151,6 @@
       <h1>M.A.S.S. TRAP</h1>
       <div class="subtitle">MOTION ANALYSIS &amp; SPEED SYSTEM</div>
       <div class="tagline">COMMAND CENTER</div>
-      <div class="theme-selector">
-        <label for="themePicker">Theme:</label>
-        <select id="themePicker" onchange="setTheme(this.value)">
-          <option value="interceptor">Interceptor</option>
-          <option value="classic">Classic</option>
-          <option value="daytona">Daytona</option>
-          <option value="casefile">Case File</option>
-          <option value="cyber">Cyber</option>
-        </select>
-      </div>
     </div>
 
     <!-- State Banner (Dispatcher: aria-live announces state changes) -->
@@ -185,7 +187,7 @@
 
     <!-- Science Fair Testing (Playlist Mode) — hidden in kiosk mode -->
     <details id="playlistSection" class="section kiosk-hide">
-      <summary class="section-title" style="cursor:pointer; list-style:none; display:flex; align-items:center; gap:8px; padding:12px; border:2px dashed var(--accent); border-radius:8px; background:linear-gradient(135deg, var(--card-bg) 0%, transparent 100%); transition:all 0.2s ease;">
+      <summary class="section-title" style="cursor:pointer; list-style:none; display:flex; align-items:center; gap:8px; padding:12px; border:2px solid var(--accent); border-radius:8px; background:linear-gradient(135deg, var(--card-bg) 0%, transparent 100%); transition:all 0.2s ease;">
         <span aria-hidden="true" style="font-size:1.4em;">&#x1F9EA;</span>
         <span style="flex:1;">
           <span style="font-weight:900;letter-spacing:1px;">SCIENCE FAIR TESTING</span>
@@ -268,7 +270,7 @@
           </div>
           <div class="grid grid-3" style="margin-top:6px;gap:6px;">
             <input type="text" id="plNewCondLabel" placeholder="e.g. +14g tungsten" aria-label="New condition label">
-            <input type="number" id="plNewCondWeight" placeholder="e.g. 14.2" step="0.001" min="0.001" aria-label="Added weight in grams">
+            <input type="number" id="plNewCondWeight" placeholder="e.g. 14.2" step="0.001" min="0.001" inputmode="decimal" aria-label="Added weight in grams">
             <button class="btn btn-accent btn-sm" onclick="plAddCondition()">ADD CONDITION</button>
           </div>
         </div>
@@ -276,7 +278,7 @@
         <!-- Trials Per Condition -->
         <div style="margin:12px 0;">
           <label for="plTrials" style="font-size:0.85rem;font-weight:700;color:var(--accent);">TRIALS PER CONDITION</label>
-          <input type="number" id="plTrials" value="3" min="2" max="10" style="width:80px;margin-left:8px;">
+          <input type="number" id="plTrials" value="3" min="2" max="10" inputmode="numeric" style="width:80px;margin-left:8px;">
         </div>
 
         <div class="pl-nav-buttons">
@@ -638,7 +640,7 @@
         <div><label for="carColor" class="card-label">Color</label>
         <input type="text" id="carColor" placeholder="e.g. Red"></div>
         <div><label for="carWeight" class="card-label">Mass (grams)</label>
-        <input type="number" id="carWeight" placeholder="e.g. 35.000" min="0" step="0.001"></div>
+        <input type="number" id="carWeight" placeholder="e.g. 35.000" min="0" step="0.001" inputmode="decimal"></div>
       </div>
       <button id="addCarBtn" class="btn btn-accent" onclick="addCar()">ADD TO GARAGE</button>
       <div id="currentCar" class="text-center text-muted" style="margin:15px 0; font-size:1.2rem; font-weight:bold;">
@@ -669,11 +671,11 @@
       <div class="grid">
         <div>
           <label for="trackLength" class="card-label" id="trackLengthLabel">Track Length (meters)</label>
-          <input type="number" id="trackLength" value="2.0" min="0" step="0.01" onchange="updateTrackLength()">
+          <input type="number" id="trackLength" value="2.0" min="0" step="0.01" inputmode="decimal" onchange="updateTrackLength()">
         </div>
         <div id="rampHeightSection" style="display:none;">
           <label for="rampHeight" class="card-label">Ramp Height (meters)</label>
-          <input type="number" id="rampHeight" value="0" min="0" step="0.01" onchange="saveRampHeight()">
+          <input type="number" id="rampHeight" value="0" min="0" step="0.01" inputmode="decimal" onchange="saveRampHeight()">
           <div class="text-muted" style="font-size:0.75rem;margin-top:2px;">Floor to start gate release point</div>
         </div>
         <div>
@@ -818,6 +820,12 @@
         if (data.state === 'ARMED') announce('System armed. Awaiting target.');
         else if (data.state === 'RACING') announce('Target acquired. Pursuit active.');
         // FINISHED announced below with full race data
+        // Haptic feedback — buzz Ben's phone on state transitions
+        if (navigator.vibrate) {
+          if (data.state === 'ARMED') navigator.vibrate(100);
+          else if (data.state === 'RACING') navigator.vibrate([50, 30, 50]);
+          else if (data.state === 'FINISHED') navigator.vibrate([100, 50, 200]);
+        }
       }
 
       // LED visualizer
@@ -1124,7 +1132,7 @@
 
         return '<div class="mw-card' + rankClass + (isActive ? ' mw-new-record' : '') + '">' +
           '<div class="mw-rank">' + rankTitle + '</div>' +
-          '<div class="mw-name">' + item.name + '</div>' +
+          '<div class="mw-name">' + escHtml(item.name) + '</div>' +
           '<div class="mw-stats">' +
             '<div>Time: <strong>' + (item.bestTime != null ? safeFixed(item.bestTime, 3) + 's' : '--') + '</strong></div>' +
             '<div>Speed: <strong>' + mphToDisplaySpeed(item.bestSpeed) + ' ' + speedUnit() + '</strong></div>' +
@@ -1143,7 +1151,10 @@
     // ========================================================================
     function armRace() { wsSend({ cmd: 'arm' }); }
     function resetRace() { wsSend({ cmd: 'reset' }); }
-    function syncClock() { wsSend({ cmd: 'syncClock' }); alert('Clock sync requested!'); }
+    function syncClock() {
+      wsSend({ cmd: 'syncClock' });
+      massToast('\u2713 Clock sync requested', 'success', 2000);
+    }
     function updateTrackLength() {
       var length = parseFloat(document.getElementById('trackLength').value);
       if (length > 0 && length < 100) { wsSend({ cmd: 'setTrack', length: length }); }
@@ -1244,7 +1255,7 @@
     }
 
     async function clearGarage() {
-      if (garage.length === 0) { alert('Garage is already empty!'); return; }
+      if (garage.length === 0) { massToast('Garage is already empty!', 'error'); return; }
       var c = prompt('Type CLEAR to delete all ' + garage.length + ' cars:');
       if (c !== 'CLEAR') return;
       garage = [];
@@ -1258,7 +1269,7 @@
     }
 
     function exportGarage() {
-      if (garage.length === 0) { alert('No cars to export!'); return; }
+      if (garage.length === 0) { massToast('No cars to export!', 'error'); return; }
       var blob = new Blob([JSON.stringify(garage, null, 2)], { type: 'application/json' });
       var url = window.URL.createObjectURL(blob);
       var a = document.createElement('a');
@@ -1276,10 +1287,10 @@
       reader.onload = async function(e) {
         try {
           var imported = JSON.parse(e.target.result);
-          if (!Array.isArray(imported)) { alert('Invalid garage file'); return; }
+          if (!Array.isArray(imported)) { massToast('Invalid garage file', 'error'); return; }
           for (var i = 0; i < imported.length; i++) {
             var car = imported[i];
-            if (!car.name || !car.weight) { alert('Invalid car data'); return; }
+            if (!car.name || !car.weight) { massToast('Invalid car data', 'error'); return; }
             if (!car.stats) car.stats = { runs: 0, bestTime: null, bestSpeed: 0 };
             if (!car.id) car.id = Date.now() + Math.random();
           }
@@ -1297,7 +1308,7 @@
           } else { garage = imported; }
           await saveGarage();
           showGarageStatus('Imported ' + imported.length + ' cars!', true);
-        } catch (err) { alert('Failed to parse: ' + err.message); }
+        } catch (err) { massToast('Failed to parse: ' + err.message, 'error'); }
       };
       reader.readAsText(file);
       event.target.value = '';
@@ -1307,8 +1318,8 @@
       var name = document.getElementById('carName').value.trim();
       var color = document.getElementById('carColor').value.trim();
       var weight = parseFloat(document.getElementById('carWeight').value);
-      if (!name || name.length < 1 || name.length > 30) { alert('Name must be 1-30 characters!'); return; }
-      if (!weight || weight < 0.1 || weight > 1000) { alert('Mass must be 0.1-1000 grams!'); return; }
+      if (!name || name.length < 1 || name.length > 30) { massToast('Name must be 1-30 characters!', 'error'); return; }
+      if (!weight || weight < 0.1 || weight > 1000) { massToast('Mass must be 0.1-1000 grams!', 'error'); return; }
 
       if (editingCarIndex >= 0) {
         garage[editingCarIndex].name = name;
@@ -1324,7 +1335,7 @@
         document.getElementById('addCarBtn').textContent = 'ADD TO GARAGE';
       } else {
         if (garage.some(function(c) { return c.name.toLowerCase() === name.toLowerCase(); })) {
-          alert('Car already exists! Click pencil to edit.'); return;
+          massToast('Car already exists! Click pencil to edit.', 'error'); return;
         }
         garage.push({ id: Date.now(), name: name, color: color || 'N/A', weight: weight,
           stats: { runs: 0, bestTime: null, bestSpeed: 0 }, notes: [] });
@@ -1425,7 +1436,7 @@
         var label = escHtml(car.name) + ', ' + car.weight + ' grams, ' + bestStr + (isActive ? ', selected' : '');
         var notes = car.notes || [];
         var notesHtml = notes.slice(-3).map(function(n) {
-          return '<div class="mech-note">' + new Date(n.ts).toLocaleDateString() + ': ' + n.text + '</div>';
+          return '<div class="mech-note">' + new Date(n.ts).toLocaleDateString() + ': ' + escHtml(n.text) + '</div>';
         }).join('');
         return '<div class="garage-car ' + (isActive ? 'active' : '') + '" ' +
           'role="button" tabindex="0" ' +
@@ -1435,8 +1446,8 @@
           'aria-label="' + label + '">' +
           '<button class="delete-btn" onclick="deleteCar(' + i + ', event)" aria-label="Delete ' + escHtml(car.name) + '">x</button>' +
           '<button class="edit-btn" onclick="editCar(' + i + ', event)" aria-label="Edit ' + escHtml(car.name) + '">&#9998;</button>' +
-          '<h3>' + car.name + '</h3>' +
-          '<p>' + (car.color || '') + '</p>' +
+          '<h3>' + escHtml(car.name) + '</h3>' +
+          '<p>' + escHtml(car.color || '') + '</p>' +
           '<p>' + car.weight + 'g</p>' +
           '<div class="garage-stats">' +
             '<span>Runs: ' + (car.stats.runs || 0) + '</span>' +
@@ -1463,6 +1474,35 @@
       if (prevBest == null || raceData.time < prevBest) garage[carIndex].stats.bestTime = raceData.time;
       if (raceData.speed_mph > (garage[carIndex].stats.bestSpeed || 0)) garage[carIndex].stats.bestSpeed = raceData.speed_mph;
       await saveGarage();
+    }
+
+    // Rebuild garage stats from history — fixes desync when stats weren't persisted
+    async function rebuildGarageStatsFromHistory() {
+      if (!raceHistory || raceHistory.length === 0 || garage.length === 0) return;
+      var changed = false;
+      garage.forEach(function(car) {
+        var runs = raceHistory.filter(function(h) { return h.car === car.name; });
+        if (runs.length === 0) return;
+        var bestTime = null;
+        var bestSpeed = 0;
+        runs.forEach(function(h) {
+          if (h.time != null && (bestTime == null || h.time < bestTime)) bestTime = h.time;
+          if (h.speed_mph > bestSpeed) bestSpeed = h.speed_mph;
+        });
+        if (!car.stats) car.stats = { runs: 0, bestTime: null, bestSpeed: 0 };
+        // Only update if history has MORE data than current stats (don't clobber good data)
+        if (runs.length > car.stats.runs) {
+          car.stats.runs = runs.length;
+          car.stats.bestTime = bestTime;
+          car.stats.bestSpeed = bestSpeed;
+          changed = true;
+        }
+      });
+      if (changed) {
+        console.log('[STATS] Rebuilt garage stats from history');
+        await saveGarageToESP();
+        renderGarage();
+      }
     }
 
     // ========================================================================
@@ -1524,7 +1564,7 @@
         var displayScale = h.speed_mps ? formatSpeed(h.speed_mps * currentScaleFactor, 0) : mphToDisplaySpeed(h.scale_mph).split('.')[0];
         return '<tr>' +
           '<td>#' + h.run + '</td>' +
-          '<td><strong class="text-accent">' + h.car + '</strong></td>' +
+          '<td><strong class="text-accent">' + escHtml(h.car) + '</strong></td>' +
           '<td>' + h.weight + 'g</td>' +
           '<td class="font-data">' + safeFixed(h.time, 3) + 's</td>' +
           '<td>' + displaySpeed + '</td>' +
@@ -1544,7 +1584,7 @@
     // DATA EXPORT
     // ========================================================================
     function exportCSV() {
-      if (raceHistory.length === 0) { alert('No data!'); return; }
+      if (raceHistory.length === 0) { massToast('No data!', 'error'); return; }
       var su = speedUnit();
       var csv = 'Run,Timestamp,Car,Weight(g),Time(s),Speed(' + su + '),Scale(' + su + '),Speed(m/s),Momentum,KE\n';
       raceHistory.forEach(function(h) {
@@ -1588,7 +1628,7 @@
 
     function testSheetsUpload() {
       var url = document.getElementById('sheetsUrl').value.trim() || configSheetsUrl;
-      if (!url) { alert('Enter a Google Sheets URL first!'); return; }
+      if (!url) { massToast('Enter a Google Sheets URL first!', 'error'); return; }
       uploadToSheets({ car: 'TEST', weight: 35, time: 1.234, speed_mph: 1.62, scale_mph: 103.7, momentum: 0.057, ke: 0.023 }, url);
     }
 
@@ -1842,7 +1882,7 @@
         });
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '/api/files?path=/experiment.json', true);
-        xhr.setRequestHeader('X-API-Key', 'admin');
+        xhr.setRequestHeader('X-API-Key', getApiKey());
         xhr.setRequestHeader('Content-Type', 'application/octet-stream');
         xhr.send(payload);
       } catch (e) { console.error('[PLAYLIST] ESP save failed:', e); }
@@ -1852,7 +1892,7 @@
       try {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/api/files?path=/experiment.json', true);
-        xhr.setRequestHeader('X-API-Key', 'admin');
+        xhr.setRequestHeader('X-API-Key', getApiKey());
         xhr.onload = function() {
           if (xhr.status === 200) {
             try { callback(JSON.parse(xhr.responseText)); } catch (e) { callback(null); }
@@ -2176,8 +2216,8 @@
     function plAddCondition() {
       var label = document.getElementById('plNewCondLabel').value.trim();
       var weight = parseFloat(document.getElementById('plNewCondWeight').value);
-      if (!label) { alert('Enter a label for this condition (e.g. "+14g tungsten")'); return; }
-      if (isNaN(weight) || weight <= 0) { alert('Enter the added weight in grams (must be > 0)'); return; }
+      if (!label) { massToast('Enter a label for this condition', 'error'); return; }
+      if (isNaN(weight) || weight <= 0) { massToast('Added weight must be greater than 0g', 'error'); return; }
       playlistMode.config.conditions.push({ label: label, addedWeight: weight });
       document.getElementById('plNewCondLabel').value = '';
       document.getElementById('plNewCondWeight').value = '';
@@ -2236,7 +2276,7 @@
     // ===== PHASE 2 → 3: GENERATE MATRIX & ASSIGN CASE NUMBERS =====
     function plPhase2Advance() {
       if (playlistMode.config.selectedCarIds.length === 0) {
-        alert('Select at least one car!');
+        massToast('Select at least one car!', 'error');
         return;
       }
 
@@ -2448,7 +2488,7 @@
 
     function plCaptureEvidencePhoto() {
       if (!IMGBB_API_KEY) {
-        alert('Photo upload not configured.\n\nTo enable: open browser console and run:\nlocalStorage.setItem("mass_imgbb_key", "YOUR_KEY")\nthen reload the page.');
+        massToast('Photo upload not configured', 'warn');
         return;
       }
       // Determine target case: explicit selection or next un-photo'd case
@@ -2470,7 +2510,7 @@
       if (!targetCase && playlistMode.tests.length > 0) {
         targetCase = playlistMode.tests[0].caseNumber; // Fallback to first
       }
-      if (!targetCase) { alert('No test cases to photograph.'); return; }
+      if (!targetCase) { massToast('No test cases to photograph', 'warn'); return; }
 
       var input = document.createElement('input');
       input.type = 'file';
@@ -2479,7 +2519,7 @@
       input.onchange = function() {
         if (!input.files || !input.files[0]) return;
         var file = input.files[0];
-        if (file.size > 32 * 1024 * 1024) { alert('Photo too large (max 32MB)'); return; }
+        if (file.size > 32 * 1024 * 1024) { massToast('Photo too large (max 32MB)', 'error'); return; }
 
         var btn = document.getElementById('plPhase3PhotoBtn');
         if (btn) { btn.textContent = 'UPLOADING...'; btn.disabled = true; }
@@ -2552,7 +2592,7 @@
           status: 'vehicle-tag'
         });
       }
-      if (entries.length === 0) { alert('No vehicles in test plan.'); return; }
+      if (entries.length === 0) { massToast('No vehicles in test plan', 'warn'); return; }
       evShowTagsOverlay(entries);
     }
 
@@ -2647,7 +2687,7 @@
     }
 
     function plBeginDataCollection() {
-      if (playlistMode.tests.length === 0) { alert('No test plan!'); return; }
+      if (playlistMode.tests.length === 0) { massToast('No test plan!', 'error'); return; }
 
       playlistMode.active = true;
       playlistMode.paused = false;
@@ -3477,7 +3517,7 @@
       try {
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '/api/files?path=' + encodeURIComponent(filename), true);
-        xhr.setRequestHeader('X-API-Key', 'admin');
+        xhr.setRequestHeader('X-API-Key', getApiKey());
         xhr.setRequestHeader('Content-Type', 'application/octet-stream');
         xhr.send(JSON.stringify(reportData));
       } catch (e) { console.error('[REPORT] Save failed:', e); }
@@ -3495,7 +3535,7 @@
 
     function plShowPastReports() {
       var saved = JSON.parse(localStorage.getItem('mass_saved_reports') || '[]');
-      if (saved.length === 0) { alert('No saved reports yet.'); return; }
+      if (saved.length === 0) { massToast('No saved reports yet', 'info'); return; }
 
       var overlay = document.createElement('div');
       overlay.id = 'plReportsOverlay';
@@ -3537,7 +3577,7 @@
           }
         }
       }
-      if (entries.length === 0) { alert('No evidence entries to print.'); return; }
+      if (entries.length === 0) { massToast('No evidence entries to print', 'warn'); return; }
       evShowTagsOverlay(entries);
     }
 
@@ -3592,7 +3632,7 @@
         });
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '/api/files?path=/evidence.json', true);
-        xhr.setRequestHeader('X-API-Key', 'admin');
+        xhr.setRequestHeader('X-API-Key', getApiKey());
         xhr.setRequestHeader('Content-Type', 'application/octet-stream');
         xhr.send(payload);
       } catch (e) { console.error('[EVIDENCE] ESP save failed:', e); }
@@ -3601,7 +3641,7 @@
       try {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', '/api/files?path=/evidence.json', true);
-        xhr.setRequestHeader('X-API-Key', 'admin');
+        xhr.setRequestHeader('X-API-Key', getApiKey());
         xhr.onload = function() {
           if (xhr.status === 200) {
             try {
@@ -3641,7 +3681,7 @@
 
     function evCaptureSetupPhoto() {
       if (!IMGBB_API_KEY) {
-        alert('Photo upload not configured.\n\nTo enable: open browser console and run:\nlocalStorage.setItem("mass_imgbb_key", "YOUR_KEY")\nthen reload the page.');
+        massToast('Photo upload not configured', 'warn');
         return;
       }
       var input = document.createElement('input');
@@ -3652,7 +3692,7 @@
         if (!input.files || !input.files[0]) return;
         var file = input.files[0];
         if (file.size > 32 * 1024 * 1024) {
-          alert('Photo too large (max 32MB)');
+          massToast('Photo too large (max 32MB)', 'error');
           return;
         }
 
@@ -3737,7 +3777,7 @@
         completedCount = playlistMode.results.filter(function(r) { return r && !r.skipped; }).length;
       }
       if (completedCount === 0) {
-        alert('No completed test runs to show evidence for.');
+        massToast('No completed test runs to show evidence for', 'warn');
         return;
       }
       // Get the most recent N evidence entries (where N = completed playlist runs)
@@ -3856,17 +3896,8 @@
       if (evidenceLog.length > 500) evidenceLog = evidenceLog.slice(-500);
       evSaveEvidence();
 
-      // AUTO-SHOW tag in normal mode only
-      var showEntry = entry;
-      setTimeout(function() {
-        evShowTagsOverlay([showEntry]);
-        if (showEntry.setupPhotos.length > 0) {
-          announce('Evidence ' + caseNum2 + ' logged with ' + showEntry.setupPhotos.length +
-            ' setup photo' + (showEntry.setupPhotos.length > 1 ? 's' : '') + '. Ready to print.');
-        } else {
-          announce('Evidence ' + caseNum2 + ' logged. Tap the camera icon to add a photo.');
-        }
-      }, 800);
+      // Quietly log evidence — no auto-popup overlay (user can view via EVIDENCE LOG button)
+      announce('Evidence ' + caseNum2 + ' logged.');
 
       return caseNum2;
     }
@@ -4030,7 +4061,7 @@
     // Upload a photo to ImgBB and link it to an evidence entry
     function evUploadPhoto(caseNumber) {
       if (!IMGBB_API_KEY) {
-        alert('Photo upload not configured.\n\nTo enable: open browser console and run:\nlocalStorage.setItem("mass_imgbb_key", "YOUR_KEY")\nthen reload the page.');
+        massToast('Photo upload not configured', 'warn');
         return;
       }
       // Create hidden file input
@@ -4042,7 +4073,7 @@
         if (!input.files || !input.files[0]) return;
         var file = input.files[0];
         if (file.size > 32 * 1024 * 1024) {
-          alert('Photo too large (max 32MB)');
+          massToast('Photo too large (max 32MB)', 'error');
           return;
         }
 
@@ -4076,22 +4107,22 @@
                   evRefreshTagPhoto(caseNumber, resp.data.thumb ? resp.data.thumb.url : resp.data.url);
                 } else {
                   if (btn) { btn.textContent = '❌ ERROR'; btn.disabled = false; }
-                  alert('Upload failed: unexpected response');
+                  massToast('Upload failed: unexpected response', 'error');
                 }
               } catch(err) {
                 if (btn) { btn.textContent = '❌ ERROR'; btn.disabled = false; }
-                alert('Upload failed: ' + err.message);
+                massToast('Upload failed: ' + err.message, 'error');
               }
             } else {
               if (btn) { btn.textContent = '❌ ERROR'; btn.disabled = false; }
-              alert('Upload failed: HTTP ' + xhr.status);
+              massToast('Upload failed: HTTP ' + xhr.status, 'error');
             }
             // Reset button after delay
             setTimeout(function() { if (btn) { btn.textContent = origText || '📷'; btn.disabled = false; } }, 3000);
           };
           xhr.onerror = function() {
             if (btn) { btn.textContent = '❌ OFFLINE'; btn.disabled = false; }
-            alert('Upload failed — check internet connection');
+            massToast('Upload failed — check internet connection', 'error');
             setTimeout(function() { if (btn) { btn.textContent = origText || '📷'; btn.disabled = false; } }, 3000);
           };
           xhr.send(formData);
@@ -4242,7 +4273,7 @@
     // Show evidence tags overlay with print button + label config
     function evShowTagsOverlay(entries) {
       if (!entries || entries.length === 0) {
-        alert('No evidence to tag!');
+        massToast('No evidence to tag!', 'warn');
         return;
       }
       var overlay = document.createElement('div');
@@ -4441,7 +4472,7 @@
     // NFC Tag Writer Helper — generates the URLs to write to tags
     function evShowNfcWriterHelper() {
       if (garage.length === 0) {
-        alert('Add cars to the garage first!');
+        massToast('Add cars to the garage first!', 'error');
         return;
       }
       var overlay = document.createElement('div');
@@ -4467,7 +4498,7 @@
           '<div id="nfcQr_' + i + '" style="flex-shrink:0;"></div>' +
           '<div style="flex:1;">' +
             '<div style="font-weight:900;color:var(--accent);">' + (tagged ? '&#x2705; ' : '&#x26A0;&#xFE0F; ') + escHtml(car.name) + '</div>' +
-            '<div class="text-muted" style="font-size:0.75rem;">' + car.weight + 'g | ' + (car.color || '') +
+            '<div class="text-muted" style="font-size:0.75rem;">' + car.weight + 'g | ' + escHtml(car.color || '') +
               (tagged ? ' | <span style="color:var(--success);">NFC verified</span>' : ' | Not tagged') + '</div>' +
             '<div style="display:flex;gap:4px;margin-top:6px;">' +
               '<button class="btn btn-success btn-sm" style="flex:1;font-size:0.75rem;" ' +
@@ -4602,6 +4633,7 @@
       try { updateUnitLabels(); } catch (e) { console.error('[INIT] Unit labels failed:', e); }
       try { await loadGarageFromESP(); } catch (e) { console.error('[INIT] Garage load failed:', e); }
       try { await loadHistoryFromESP(); } catch (e) { console.error('[INIT] History load failed:', e); }
+      try { await rebuildGarageStatsFromHistory(); } catch (e) { console.error('[INIT] Stats rebuild failed:', e); }
       try { initCharts(); } catch (e) { console.error('[INIT] Charts failed:', e); }
       try { if (activeCar) { setCurrentCarDisplay(activeCar); } } catch (e) { console.error('[INIT] Active car display failed:', e); }
       try { renderMostWanted(); } catch (e) { console.error('[INIT] Most Wanted render failed:', e); }
@@ -4627,7 +4659,7 @@
       // Get peers from finish gate API first
       var xhr = new XMLHttpRequest();
       xhr.open('GET', '/api/peers', true);
-      xhr.setRequestHeader('X-API-Key', 'admin');
+      xhr.setRequestHeader('X-API-Key', getApiKey());
       xhr.onload = function() {
         if (xhr.status !== 200) return;
         try {
@@ -4658,7 +4690,7 @@
     function brothersFetchInfo(host, isSelf) {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', (isSelf ? '' : 'http://' + host) + '/api/info', true);
-      xhr.setRequestHeader('X-API-Key', 'admin');
+      xhr.setRequestHeader('X-API-Key', getApiKey());
       xhr.timeout = 3000;
       xhr.onload = function() {
         if (xhr.status !== 200) return;
@@ -5275,14 +5307,14 @@
     // --- Generate report: build data and open report page ---
     function reportGenerate() {
       if (_reportSelectedCases.length === 0) {
-        alert('Select at least one case first.');
+        massToast('Select at least one case first', 'error');
         return;
       }
 
       var reportData = reportBuildData(_reportSelectedCases);
 
       if (reportData.tests.length === 0) {
-        alert('No completed runs found in the selected cases. Nothing to report.');
+        massToast('No completed runs in selected cases', 'warn');
         return;
       }
 
@@ -5292,7 +5324,7 @@
         var filename = '/reports/report_' + ts + '.json';
         var xhr = new XMLHttpRequest();
         xhr.open('POST', '/api/files?path=' + encodeURIComponent(filename), true);
-        xhr.setRequestHeader('X-API-Key', 'admin');
+        xhr.setRequestHeader('X-API-Key', getApiKey());
         xhr.setRequestHeader('Content-Type', 'application/octet-stream');
         xhr.send(JSON.stringify(reportData));
       } catch (e) { console.error('[REPORT] Save to ESP32 failed:', e); }

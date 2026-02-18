@@ -3,6 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="color-scheme" content="dark">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws: wss: https://api.github.com https://github.com https://objects.githubusercontent.com; frame-ancestors 'none';">
   <meta name="fw-version" content="2.5.0">
   <title>M.A.S.S. Trap - System Config</title>
   <link rel="stylesheet" href="/style.css">
@@ -543,7 +546,7 @@
         for (var i = 0; i < networks.length; i++) {
           var n = networks[i];
           var sec = n.secure ? ' (secured)' : ' (open)';
-          sel.innerHTML += '<option value="' + n.ssid + '">' + n.ssid + ' (' + n.rssi + 'dBm)' + sec + '</option>';
+          sel.innerHTML += '<option value="' + escHtml(n.ssid) + '">' + escHtml(n.ssid) + ' (' + n.rssi + 'dBm)' + sec + '</option>';
         }
       }).catch(function() {
         sel.innerHTML = '<option value="">Scan failed - try again</option>';
@@ -574,10 +577,10 @@
         var html = '';
         for (var i = 0; i < devices.length; i++) {
           var d = devices[i];
-          var link = d.hostname ? '<a href="http://' + d.hostname + '.local/" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:underline;">' + d.hostname + '</a>' : d.mac;
-          html += '<div class="device-item" onclick="document.getElementById(\'peerMac\').value=\'' + d.mac + '\'" style="cursor:pointer;">' +
-            '<div><span class="device-role">' + d.role.toUpperCase() + '</span><span> - ' + link + '</span></div>' +
-            '<span class="device-mac">' + d.mac + '</span></div>';
+          var link = d.hostname ? '<a href="http://' + escHtml(d.hostname) + '.local/" target="_blank" onclick="event.stopPropagation()" style="color:var(--accent);text-decoration:underline;">' + escHtml(d.hostname) + '</a>' : escHtml(d.mac);
+          html += '<div class="device-item" onclick="document.getElementById(\'peerMac\').value=\'' + escHtml(d.mac) + '\'" style="cursor:pointer;">' +
+            '<div><span class="device-role">' + escHtml(d.role).toUpperCase() + '</span><span> - ' + link + '</span></div>' +
+            '<span class="device-mac">' + escHtml(d.mac) + '</span></div>';
         }
         list.innerHTML = html;
       }).catch(function() {
@@ -612,7 +615,7 @@
 
     function loadWledEffects() {
       fetch('/api/wled/effects').then(function(resp) {
-        if (!resp.ok) { alert('Could not load effects. Test WLED connection first.'); return; }
+        if (!resp.ok) { massToast('Could not load effects. Test WLED connection first.', 'error'); return; }
         return resp.json();
       }).then(function(effects) {
         if (!effects) return;
@@ -628,7 +631,7 @@
         }
         showStatus('Effects loaded from WLED!', 'success');
       }).catch(function(e) {
-        alert('Failed to load effects: ' + e.message);
+        massToast('Failed to load effects: ' + e.message, 'error');
       });
     }
 
@@ -1067,7 +1070,7 @@
         waitForReboot(release);
       }).catch(function(err) {
         removeFwUpdateOverlay();
-        alert('Firmware update failed: ' + err.message);
+        massToast('Firmware update failed: ' + err.message, 'error');
       });
     }
 
@@ -1079,7 +1082,7 @@
         if (attempts > maxAttempts) {
           clearInterval(checkInterval);
           removeFwUpdateOverlay();
-          alert('Device did not come back online after 2 minutes.\nIt may need manual attention.');
+          massToast('Device did not come back online after 2 minutes. It may need manual attention.', 'error');
           return;
         }
         updateOverlaySub('Waiting for device to reboot... (' + attempts + 's)');
@@ -1163,7 +1166,7 @@
       var file = input.files[0];
       if (!file) return;
       if (!file.name.match(/\.bin$/i)) {
-        alert('Please select a .bin firmware file.');
+        massToast('Please select a .bin firmware file.', 'error');
         input.value = '';
         return;
       }
@@ -1209,16 +1212,16 @@
           progressContainer.style.display = 'none';
           try {
             var resp = JSON.parse(xhr.responseText);
-            alert('Upload failed: ' + (resp.error || 'Unknown error'));
+            massToast('Upload failed: ' + (resp.error || 'Unknown error'), 'error');
           } catch (e) {
-            alert('Upload failed: ' + xhr.statusText);
+            massToast('Upload failed: ' + xhr.statusText, 'error');
           }
         }
       };
 
       xhr.onerror = function() {
         progressContainer.style.display = 'none';
-        alert('Upload failed: network error');
+        massToast('Upload failed: network error', 'error');
       };
 
       xhr.send(formData);
