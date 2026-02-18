@@ -63,30 +63,36 @@
   --nav-hover:    #ff8800;
 }
 
-/* THEME 3: "Daytona" — NASCAR / Stock Car Racing — World Center of Racing */
+/* === DAYTONA THEME — For Richard, who raced Formula Vee on the same asphalt
+   where Earnhardt made turn 4 immortal. Gate code: 1959. === */
 [data-theme="daytona"] {
-  --bg:           #141414;
-  --bg-card:      #2a2a2a;
-  --bg-dark:      #0e0e0e;
-  --bg-input:     #1a1a1a;
-  --border:       #555555;
+  --bg:           #0d0d0d;
+  --bg-card:      #1e1e1e;
+  --bg-dark:      #080808;
+  --bg-input:     #151515;
+  --border:       #333333;
   --accent:       #ffcc00;
   --accent-rgb:   255,204,0;
-  --secondary:    #ff0000;
-  --secondary-rgb:255,0,0;
+  --secondary:    #cc0000;
+  --secondary-rgb:204,0,0;
   --success:      #00c853;
   --success-rgb:  0,200,83;
   --danger:       #ff1744;
   --danger-rgb:   255,23,68;
-  --text:         #f0f0f0;
-  --text-muted:   #999999;
+  --text:         #e8e8e8;
+  --text-muted:   #777777;
   --font-body:    Impact, 'Arial Narrow', 'Segoe UI', sans-serif;
   --font-data:    'Courier New', 'Consolas', monospace;
-  --nav-bg:       #0e0e0e;
+  --nav-bg:       #080808;
   --nav-border:   #ffcc00;
   --nav-active:   #ffcc00;
   --nav-link:     #cccccc;
-  --nav-hover:    #ff0000;
+  --nav-hover:    #cc0000;
+  /* Daytona-exclusive palette */
+  --sand:          #c2b280;   /* Beach sand warmth — Daytona Beach */
+  --scanner-green: #33ff33;   /* Scanner LCD green — RadioShack Pro-444 */
+  --flag-green:    #00aa00;   /* Green flag */
+  --76-orange:     #ff6600;   /* 76 ball — they tore it down in 2004 */
 }
 
 /* THEME 4: "Case File" — Police Detective / Evidence Dossier */
@@ -110,35 +116,36 @@
   --font-data:    'Courier New', 'Courier', monospace;
   --nav-bg:       #3d3224;
   --nav-border:   #8b0000;
-  --nav-active:   #daa520;
-  --nav-link:     #d4c8a8;
-  --nav-hover:    #daa520;
+  --nav-active:   #8b0000;
+  --nav-link:     #5c4a3a;
+  --nav-hover:    #8b0000;
 }
 
 /* THEME 5: "Cyber" — Terminal / Hacker Aesthetic */
+/* === CYBER / SYNTHWAVE THEME — Midnight neon: teal + magenta on deep navy === */
 [data-theme="cyber"] {
-  --bg:           #000000;
-  --bg-card:      #111a11;
-  --bg-dark:      #000000;
-  --bg-input:     #0d160d;
-  --border:       #003300;
-  --accent:       #00ff00;
-  --accent-rgb:   0,255,0;
-  --secondary:    #00ccff;
-  --secondary-rgb:0,204,255;
-  --success:      #00ff00;
-  --success-rgb:  0,255,0;
-  --danger:       #ff0040;
-  --danger-rgb:   255,0,64;
-  --text:         #00ff00;
-  --text-muted:   #009900;
+  --bg:           #0a0a14;
+  --bg-card:      #111122;
+  --bg-dark:      #050510;
+  --bg-input:     #0d0d1e;
+  --border:       #1a3a5a;
+  --accent:       #00ffcc;
+  --accent-rgb:   0,255,204;
+  --secondary:    #ff00ff;
+  --secondary-rgb:255,0,255;
+  --success:      #00ff66;
+  --success-rgb:  0,255,102;
+  --danger:       #ff0044;
+  --danger-rgb:   255,0,68;
+  --text:         #ccddee;
+  --text-muted:   #557799;
   --font-body:    'Cascadia Code', 'Fira Code', 'Consolas', monospace;
   --font-data:    'Cascadia Code', 'Fira Code', 'Consolas', monospace;
-  --nav-bg:       #000000;
-  --nav-border:   #003300;
-  --nav-active:   #00ff00;
-  --nav-link:     #009900;
-  --nav-hover:    #00ff00;
+  --nav-bg:       #050510;
+  --nav-border:   #1a3a5a;
+  --nav-active:   #00ffcc;
+  --nav-link:     #557799;
+  --nav-hover:    #00ffcc;
 }
 
 /* =================================================================
@@ -206,15 +213,45 @@ body {
   transform: translateY(4px);
   box-shadow: 0 0 0 rgba(0,0,0,0.4);
 }
-/* Interceptor: State banner — armored tactical display */
+/* Interceptor: State banner — NEON WLED border glow (replaces LED bar) */
 [data-theme="interceptor"] .state-banner {
   box-shadow: 0 4px 0 rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.05);
 }
+[data-theme="interceptor"] .state-banner.idle {
+  box-shadow:
+    0 4px 0 rgba(0,0,0,0.3),
+    0 0 15px rgba(255,160,0,0.4),
+    0 0 40px rgba(255,160,0,0.15),
+    0 0 80px rgba(255,160,0,0.06),
+    inset 0 0 20px rgba(255,160,0,0.06);
+  animation: mt-neon-breathe 3s infinite;
+}
 [data-theme="interceptor"] .state-banner.armed {
-  box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 0 20px rgba(var(--success-rgb),0.2);
+  box-shadow:
+    0 4px 0 rgba(0,0,0,0.3),
+    0 0 20px rgba(var(--success-rgb),0.5),
+    0 0 50px rgba(var(--success-rgb),0.2),
+    0 0 100px rgba(var(--success-rgb),0.08),
+    inset 0 0 25px rgba(var(--success-rgb),0.06);
+  animation: mt-neon-pulse 1s infinite;
 }
 [data-theme="interceptor"] .state-banner.racing {
-  box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 0 20px rgba(var(--danger-rgb),0.3);
+  box-shadow:
+    0 4px 0 rgba(0,0,0,0.3),
+    0 0 25px rgba(var(--danger-rgb),0.6),
+    0 0 60px rgba(var(--danger-rgb),0.25),
+    0 0 120px rgba(var(--danger-rgb),0.1),
+    inset 0 0 30px rgba(var(--danger-rgb),0.06);
+  animation: mt-neon-flash 0.5s infinite;
+}
+[data-theme="interceptor"] .state-banner.finished {
+  box-shadow:
+    0 4px 0 rgba(0,0,0,0.3),
+    0 0 20px rgba(var(--accent-rgb),0.5),
+    0 0 50px rgba(var(--accent-rgb),0.2),
+    0 0 100px rgba(var(--accent-rgb),0.08),
+    inset 0 0 25px rgba(var(--accent-rgb),0.06);
+  animation: mt-neon-celebrate 1.5s infinite alternate;
 }
 /* Interceptor: Table — dark ops with gold header accent */
 [data-theme="interceptor"] thead {
@@ -583,11 +620,12 @@ body {
 [data-theme="classic"] .info-card { background: white; border: 2px solid var(--secondary); }
 [data-theme="classic"] .save-bar { background: #000; border-top: 3px solid var(--accent); }
 [data-theme="classic"] .lidar-bar-container { background: #e9ecef; }
-[data-theme="classic"] .console-status-bar { background: #000; color: #ccc; }
+[data-theme="classic"] .fleet-bar { background: #000; color: #ccc; }
 
-/* Daytona: Asphalt texture with bold tire skid marks */
+/* Daytona: Asphalt texture with bold tire skid marks
+   — Max Frank Massfeller Sr., Holly Hill */
 [data-theme="daytona"] body {
-  background-color: #141414;
+  background-color: #0d0d0d;
   background-image:
     /* Tire marks — two parallel skid lines down each margin */
     linear-gradient(180deg,
@@ -612,14 +650,21 @@ body {
       rgba(255,255,255,0.01) 3px, rgba(255,255,255,0.01) 4px);
   background-attachment: fixed;
 }
-/* Daytona: Checkered flag border on nav + plate steel */
+/* Daytona: Checkered flag strip below nav + plate steel
+   — "Gentlemen, start your engines" */
 [data-theme="daytona"] .mass-nav {
-  border-bottom: 4px solid;
-  border-image: repeating-linear-gradient(
-    90deg, #ffffff 0, #ffffff 8px, #111111 8px, #111111 16px
-  ) 4;
+  border-bottom: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-  background: linear-gradient(180deg, #1a1a1a 0%, #0e0e0e 100%);
+  background: linear-gradient(180deg, #141414 0%, #080808 100%);
+  position: relative;
+}
+[data-theme="daytona"] .mass-nav::after {
+  content: '';
+  position: absolute;
+  bottom: -12px; left: 0; right: 0;
+  height: 12px;
+  background: repeating-conic-gradient(#ffffff 0% 25%, #111111 0% 50%) 0 0 / 12px 12px;
+  z-index: 10;
 }
 
 /* Case File: Aged paper with coffee stain ring + faint ruled lines */
@@ -640,8 +685,9 @@ body {
 /* Cyber: Falling code rain / scan lines */
 [data-theme="cyber"] body {
   background-image:
-    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,0,0.015) 2px, rgba(0,255,0,0.015) 4px),
-    radial-gradient(ellipse at 50% 0%, rgba(0,80,0,0.15), transparent 70%);
+    repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,255,204,0.012) 2px, rgba(0,255,204,0.012) 4px),
+    radial-gradient(ellipse at 50% 0%, rgba(0,60,120,0.2), transparent 70%),
+    radial-gradient(ellipse at 80% 100%, rgba(255,0,255,0.04), transparent 50%);
 }
 
 a { color: var(--secondary); text-decoration: none; }
@@ -752,16 +798,18 @@ a:hover { color: var(--accent); }
 
   .mass-nav-list a {
     flex-direction: row;
-    padding: 10px 20px;
-    font-size: 0.78rem;
+    padding: 7px 18px;
+    font-size: 0.72rem;
     color: var(--nav-link);
     background: var(--bg-dark);
     border: 1px solid var(--border);
     border-bottom: none;
-    border-radius: 10px 10px 0 0;
-    /* Overlap into the bottom border to create the "merged tab" illusion */
-    margin-bottom: -2px;
+    border-radius: 8px 8px 0 0;
     position: relative;
+    /* Inactive tabs sit BEHIND the yellow rail — no overlap */
+    margin-bottom: 0;
+    z-index: 0;
+    transition: color 0.15s, background 0.15s;
   }
 
   .mass-nav-list a:hover {
@@ -773,8 +821,12 @@ a:hover { color: var(--accent); }
     color: var(--nav-active);
     background: var(--bg);
     border-color: var(--nav-border);
-    /* Tab merges seamlessly: no bottom border, sits on top of the nav border */
+    border-width: 2px;
+    /* Active tab breaks THROUGH the yellow rail — overlaps the border */
+    margin-bottom: -2px;
     border-bottom: 2px solid var(--bg);
+    padding: 10px 22px;
+    font-size: 0.78rem;
     z-index: 2;
   }
 
@@ -833,19 +885,23 @@ a:hover { color: var(--accent); }
   text-transform: uppercase;
 }
 
-/* Theme selector (small dropdown) */
+/* Theme selector — fixed in nav bar area */
 .theme-selector {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 10px;
-  font-size: 0.75rem;
+  position: fixed;
+  top: 8px;
+  right: 8px;
+  z-index: 9500;
+  font-size: 0.7rem;
   color: var(--text-muted);
+}
+/* Desktop: sit left of LINKED badge in nav negative space */
+@media (min-width: 769px) {
+  .theme-selector { top: 12px; right: 110px; }
 }
 .theme-selector select {
   padding: 4px 8px;
-  font-size: 0.75rem;
-  background: var(--bg-input);
+  font-size: 0.7rem;
+  background: var(--bg-dark);
   color: var(--text);
   border: 1px solid var(--border);
   border-radius: 4px;
@@ -853,6 +909,14 @@ a:hover { color: var(--accent); }
   cursor: pointer;
 }
 .theme-selector select:focus { outline: none; border-color: var(--accent); }
+/* Dark themes: force dark select bg since nav bar is dark */
+[data-theme="interceptor"] .theme-selector select,
+[data-theme="classic"] .theme-selector select,
+[data-theme="daytona"] .theme-selector select,
+[data-theme="cyber"] .theme-selector select {
+  background: rgba(0,0,0,0.85);
+  color: #ccc;
+}
 
 @media (max-width: 768px) {
   .page-header h1 { font-size: 1.6rem; letter-spacing: 2px; }
@@ -876,77 +940,133 @@ a:hover { color: var(--accent); }
   margin-bottom: 16px;
   text-transform: uppercase;
   letter-spacing: 4px;
-  transition: all 0.3s;
+  transition: color 0.3s, background 0.3s, border-color 0.3s;
 }
-.state-banner.idle { border-color: var(--accent); color: var(--accent); }
+/* IDLE: amber border + subtle glow */
+.state-banner.idle {
+  border-color: #FFA000;
+  color: var(--accent);
+  box-shadow: 0 0 12px rgba(255,160,0,0.3), inset 0 0 8px rgba(255,160,0,0.04);
+}
+/* ARMED: green border + glow */
 .state-banner.armed {
-  background: rgba(var(--success-rgb), 0.12);
+  background: rgba(var(--success-rgb), 0.08);
   border-color: var(--success);
   color: var(--success);
-  animation: mt-pulse 1s infinite;
+  box-shadow: 0 0 16px rgba(var(--success-rgb), 0.3), inset 0 0 10px rgba(var(--success-rgb), 0.04);
 }
+/* RACING: red border + glow */
 .state-banner.racing {
-  background: rgba(var(--danger-rgb), 0.12);
+  background: rgba(var(--danger-rgb), 0.08);
   border-color: var(--danger);
   color: var(--danger);
-  animation: mt-flash 0.5s infinite;
+  box-shadow: 0 0 20px rgba(var(--danger-rgb), 0.4), inset 0 0 12px rgba(var(--danger-rgb), 0.04);
 }
+/* FINISHED: gold border + glow */
 .state-banner.finished {
   border-color: var(--accent);
   color: var(--accent);
+  box-shadow: 0 0 16px rgba(var(--accent-rgb), 0.3), inset 0 0 10px rgba(var(--accent-rgb), 0.04);
 }
 
-@keyframes mt-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
-@keyframes mt-flash { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
+/* Neon glow keyframes — multi-layer scatter for dramatic WLED effect */
+@keyframes mt-neon-breathe {
+  0%,100% {
+    box-shadow:
+      0 4px 0 rgba(0,0,0,0.3),
+      0 0 10px rgba(255,160,0,0.2),
+      0 0 30px rgba(255,160,0,0.08),
+      0 0 60px rgba(255,160,0,0.03),
+      inset 0 0 12px rgba(255,160,0,0.03);
+  }
+  50% {
+    box-shadow:
+      0 4px 0 rgba(0,0,0,0.3),
+      0 0 20px rgba(255,160,0,0.5),
+      0 0 50px rgba(255,160,0,0.2),
+      0 0 100px rgba(255,160,0,0.08),
+      inset 0 0 25px rgba(255,160,0,0.08);
+  }
+}
+@keyframes mt-neon-pulse {
+  0%,100% {
+    box-shadow:
+      0 4px 0 rgba(0,0,0,0.3),
+      0 0 12px rgba(var(--success-rgb), 0.25),
+      0 0 35px rgba(var(--success-rgb), 0.1),
+      0 0 70px rgba(var(--success-rgb), 0.04),
+      inset 0 0 15px rgba(var(--success-rgb), 0.03);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow:
+      0 4px 0 rgba(0,0,0,0.3),
+      0 0 25px rgba(var(--success-rgb), 0.6),
+      0 0 60px rgba(var(--success-rgb), 0.25),
+      0 0 120px rgba(var(--success-rgb), 0.1),
+      inset 0 0 30px rgba(var(--success-rgb), 0.08);
+    transform: scale(1.01);
+  }
+}
+@keyframes mt-neon-flash {
+  0%,100% {
+    box-shadow:
+      0 4px 0 rgba(0,0,0,0.3),
+      0 0 15px rgba(var(--danger-rgb), 0.35),
+      0 0 40px rgba(var(--danger-rgb), 0.15),
+      0 0 80px rgba(var(--danger-rgb), 0.06),
+      inset 0 0 20px rgba(var(--danger-rgb), 0.04);
+    opacity: 1;
+  }
+  50% {
+    box-shadow:
+      0 4px 0 rgba(0,0,0,0.3),
+      0 0 30px rgba(var(--danger-rgb), 0.7),
+      0 0 70px rgba(var(--danger-rgb), 0.3),
+      0 0 140px rgba(var(--danger-rgb), 0.12),
+      inset 0 0 35px rgba(var(--danger-rgb), 0.08);
+    opacity: 0.85;
+  }
+}
+@keyframes mt-neon-celebrate {
+  0% {
+    box-shadow:
+      0 4px 0 rgba(0,0,0,0.3),
+      0 0 12px rgba(var(--accent-rgb), 0.25),
+      0 0 35px rgba(var(--accent-rgb), 0.1),
+      0 0 70px rgba(var(--accent-rgb), 0.04),
+      inset 0 0 15px rgba(var(--accent-rgb), 0.03);
+  }
+  100% {
+    box-shadow:
+      0 4px 0 rgba(0,0,0,0.3),
+      0 0 25px rgba(var(--accent-rgb), 0.6),
+      0 0 60px rgba(var(--accent-rgb), 0.25),
+      0 0 120px rgba(var(--accent-rgb), 0.1),
+      inset 0 0 30px rgba(var(--accent-rgb), 0.08);
+  }
+}
 
 @media (max-width: 768px) {
   .state-banner { font-size: 1.3rem; padding: 14px; letter-spacing: 2px; }
 }
 
 /* =================================================================
-   LED VISUALIZER BAR
+   LED VISUALIZER BAR — Now merged into state-banner border glow.
+   Kept as hidden element so JS doesn't error on missing element.
    ================================================================= */
 .led-bar {
-  height: 6px;
+  height: 0;
   width: 100%;
-  border-radius: 3px;
-  margin-bottom: 16px;
-  background: var(--border);
-  transition: all 0.3s;
-}
-/* IDLE: WLED Effect 0 "Solid" — steady amber glow (#FFA000) */
-.led-bar.idle {
-  background: #FFA000;
-  box-shadow: 0 0 12px rgba(255,160,0,0.5);
-  animation: mt-breathe 3s infinite;
-}
-/* ARMED: WLED Effect 28 "Chase" — dot chasing along the strip */
-.led-bar.armed {
-  background: linear-gradient(90deg, transparent 0%, transparent 35%, #FFA000 48%, #FFA000 52%, transparent 65%, transparent 100%);
-  background-size: 300% 100%;
-  box-shadow: 0 0 16px rgba(255,160,0,0.6);
-  animation: mt-chase 0.8s infinite linear;
-}
-/* RACING: WLED Effect 49 "Fairy" — twinkling sparkles */
-.led-bar.racing {
-  background: linear-gradient(90deg, #FFA000 0%, transparent 8%, transparent 15%, #FFA000 20%, transparent 28%, transparent 40%, #FFA000 45%, transparent 52%, transparent 65%, #FFA000 70%, transparent 78%, transparent 88%, #FFA000 92%);
-  box-shadow: 0 0 16px rgba(255,160,0,0.5);
-  animation: mt-twinkle 0.4s infinite alternate;
-}
-/* FINISHED: WLED Effect 11 "Scan Dual" — two bars bouncing */
-.led-bar.finished {
-  background:
-    linear-gradient(90deg, transparent 0%, transparent 20%, #FFA000 25%, #FFA000 30%, transparent 35%, transparent 100%),
-    linear-gradient(90deg, transparent 0%, transparent 65%, #FFA000 70%, #FFA000 75%, transparent 80%, transparent 100%);
-  background-size: 200% 100%, 200% 100%;
-  box-shadow: 0 0 20px rgba(255,160,0,0.6);
-  animation: mt-scan-dual 1.2s infinite alternate ease-in-out;
+  margin: 0;
+  padding: 0;
+  border: none;
+  overflow: hidden;
 }
 
-@keyframes mt-breathe { 0%,100% { opacity: 0.4; } 50% { opacity: 1; } }
-@keyframes mt-chase { 0% { background-position: 200% 0; } 100% { background-position: -100% 0; } }
-@keyframes mt-twinkle { 0% { opacity: 0.5; } 100% { opacity: 1; } }
-@keyframes mt-scan-dual { 0% { background-position: -50% 0, 150% 0; } 100% { background-position: 150% 0, -50% 0; } }
+/* Legacy keyframes — used by lidar indicator and other components */
+@keyframes mt-pulse { 0%,100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+@keyframes mt-flash { 0%,100% { opacity: 1; } 50% { opacity: 0.7; } }
 
 /* =================================================================
    CARDS — Data display containers
@@ -1029,6 +1149,19 @@ label.btn { display: flex; align-items: center; justify-content: center; }
 }
 .section-title.danger { background: var(--danger); color: #fff; }
 .section-title.secondary { background: var(--secondary); color: #fff; }
+
+/* Summary elements used as section-titles need to stay in flow (not position:absolute) */
+summary.section-title {
+  position: relative;
+  top: auto; left: auto;
+  background: var(--bg-card, #2a2a2a);
+  color: var(--text, #f0f0f0);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
 
 /* --- Case File: Detective dossier — manila folders, red tape, typewriter --- */
 [data-theme="casefile"] .page-header {
@@ -1193,7 +1326,8 @@ label.btn { display: flex; align-items: center; justify-content: center; }
   border: 1px solid #b8a88a;
 }
 
-/* --- Daytona: NASCAR pit wall — heavy steel, speed stripes, bold impact --- */
+/* --- Daytona: NASCAR pit wall — heavy steel, speed stripes, bold impact
+   Pit lane darkness — the gate code to drive on that track was 1959 --- */
 [data-theme="daytona"] .page-header {
   text-shadow: 3px 3px 0px rgba(0,0,0,0.8);
 }
@@ -1235,21 +1369,23 @@ label.btn { display: flex; align-items: center; justify-content: center; }
   text-shadow: 1px 1px 3px rgba(0,0,0,0.7);
   box-shadow: 0 2px 4px rgba(0,0,0,0.4);
 }
-/* Daytona: State banner — scoreboard tower with checkered flag top border */
+/* Daytona: State banner — scoreboard tower with checkered flag top strip */
 [data-theme="daytona"] .state-banner {
   border: 4px solid var(--accent);
-  border-top: 6px solid;
-  border-image: repeating-linear-gradient(
-    90deg, #ffffff 0, #ffffff 8px, #111111 8px, #111111 16px
-  ) 6;
-  border-image-slice: 6 0 0 0;
-  border-left: 4px solid var(--accent);
-  border-right: 4px solid var(--accent);
-  border-bottom: 4px solid var(--accent);
   box-shadow: 0 6px 0 rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
   font-family: Impact, 'Arial Narrow', sans-serif;
   font-style: italic;
   border-radius: 4px;
+  position: relative;
+  margin-top: 16px;
+}
+[data-theme="daytona"] .state-banner::before {
+  content: '';
+  position: absolute;
+  top: -14px; left: -4px; right: -4px;
+  height: 12px;
+  background: repeating-conic-gradient(#ffffff 0% 25%, #222222 0% 50%) 0 0 / 12px 12px;
+  border-radius: 4px 4px 0 0;
 }
 [data-theme="daytona"] .state-banner.armed {
   box-shadow: 0 6px 0 rgba(0,0,0,0.5), 0 0 24px rgba(var(--success-rgb),0.3);
@@ -1315,146 +1451,273 @@ label.btn { display: flex; align-items: center; justify-content: center; }
   border-top: 3px solid var(--accent);
   box-shadow: 0 4px 0 rgba(0,0,0,0.3), 0 0 16px rgba(var(--accent-rgb), 0.25);
 }
+/* Scanner green — RadioShack Pro-444, pressed to your ear in the grandstands,
+   laughing at team comms */
+/* Daytona: Fleet bar → Scanner LCD display with scan lines + phosphor green */
+[data-theme="daytona"] .fleet-bar {
+  background: #0a0a0a;
+  border-top: 2px solid #333;
+  background-image: repeating-linear-gradient(
+    0deg, transparent, transparent 2px, rgba(255,255,255,0.015) 2px, rgba(255,255,255,0.015) 3px
+  );
+  font-family: 'Courier New', 'Consolas', monospace;
+  letter-spacing: 1px;
+}
+[data-theme="daytona"] .fleet-bar-host {
+  color: var(--scanner-green, #33ff33);
+  text-shadow: 0 0 6px rgba(51,255,51,0.4);
+  text-transform: uppercase;
+}
+[data-theme="daytona"] .fleet-bar-sep { color: #333; }
+[data-theme="daytona"] .fb-peer.online {
+  color: var(--scanner-green, #33ff33);
+  text-shadow: 0 0 4px rgba(51,255,51,0.3);
+}
+[data-theme="daytona"] .fb-peer.stale { color: var(--accent); }
+[data-theme="daytona"] .fb-peer.offline { color: #cc0000; }
+[data-theme="daytona"] .fleet-bar-metrics {
+  color: var(--scanner-green, #33ff33);
+  text-shadow: 0 0 4px rgba(51,255,51,0.2);
+}
+[data-theme="daytona"] .fb-sync.synced {
+  color: var(--scanner-green, #33ff33);
+  text-shadow: 0 0 6px rgba(51,255,51,0.4);
+}
+/* 76 ball — they tore it down in 2004. Dale Jr. saved North Wilkesboro's.
+   The one from Daytona is gone. */
+/* Daytona: Version badge → 76 ball (orange sphere with version number) */
+[data-theme="daytona"] .version-badge {
+  background: radial-gradient(circle at 35% 35%, #ff8800, #ff6600 40%, #cc5500 100%);
+  color: white;
+  border: 2px solid #cc5500;
+  border-radius: 50%;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  padding: 0;
+  font-family: Impact, 'Arial Narrow', sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  font-style: italic;
+  box-shadow: 2px 3px 8px rgba(0,0,0,0.6), inset -2px -2px 4px rgba(0,0,0,0.3);
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+[data-theme="daytona"] .version-badge a { color: white; }
+[data-theme="daytona"] .version-badge.update-available {
+  animation: daytona-76-pulse 2s ease-in-out infinite;
+}
+@keyframes daytona-76-pulse {
+  0%, 100% { box-shadow: 2px 3px 8px rgba(0,0,0,0.6), inset -2px -2px 4px rgba(0,0,0,0.3); }
+  50% { box-shadow: 0 0 16px rgba(255,102,0,0.6), 2px 3px 8px rgba(0,0,0,0.6), inset -2px -2px 4px rgba(0,0,0,0.3); }
+}
+/* Turn 4 — some corners you don't come back from */
+/* Daytona: State banner enhancements — scanner IDLE, green flag ARMED, checkered FINISHED */
+[data-theme="daytona"] .state-banner.idle {
+  color: var(--scanner-green, #33ff33);
+  text-shadow: 0 0 8px rgba(51,255,51,0.2);
+  border-color: #333;
+}
+@keyframes daytona-green-flag {
+  0%, 100% { box-shadow: 0 6px 0 rgba(0,0,0,0.5), 0 0 24px rgba(0,200,83,0.3); }
+  50% { box-shadow: 0 6px 0 rgba(0,0,0,0.5), 0 0 40px rgba(0,200,83,0.5); }
+}
+[data-theme="daytona"] .state-banner.armed {
+  animation: daytona-green-flag 2s ease-in-out infinite;
+  border-color: var(--success);
+}
+[data-theme="daytona"] .state-banner.finished {
+  background-image: repeating-conic-gradient(#222 0% 25%, #151515 0% 50%);
+  background-size: 16px 16px;
+  text-shadow: 0 0 10px rgba(0,0,0,0.9), 2px 2px 0 rgba(0,0,0,0.8);
+  box-shadow: 0 6px 0 rgba(0,0,0,0.5), 0 0 20px rgba(var(--accent-rgb),0.3);
+}
+/* Mardi Gras beads — if you've been to Daytona in February,
+   you know exactly what those beads mean */
+/* Daytona: Section dividers → Mardi Gras bead strand (purple / green / gold) */
+[data-theme="daytona"] hr {
+  height: 6px;
+  border: none;
+  background:
+    radial-gradient(circle, #7b2d8b 2px, transparent 2px) 0 0 / 12px 6px,
+    radial-gradient(circle, #1a8c2f 2px, transparent 2px) 4px 0 / 12px 6px,
+    radial-gradient(circle, #d4a017 2px, transparent 2px) 8px 0 / 12px 6px;
+  margin: 12px 0;
+  opacity: 0.5;
+}
+/* Mr. Daytona — Scott Russell, #1, 5x Daytona 200. Crashed lap 1 in '95,
+   leapt over his own fallen Kawasaki, still won. */
+/* Daytona: Body watermark → Simplified Daytona tri-oval track silhouette */
+[data-theme="daytona"] body::after {
+  content: '';
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 70vw; max-width: 550px;
+  height: 35vw; max-height: 275px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 200'%3E%3Cpath d='M80,160 C20,160 10,100 30,60 C50,20 120,10 200,15 C220,10 240,8 260,10 C280,8 310,15 340,40 C380,70 385,130 350,160 C320,185 260,190 200,185 C140,190 100,180 80,160 Z' fill='none' stroke='white' stroke-width='3'/%3E%3Cellipse cx='200' cy='115' rx='80' ry='40' fill='none' stroke='white' stroke-width='1' opacity='0.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: contain;
+  opacity: 0.025;
+  pointer-events: none;
+  z-index: -1;
+}
+/* For Beaver — Stephen Henry "Beaver" Massfeller, Pipeline survivor.
+   He always came back. That's what Massfellers do. */
 
 /* --- Cyber: Full terminal / CRT monitor aesthetic — phosphor glow everything --- */
 [data-theme="cyber"] .page-header {
-  text-shadow: 0 0 10px rgba(0,255,0,0.4), 0 0 30px rgba(0,255,0,0.15);
+  text-shadow: 0 0 10px rgba(0,255,204,0.4), 0 0 30px rgba(0,255,204,0.15);
 }
 [data-theme="cyber"] .page-header h1 {
-  text-shadow: 0 0 10px rgba(0,255,0,0.5), 0 0 40px rgba(0,255,0,0.2);
+  text-shadow: 0 0 10px rgba(0,255,204,0.5), 0 0 40px rgba(255,0,255,0.15);
   letter-spacing: 6px;
 }
 [data-theme="cyber"] .page-header .subtitle {
-  color: #00ff00;
-  text-shadow: 0 0 6px rgba(0,255,0,0.3);
+  color: var(--accent);
+  text-shadow: 0 0 6px rgba(0,255,204,0.3);
 }
 [data-theme="cyber"] .page-header-shield {
-  box-shadow: 0 0 12px rgba(0,255,0,0.3), 0 0 24px rgba(0,255,0,0.1);
+  box-shadow: 0 0 12px rgba(0,255,204,0.3), 0 0 24px rgba(255,0,255,0.1);
 }
-/* Cyber: Cards — terminal windows with phosphor border glow */
+/* Cyber: Cards — holographic panels with teal edge glow */
 [data-theme="cyber"] .card {
-  border: 1px solid #003300;
-  border-bottom: 2px solid #00ff00;
-  box-shadow: 0 0 8px rgba(0,255,0,0.1), 0 4px 0 rgba(0,0,0,0.4), inset 0 0 2px rgba(0,255,0,0.03);
+  border: 1px solid #1a3a5a;
+  border-bottom: 2px solid #00ffcc;
+  box-shadow: 0 0 8px rgba(0,255,204,0.08), 0 4px 0 rgba(0,0,0,0.4), inset 0 0 2px rgba(0,255,204,0.02);
   border-radius: 2px;
 }
 [data-theme="cyber"] .card:hover {
-  box-shadow: 0 0 16px rgba(0,255,0,0.15), 0 4px 0 rgba(0,0,0,0.4), inset 0 0 4px rgba(0,255,0,0.05);
+  box-shadow: 0 0 16px rgba(0,255,204,0.12), 0 4px 0 rgba(0,0,0,0.4), inset 0 0 4px rgba(255,0,255,0.03);
   transform: translateY(-2px);
 }
 [data-theme="cyber"] .card-value {
-  text-shadow: 0 0 8px rgba(0,255,0,0.4);
+  text-shadow: 0 0 8px rgba(0,255,204,0.4);
 }
 [data-theme="cyber"] .card-label {
-  text-shadow: 0 0 4px rgba(0,255,0,0.2);
+  text-shadow: 0 0 4px rgba(0,255,204,0.2);
 }
-/* Cyber: Sections — terminal panels with glowing borders */
+/* Cyber: Sections — neon-bordered panels */
 [data-theme="cyber"] .section {
-  border: 1px solid #003300;
+  border: 1px solid #1a3a5a;
   border-radius: 2px;
-  box-shadow: 0 0 12px rgba(0,255,0,0.06), 0 4px 0 rgba(0,0,0,0.3);
+  box-shadow: 0 0 12px rgba(0,255,204,0.04), 0 4px 0 rgba(0,0,0,0.3);
 }
 [data-theme="cyber"] .section:hover {
-  box-shadow: 0 0 16px rgba(0,255,0,0.1), 0 4px 0 rgba(0,0,0,0.3);
+  box-shadow: 0 0 16px rgba(0,255,204,0.08), 0 4px 0 rgba(0,0,0,0.3);
 }
 [data-theme="cyber"] .section-title {
-  text-shadow: 0 0 8px rgba(0,255,0,0.4);
+  text-shadow: 0 0 8px rgba(0,255,204,0.4);
   border-radius: 2px;
-  box-shadow: 0 0 6px rgba(0,255,0,0.2);
+  box-shadow: 0 0 6px rgba(0,255,204,0.15);
 }
-/* Cyber: Buttons — terminal command keys */
+/* Cyber: Buttons — synthwave neon keys */
 [data-theme="cyber"] .btn {
   border-radius: 2px;
-  box-shadow: 0 3px 0 rgba(0,0,0,0.5), 0 0 6px rgba(0,255,0,0.1);
-  border: 1px solid rgba(0,255,0,0.15);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.5), 0 0 6px rgba(0,255,204,0.08);
+  border: 1px solid rgba(0,255,204,0.15);
   text-shadow: 0 0 4px rgba(0,0,0,0.5);
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
 }
 [data-theme="cyber"] .btn:active {
   transform: translateY(3px);
-  box-shadow: 0 0 0 rgba(0,0,0,0.5), 0 0 8px rgba(0,255,0,0.15);
+  box-shadow: 0 0 0 rgba(0,0,0,0.5), 0 0 8px rgba(0,255,204,0.15);
 }
 [data-theme="cyber"] .btn-accent {
-  box-shadow: 0 3px 0 rgba(0,0,0,0.5), 0 0 10px rgba(0,255,0,0.2);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.5), 0 0 10px rgba(0,255,204,0.2);
 }
 [data-theme="cyber"] .btn-primary {
-  box-shadow: 0 3px 0 rgba(0,0,0,0.5), 0 0 10px rgba(0,204,255,0.15);
+  box-shadow: 0 3px 0 rgba(0,0,0,0.5), 0 0 10px rgba(255,0,255,0.15);
 }
-/* Cyber: State banner — system status with CRT glow */
+/* Cyber: State banner — synthwave neon status */
 [data-theme="cyber"] .state-banner {
-  border: 2px solid #003300;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 16px rgba(0,255,0,0.08), inset 0 0 40px rgba(0,255,0,0.02);
+  border: 2px solid #1a3a5a;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 16px rgba(0,255,204,0.06), inset 0 0 40px rgba(0,255,204,0.01);
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
 }
 [data-theme="cyber"] .state-banner.idle {
-  text-shadow: 0 0 10px rgba(0,255,0,0.5);
-  border-color: #004400;
+  text-shadow: 0 0 10px rgba(0,255,204,0.5);
+  border-color: #1a3a5a;
+  animation: mt-cyber-breathe 3s infinite;
 }
 [data-theme="cyber"] .state-banner.armed {
-  border-color: #00ff00;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 24px rgba(0,255,0,0.2), inset 0 0 40px rgba(0,255,0,0.03);
-  text-shadow: 0 0 12px rgba(0,255,0,0.6);
+  border-color: #00ffcc;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 24px rgba(0,255,204,0.2), inset 0 0 40px rgba(0,255,204,0.03);
+  text-shadow: 0 0 12px rgba(0,255,204,0.6);
+  animation: mt-cyber-pulse 1s infinite;
 }
 [data-theme="cyber"] .state-banner.racing {
-  border-color: #ff0040;
-  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 24px rgba(255,0,64,0.25), inset 0 0 40px rgba(255,0,64,0.03);
-  text-shadow: 0 0 12px rgba(255,0,64,0.6);
+  border-color: #ff00ff;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 24px rgba(255,0,255,0.25), inset 0 0 40px rgba(255,0,255,0.03);
+  text-shadow: 0 0 12px rgba(255,0,255,0.6);
+  animation: mt-neon-flash 0.5s infinite;
 }
 [data-theme="cyber"] .state-banner.finished {
-  text-shadow: 0 0 12px rgba(0,255,0,0.5);
-  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 20px rgba(0,255,0,0.15);
+  text-shadow: 0 0 12px rgba(0,255,204,0.5);
+  box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 20px rgba(0,255,204,0.15);
+  animation: mt-cyber-celebrate 1.5s infinite alternate;
 }
-/* Cyber: Tables — dark terminal readout */
+@keyframes mt-cyber-breathe {
+  0%,100% { box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 8px rgba(0,255,204,0.04), inset 0 0 20px rgba(0,255,204,0.01); }
+  50%     { box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 20px rgba(0,255,204,0.12), inset 0 0 40px rgba(0,255,204,0.02); }
+}
+@keyframes mt-cyber-pulse {
+  0%,100% { box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 16px rgba(0,255,204,0.12), inset 0 0 30px rgba(0,255,204,0.02); transform: scale(1); }
+  50%     { box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 32px rgba(0,255,204,0.25), inset 0 0 50px rgba(0,255,204,0.03); transform: scale(1.01); }
+}
+@keyframes mt-cyber-celebrate {
+  0%   { box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 12px rgba(0,255,204,0.08), inset 0 0 20px rgba(0,255,204,0.01); }
+  100% { box-shadow: 0 4px 0 rgba(0,0,0,0.4), 0 0 28px rgba(255,0,255,0.2), inset 0 0 40px rgba(255,0,255,0.03); }
+}
+/* Cyber: Tables — synthwave data grid */
 [data-theme="cyber"] thead {
-  background: #001a00;
-  color: #00ff00;
-  text-shadow: 0 0 4px rgba(0,255,0,0.3);
-  box-shadow: 0 1px 0 #003300;
+  background: #0d1a2a;
+  color: #00ffcc;
+  text-shadow: 0 0 4px rgba(0,255,204,0.3);
+  box-shadow: 0 1px 0 #1a3a5a;
 }
 [data-theme="cyber"] tbody tr {
-  border-bottom-color: #002200;
+  border-bottom-color: #111a2a;
 }
 [data-theme="cyber"] tbody tr:hover {
-  background: rgba(0,255,0,0.04);
+  background: rgba(0,255,204,0.04);
 }
-/* Cyber: Garage — process list entries */
+/* Cyber: Garage — synthwave vehicle registry */
 [data-theme="cyber"] .garage-car {
   border-radius: 2px;
-  border-color: #002200;
+  border-color: #1a2a3a;
   box-shadow: 0 2px 0 rgba(0,0,0,0.3);
 }
 [data-theme="cyber"] .garage-car:hover {
-  border-color: #004400;
-  box-shadow: 0 0 12px rgba(0,255,0,0.1), 0 4px 8px rgba(0,0,0,0.3);
+  border-color: #2a4a6a;
+  box-shadow: 0 0 12px rgba(0,255,204,0.08), 0 4px 8px rgba(0,0,0,0.3);
 }
 [data-theme="cyber"] .garage-car.active {
-  border-color: #00ff00;
-  box-shadow: 0 0 12px rgba(0,255,0,0.15), 0 2px 0 rgba(0,0,0,0.3);
+  border-color: #00ffcc;
+  box-shadow: 0 0 12px rgba(0,255,204,0.15), 0 2px 0 rgba(0,0,0,0.3);
 }
 [data-theme="cyber"] .garage-car h3 {
-  text-shadow: 0 0 6px rgba(0,255,0,0.3);
+  text-shadow: 0 0 6px rgba(0,255,204,0.3);
 }
-/* Cyber: Connection badge — system tray */
+/* Cyber: Connection badge — network status */
 [data-theme="cyber"] .conn-badge {
   border-radius: 2px;
-  box-shadow: 0 0 8px rgba(0,255,0,0.1);
-  border-color: #003300;
+  box-shadow: 0 0 8px rgba(0,255,204,0.08);
+  border-color: #1a3a5a;
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
 }
 [data-theme="cyber"] .conn-badge.connected {
-  box-shadow: 0 0 10px rgba(0,255,0,0.15);
+  box-shadow: 0 0 10px rgba(0,255,204,0.15);
 }
 /* Cyber: Most Wanted — threat database */
 [data-theme="cyber"] .mw-card {
   border-radius: 2px;
-  border-color: #002200;
-  box-shadow: 0 3px 0 rgba(0,0,0,0.3), 0 0 8px rgba(0,255,0,0.05);
+  border-color: #1a2a3a;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.3), 0 0 8px rgba(0,255,204,0.04);
 }
 [data-theme="cyber"] .mw-card.rank-1 {
-  border-color: #00ff00;
-  box-shadow: 0 3px 0 rgba(0,0,0,0.3), 0 0 16px rgba(0,255,0,0.15);
+  border-color: #00ffcc;
+  box-shadow: 0 3px 0 rgba(0,0,0,0.3), 0 0 16px rgba(0,255,204,0.15);
 }
-/* Cyber: Inputs — terminal input fields */
+/* Cyber: Inputs — synthwave data fields */
 [data-theme="cyber"] input[type="text"],
 [data-theme="cyber"] input[type="number"],
 [data-theme="cyber"] input[type="password"],
@@ -1462,24 +1725,54 @@ label.btn { display: flex; align-items: center; justify-content: center; }
 [data-theme="cyber"] select,
 [data-theme="cyber"] textarea {
   border-radius: 2px;
-  border-color: #003300;
+  border-color: #1a3a5a;
   font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
 }
 [data-theme="cyber"] input:focus,
 [data-theme="cyber"] select:focus,
 [data-theme="cyber"] textarea:focus {
-  box-shadow: 0 0 8px rgba(0,255,0,0.2);
-  border-color: #00ff00;
+  box-shadow: 0 0 8px rgba(0,255,204,0.2);
+  border-color: #00ffcc;
 }
-/* Cyber: Nav — terminal toolbar with glow */
+/* Cyber: Nav — synthwave toolbar */
 [data-theme="cyber"] .mass-nav {
-  border-color: #003300;
-  box-shadow: 0 1px 8px rgba(0,255,0,0.08);
+  border-color: #1a3a5a;
+  box-shadow: 0 1px 8px rgba(0,255,204,0.06);
 }
 /* Cyber: Version badge — system version readout */
 [data-theme="cyber"] .version-badge {
-  border: 1px solid #003300;
-  box-shadow: 0 0 4px rgba(0,255,0,0.1);
+  border: 1px solid #1a3a5a;
+  box-shadow: 0 0 4px rgba(0,255,204,0.08);
+}
+/* Cyber: Fleet bar — synthwave dispatch with teal/magenta glow */
+[data-theme="cyber"] .fleet-bar {
+  background: #050510;
+  border-top: 2px solid #1a3a5a;
+  background-image: repeating-linear-gradient(
+    0deg, transparent, transparent 2px, rgba(0,255,204,0.01) 2px, rgba(0,255,204,0.01) 3px
+  );
+  font-family: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
+  letter-spacing: 1px;
+}
+[data-theme="cyber"] .fleet-bar-host {
+  color: #00ffcc;
+  text-shadow: 0 0 6px rgba(0,255,204,0.4);
+  text-transform: uppercase;
+}
+[data-theme="cyber"] .fleet-bar-sep { color: #1a3a5a; }
+[data-theme="cyber"] .fb-peer.online {
+  color: #00ffcc;
+  text-shadow: 0 0 4px rgba(0,255,204,0.3);
+}
+[data-theme="cyber"] .fb-peer.stale { color: #ff00ff; text-shadow: 0 0 4px rgba(255,0,255,0.2); }
+[data-theme="cyber"] .fb-peer.offline { color: #ff0044; }
+[data-theme="cyber"] .fleet-bar-metrics {
+  color: #00ffcc;
+  text-shadow: 0 0 4px rgba(0,255,204,0.2);
+}
+[data-theme="cyber"] .fb-sync.synced {
+  color: #00ffcc;
+  text-shadow: 0 0 6px rgba(0,255,204,0.4);
 }
 
 /* =================================================================
@@ -1810,13 +2103,13 @@ tbody tr:hover { background: rgba(var(--secondary-rgb), 0.08); }
    ================================================================= */
 .conn-badge {
   position: fixed; top: 8px; right: 8px;
-  background: rgba(0,0,0,0.85); padding: 8px 14px; border-radius: 8px;
-  font-size: 0.8rem; font-weight: 700; z-index: 9500;
+  background: rgba(0,0,0,0.85); padding: 6px 12px; border-radius: 6px;
+  font-size: 0.7rem; font-weight: 700; z-index: 9500;
   border: 2px solid var(--border);
 }
-/* Desktop: push badge below sticky nav bar */
+/* Desktop: tuck badge into the nav bar's negative space (right of tabs) */
 @media (min-width: 769px) {
-  .conn-badge { top: 56px; }
+  .conn-badge { top: 10px; right: 20px; }
 }
 .conn-badge.connected { border-color: var(--success); color: var(--success); }
 .conn-badge.disconnected { border-color: var(--danger); color: var(--danger); }
@@ -1845,12 +2138,12 @@ tbody tr:hover { background: rgba(var(--secondary-rgb), 0.08); }
    VERSION BADGE
    ================================================================= */
 .version-badge {
-  position: fixed; bottom: 8px; right: 8px;
+  position: fixed; bottom: 28px; right: 8px;
   background: rgba(0,0,0,0.7); color: var(--text-muted);
   padding: 4px 10px; border-radius: 6px; font-size: 0.65rem;
   z-index: 8000; font-family: var(--font-data);
 }
-@media (max-width: 768px) { .version-badge { bottom: 68px; } }
+@media (max-width: 768px) { .version-badge { bottom: 84px; } }
 
 /* =================================================================
    CONSOLE PAGE — Terminal overrides
@@ -2186,20 +2479,50 @@ body:has(.save-bar) .container { padding-bottom: 64px; }
 .message-box strong { color: var(--accent); }
 
 /* =================================================================
-   CONSOLE STATUS BAR (bottom fixed, different from main status-bar)
+   FLEET DISPATCH BAR — persistent bottom status bar on ALL pages
+   zsh-style: hostname │ ● Start ● Trap ● Telem │ drift │ RSSI │ heap │ uptime
    ================================================================= */
-.console-status-bar {
+.fleet-bar {
   position: fixed; bottom: 0; left: 0; right: 0;
   background: var(--bg-dark); color: var(--text-muted);
-  padding: 5px 12px; font-size: 0.7rem;
-  display: flex; justify-content: space-between;
+  padding: 4px 12px; font-size: 0.7rem;
+  font-family: var(--font-data);
+  display: flex; align-items: center;
   border-top: 1px solid var(--border); z-index: 100;
+  white-space: nowrap; overflow: hidden;
 }
-.console-status-bar .heap { color: var(--success); }
-.console-status-bar .uptime { color: var(--accent); }
+.fleet-bar-sep { margin: 0 8px; color: var(--border); }
+.fleet-bar-host { font-weight: 700; color: var(--accent); }
+.fleet-bar-roster { display: flex; gap: 10px; align-items: center; }
+.fleet-bar-metrics { margin-left: auto; display: flex; gap: 4px; align-items: center; }
+.fleet-bar-metrics .fb-sep { color: var(--border); margin: 0 2px; }
+
+/* Peer status chips */
+.fb-peer { font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; font-size: 0.65rem; }
+.fb-peer.online  { color: var(--success); }
+.fb-peer.stale   { color: var(--accent); }
+.fb-peer.offline { color: var(--danger); opacity: 0.7; }
+.fb-peer.unknown { color: var(--text-muted); opacity: 0.4; }
+
+/* Health metric colors */
+.fb-drift  { color: var(--secondary); }
+.fb-rssi   { color: var(--accent); }
+.fb-heap   { color: var(--success); }
+.fb-uptime { color: var(--text-muted); }
+.fb-fw     { color: var(--text-muted); opacity: 0.7; }
+
+/* Sync indicator — distinct from other metrics */
+.fb-sync.synced  { color: var(--success); font-weight: 700; }
+.fb-sync.no-sync { color: var(--text-muted); font-weight: 400; font-style: italic; }
+
+/* Fleet bar links — no underlines, inherit color, clickable */
+.fleet-bar a { color: inherit; text-decoration: none; }
+.fleet-bar a:hover { text-decoration: underline; opacity: 1; }
 
 @media (max-width: 768px) {
-  .console-status-bar { bottom: 56px; }
+  .fleet-bar { bottom: 56px; font-size: 0.6rem; flex-wrap: wrap; justify-content: center; gap: 2px; }
+  .fleet-bar-sep { margin: 0 4px; }
+  .fleet-bar-metrics { margin-left: 0; }
   .serial-output { height: 40vh; }
 }
 
@@ -2293,6 +2616,28 @@ body.kiosk .kiosk-unlock {
   text-transform: uppercase;
 }
 .skip-link:focus { top: 0; outline: 2px solid var(--bg); }
+
+/* ===== Toast Notifications ===== */
+.mass-toast-container {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  z-index: 99999; display: flex; flex-direction: column;
+  align-items: center; gap: 8px; pointer-events: none;
+}
+.mass-toast {
+  padding: 10px 24px; border-radius: 8px; font-weight: 700;
+  font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase;
+  color: #fff; opacity: 0; transform: translateY(-20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  pointer-events: auto; text-align: center;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  font-family: var(--font-body, Impact, 'Arial Narrow', sans-serif);
+  max-width: 90vw;
+}
+.mass-toast.show { opacity: 1; transform: translateY(0); }
+.mass-toast.success { background: var(--success, #00c853); }
+.mass-toast.error { background: var(--danger, #ff1744); }
+.mass-toast.info { background: var(--accent, #ffcc00); color: var(--bg, #111); }
+.mass-toast.warn { background: var(--secondary, #cc0000); }
 
 /* =================================================================
    VERSION BADGE — Update indicator
