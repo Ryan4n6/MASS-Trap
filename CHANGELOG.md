@@ -2,6 +2,57 @@
 
 All notable changes to The M.A.S.S. Trap (Motion Analysis & Speed System) will be documented in this file.
 
+## [Unreleased]
+
+### Security Hardening (Hot-Pushed 2026-02-18)
+
+#### XSS Prevention
+- **`escHtml()` now escapes quote characters** — Added `"` → `&quot;` and `'` → `&#39;` to the shared HTML sanitizer in `main.js`. The original function only escaped `<`, `>`, `&`, making all attribute-context uses (e.g., `value="..."`, `onclick="..."`) vulnerable to breakout attacks.
+- **15 XSS injection points fixed across 6 files** — All dynamic user content rendered via `innerHTML` is now sanitized:
+  - `dashboard.html`: Car names in leaderboard, garage cards, NFC writer, history table; notes text; car colors in style attributes
+  - `index.html`: Same vectors (standalone fallback page has its own inline `escHtml()`)
+  - `history.html`: Car names in leaderboard and history table; notes text
+  - `system.html`: WiFi SSIDs in scan results; peer hostnames, roles, and MAC addresses in discovery table
+  - `config.html`: WiFi SSIDs in scan results; peer hostnames, roles, and MAC addresses (standalone page with inline `escHtml()`)
+
+#### Content Security Policy
+- **CSP meta tags added to all 11 HTML files** — Each page has a tailored `Content-Security-Policy` restricting script sources to `'self' 'unsafe-inline'` (required for embedded JS), image sources, and connection sources. All pages block framing via `frame-ancestors 'none'` (clickjacking prevention).
+  - `dashboard.html`: Allows `img-src` for ImgBB (`i.ibb.co`) and QR code API (`api.qrserver.com`) used by evidence system
+  - `system.html`: Allows `connect-src` for GitHub API (`api.github.com`, `github.com`, `objects.githubusercontent.com`) used by firmware update checker
+  - `config.html`: Same GitHub API allowance for firmware update tab
+  - All other pages: Strict `'self'`-only policy with WebSocket (`ws: wss:`) where needed
+
+#### API Key Hygiene
+- **8 hardcoded API keys replaced** — All instances of `xhr.setRequestHeader('X-API-Key', 'admin')` in `dashboard.html` replaced with `xhr.setRequestHeader('X-API-Key', getApiKey())` which reads from the shared auth system in `main.js`
+
+#### Firmware Security Backlog (#15)
+- **Added Backlog Item #15** to `BACKLOG_PLANS.md` — 5 firmware-side security fixes requiring recompile:
+  - 15a: Add `requireAuth()` to GET `/api/config`, `/api/system/backup`, `/api/files`, `/api/diagnostics` (~4 lines)
+  - 15b: WebSocket authentication on port 81 (~20 lines)
+  - 15c: Firmware upload auth race condition fix (~5 lines)
+  - 15d: Rate limiting on `/api/auth/check` (~40 lines)
+  - 15e: HTTP security response headers (X-Frame-Options, X-Content-Type-Options, Referrer-Policy) (~8 lines)
+
+### Modern Web Improvements (Hot-Pushed 2026-02-18)
+- **`scroll-behavior: smooth`** on `<html>` element with `prefers-reduced-motion` media query override
+- **`color-scheme: dark`** on `<html>` for native dark scrollbars and form controls
+- **`overscroll-behavior-y: contain`** on `<body>` prevents pull-to-refresh and overscroll bounce
+- **`accent-color: var(--accent)`** on all form inputs — checkboxes, radios, range sliders follow theme color
+- **`backdrop-filter: blur(8px)`** on leaderboard and firmware update overlays (with `-webkit-` prefix)
+- **Dynamic `<meta name="theme-color">`** — `setTheme()` in `main.js` now creates/updates the meta tag so mobile browser chrome matches the active theme
+- **`inputmode="decimal"`** on weight/length/height inputs; `inputmode="numeric"` on trial count — mobile keyboards show appropriate layout
+- **`navigator.vibrate()`** haptic feedback on race state transitions — ARMED (100ms), RACING (50-30-50ms), FINISHED (100-50-200ms)
+- **Toast notification system** — `massToast(message, type)` replaces all `alert()` calls with non-blocking slide-in notifications (success/error/warning/info variants, auto-dismiss with progress bar)
+
+### Added
+- **CSS Component Reference Page** (`data/css.html`) — Visual map of all CSS classes across the 5 themes with live-rendered examples. Theme picker to preview components in each theme. Served from LittleFS.
+
+### Changed
+- **`<meta name="theme-color">` and `<meta name="color-scheme" content="dark">`** added to all HTML files that were missing them (start_status.html, speedtrap_status.html, console.html, history.html, system.html)
+- **Toast notifications replace `alert()` calls** in console.html file operations (open, save, delete)
+
+---
+
 ## [2.6.0-beta] - 2026-02-16
 
 ### The Forensic Lab Manager Update

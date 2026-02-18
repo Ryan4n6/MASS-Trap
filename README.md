@@ -299,6 +299,7 @@ The OTA password defaults to `admin` — change it in the config page for securi
 | `/history.html` | Evidence Log | Race history with full physics data |
 | `/config` | System Config | WiFi, pins, peer, track, audio, LiDAR, WLED, OTA settings |
 | `/console` | Debug Console | Timestamped serial log viewer, file browser, device info |
+| `/css.html` | CSS Reference Map | Live visual component reference for all 5 themes |
 | `/about.html` | The Special K Report™ | Project stats, builders, live device status, commit timeline |
 
 ## API Endpoints
@@ -362,6 +363,7 @@ MASS-Trap/
 │   ├── main.js                # Shared JavaScript utilities
 │   ├── style.css              # Shared stylesheet (5 themes, dual-layout nav)
 │   ├── console.html           # Debug console with NTP-timestamped serial log
+│   ├── css.html               # CSS component reference map (all themes, live preview)
 │   ├── start_status.html      # Start gate lightweight status page
 │   ├── speedtrap_status.html  # Speed trap lightweight status page
 │   └── *.wav                  # Audio effect files (8-bit, 16kHz mono)
@@ -428,6 +430,7 @@ MASS-Trap/
 - [x] **GitHub Pages Site** — Interactive demo, parent guide, judge showcase, parts store, build wizard
 - [x] **Community Feedback (Giscus)** — GitHub Discussions-powered comments and reactions on all pages
 - [x] **Google Analytics** — GA4 tracking across all GitHub Pages
+- [x] **XSS Hardening & CSP** — Quote-aware escHtml(), Content-Security-Policy meta tags on all pages, API key hygiene
 
 ### Completed (v2.5.0)
 - [x] **Theme Engine** -- 5 selectable themes (Interceptor, Classic, Daytona, Case File, Cyber) with localStorage persistence
@@ -467,7 +470,7 @@ MASS-Trap/
 | Document | Purpose |
 |----------|---------|
 | [CHANGELOG.md](CHANGELOG.md) | Detailed release notes for every version (Keep a Changelog format) |
-| [BACKLOG_PLANS.md](BACKLOG_PLANS.md) | 14 backlog items with full implementation designs — security, mesh networking, fleet updates |
+| [BACKLOG_PLANS.md](BACKLOG_PLANS.md) | 15 backlog items with full implementation designs — security, mesh networking, fleet updates |
 | [MESH_AUTONOMY_DESIGN.md](MESH_AUTONOMY_DESIGN.md) | "10-Code" distributed ESP-NOW protocol — removes finish gate as single authority |
 | [DAYTONA_THEME_BRIEF.md](DAYTONA_THEME_BRIEF.md) | NASCAR-inspired theme design spec — typography, colors, personal easter eggs |
 | [HARDWARE_CATALOG.md](HARDWARE_CATALOG.md) | Complete hardware inventory with ASINs, costs, and role assignments |
