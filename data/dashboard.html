@@ -1308,7 +1308,7 @@
       var color = document.getElementById('carColor').value.trim();
       var weight = parseFloat(document.getElementById('carWeight').value);
       if (!name || name.length < 1 || name.length > 30) { alert('Name must be 1-30 characters!'); return; }
-      if (!weight || weight < 1 || weight > 200) { alert('Mass must be 1-200 grams!'); return; }
+      if (!weight || weight < 0.1 || weight > 1000) { alert('Mass must be 0.1-1000 grams!'); return; }
 
       if (editingCarIndex >= 0) {
         garage[editingCarIndex].name = name;
