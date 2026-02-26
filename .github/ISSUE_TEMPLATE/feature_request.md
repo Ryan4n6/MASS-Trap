@@ -4,6 +4,7 @@ about: Suggest an idea for M.A.S.S. Trap
 title: "[FEATURE] "
 labels: enhancement
 assignees: ''
+
 ---
 
 ## Problem

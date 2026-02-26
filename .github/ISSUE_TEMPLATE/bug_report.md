@@ -4,6 +4,7 @@ about: Something isn't working right
 title: "[BUG] "
 labels: bug
 assignees: ''
+
 ---
 
 ## Describe the Bug
