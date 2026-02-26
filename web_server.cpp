@@ -2,6 +2,7 @@
 #include "config.h"
 #include "espnow_comm.h"
 #include "finish_gate.h"
+#include "start_gate.h"
 #include "wled_integration.h"
 #include "audio_manager.h"
 #include "lidar_sensor.h"
@@ -246,6 +247,12 @@ void broadcastState() {
     lidar["state"] = (ls == LIDAR_NO_CAR) ? "empty" :
                      (ls == LIDAR_CAR_STAGED) ? "staged" : "launched";
     lidar["distance_mm"] = getDistanceMM();
+  }
+
+  // Proximity arm sensor data (HW-870 on start gate)
+  if (isProxArmEnabled()) {
+    doc["proxArm"] = true;
+    doc["proxCar"] = isProxCarPresent();
   }
 
   // Peer count for dashboard status indicators
@@ -575,7 +582,7 @@ static void handleApiReset() {
 }
 
 static void handleApiInfo() {
-  StaticJsonDocument<384> doc;
+  StaticJsonDocument<512> doc;
   doc["project"] = PROJECT_NAME;
   doc["firmware"] = FIRMWARE_VERSION;
   doc["role"] = cfg.role;
@@ -583,11 +590,13 @@ static void handleApiInfo() {
   doc["uptime_s"] = millis() / 1000;
   doc["free_heap"] = ESP.getFreeHeap();
   doc["wifi_rssi"] = WiFi.RSSI();
+  doc["wifi_channel"] = WiFi.channel();
   doc["peer_connected"] = peerConnected;
   doc["peer_count"] = peerCount;
   doc["ip"] = WiFi.localIP().toString();
   doc["audio_enabled"] = cfg.audio_enabled;
   doc["lidar_enabled"] = cfg.lidar_enabled;
+  doc["clock_offset_us"] = (double)clockOffset_us;
 
   String output;
   serializeJson(doc, output);
@@ -604,6 +613,7 @@ static void handleApiWifiStatus() {
   doc["ssid"] = cfg.wifi_ssid;
   doc["ip"] = WiFi.localIP().toString();
   doc["rssi"] = WiFi.RSSI();
+  doc["channel"] = WiFi.channel();
   doc["mode"] = (WiFi.getMode() == WIFI_AP) ? "AP" :
                 (WiFi.getMode() == WIFI_STA) ? "STA" :
                 (WiFi.getMode() == WIFI_AP_STA) ? "AP_STA" : "OFF";
@@ -923,6 +933,107 @@ static void handleApiPeersForget() {
     forgetAllPeers();
     server.send(200, "application/json", "{\"status\":\"ok\",\"action\":\"forgot_all\"}");
   }
+}
+
+// ============================================================================
+// FLEET MANAGEMENT API — WiFi sharing and remote commands
+// ============================================================================
+
+// POST /api/peers/share-wifi
+// Body (optional): {"mac":"AA:BB:CC:DD:EE:FF"} — omit for broadcast to all
+static void handleApiShareWifi() {
+  if (!requireAuth()) return;
+
+  // Only the finish gate should push WiFi creds (it's the hub)
+  if (strcmp(cfg.role, "finish") != 0) {
+    server.send(403, "application/json", "{\"error\":\"Only finish gate can share WiFi credentials\"}");
+    return;
+  }
+
+  String body = server.arg("plain");
+  if (body.length() > 0) {
+    StaticJsonDocument<128> doc;
+    DeserializationError err = deserializeJson(doc, body);
+    if (err) {
+      server.send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
+      return;
+    }
+    const char* macStr = doc["mac"] | "";
+    if (strlen(macStr) > 0) {
+      uint8_t mac[6];
+      if (parseMacString(macStr, mac)) {
+        sendWiFiConfig(mac);
+        server.send(200, "application/json", "{\"ok\":true,\"sent\":1}");
+      } else {
+        server.send(400, "application/json", "{\"error\":\"Invalid MAC address\"}");
+      }
+      return;
+    }
+  }
+
+  // No MAC specified — broadcast to all paired peers
+  sendWiFiConfigAll();
+  int pairedCount = 0;
+  for (int i = 0; i < peerCount; i++) {
+    if (peers[i].paired) pairedCount++;
+  }
+  char resp[64];
+  snprintf(resp, sizeof(resp), "{\"ok\":true,\"sent\":%d}", pairedCount);
+  server.send(200, "application/json", resp);
+}
+
+// POST /api/peers/command
+// Body: {"mac":"AA:BB:CC:DD:EE:FF","cmd":"reboot","param":0}
+static void handleApiPeerCommand() {
+  if (!requireAuth()) return;
+
+  // Only the finish gate should send remote commands
+  if (strcmp(cfg.role, "finish") != 0) {
+    server.send(403, "application/json", "{\"error\":\"Only finish gate can send remote commands\"}");
+    return;
+  }
+
+  String body = server.arg("plain");
+  if (body.length() == 0) {
+    server.send(400, "application/json", "{\"error\":\"Empty body\"}");
+    return;
+  }
+
+  StaticJsonDocument<256> doc;
+  DeserializationError err = deserializeJson(doc, body);
+  if (err) {
+    server.send(400, "application/json", "{\"error\":\"Invalid JSON\"}");
+    return;
+  }
+
+  const char* macStr = doc["mac"] | "";
+  const char* cmdStr = doc["cmd"] | "";
+  uint32_t param = doc["param"] | 0;
+
+  if (strlen(macStr) == 0 || strlen(cmdStr) == 0) {
+    server.send(400, "application/json", "{\"error\":\"Missing mac or cmd\"}");
+    return;
+  }
+
+  uint8_t mac[6];
+  if (!parseMacString(macStr, mac)) {
+    server.send(400, "application/json", "{\"error\":\"Invalid MAC address\"}");
+    return;
+  }
+
+  // Map command string to CMD_* constant
+  uint8_t cmd = 0;
+  if (strcmp(cmdStr, "reboot") == 0)          cmd = CMD_REBOOT;
+  else if (strcmp(cmdStr, "identify") == 0)    cmd = CMD_IDENTIFY;
+  else if (strcmp(cmdStr, "diag") == 0)        cmd = CMD_DIAG_REPORT;
+  else if (strcmp(cmdStr, "wifi-reconnect") == 0) cmd = CMD_WIFI_RECONNECT;
+  else {
+    server.send(400, "application/json", "{\"error\":\"Unknown command. Use: reboot, identify, diag, wifi-reconnect\"}");
+    return;
+  }
+
+  sendRemoteCmd(mac, cmd, param);
+  server.send(200, "application/json", "{\"ok\":true}");
 }
 
 // ============================================================================
@@ -1611,6 +1722,8 @@ void initWebServer() {
   server.on("/api/diagnostics", HTTP_GET, handleApiDiagnostics);
   server.on("/api/peers", HTTP_GET, handleApiPeers);
   server.on("/api/peers/forget", HTTP_POST, handleApiPeersForget);
+  server.on("/api/peers/share-wifi", HTTP_POST, handleApiShareWifi);
+  server.on("/api/peers/command", HTTP_POST, handleApiPeerCommand);
   server.on("/api/garage", HTTP_GET, handleApiGarage);
   server.on("/api/garage", HTTP_POST, handleApiGarage);
   server.on("/api/history", HTTP_GET, handleApiHistory);
@@ -1680,6 +1793,23 @@ void initWebServer() {
       server.send(502, "application/json", "{\"error\":\"WLED unreachable\"}");
     }
     http.end();
+  });
+
+  // --- Telemetry (XIAO ride-along IMU data) ---
+  server.on("/api/telemetry", HTTP_GET, []() {
+    if (!requireAuth()) return;
+    if (LittleFS.exists("/telemetry_latest.csv")) {
+      File f = LittleFS.open("/telemetry_latest.csv", "r");
+      server.streamFile(f, "text/csv");
+      f.close();
+    } else {
+      server.send(404, "application/json", "{\"error\":\"No telemetry data\"}");
+    }
+  });
+
+  server.on("/api/telemetry/info", HTTP_GET, []() {
+    if (!requireAuth()) return;
+    server.send(200, "application/json", getTelemetryInfoJson());
   });
 
   // Static CSS/JS assets from LittleFS with cache headers

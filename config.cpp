@@ -30,12 +30,15 @@ void setDefaults(DeviceConfig& c) {
   c.sensor_pin_2 = 5;    // Speed trap second sensor
   c.led_pin = 2;
 
-  // Audio (MAX98357A I2S) — disabled by default
+  // Audio — disabled by default, I2S backend for backwards compatibility
   c.audio_enabled = false;
+  strncpy(c.audio_backend, "i2s", sizeof(c.audio_backend) - 1);
   c.i2s_bclk_pin = 15;
   c.i2s_lrc_pin = 16;
   c.i2s_dout_pin = 17;
   c.audio_volume = 10;
+  c.dysv5w_tx_pin = 15;   // Default UART TX to DY-SV5W RXD
+  c.dysv5w_busy_pin = 16; // Default BUSY (DY-SV5W I/O1, LOW = playing)
 
   // LiDAR Sensor (TF-Luna UART) — disabled by default
   c.lidar_enabled = false;
@@ -272,10 +275,13 @@ String configToJson() {
 
   JsonObject audio = doc.createNestedObject("audio");
   audio["enabled"] = cfg.audio_enabled;
+  audio["backend"] = cfg.audio_backend;
   audio["bclk_pin"] = cfg.i2s_bclk_pin;
   audio["lrc_pin"] = cfg.i2s_lrc_pin;
   audio["dout_pin"] = cfg.i2s_dout_pin;
   audio["volume"] = cfg.audio_volume;
+  audio["dysv5w_tx_pin"] = cfg.dysv5w_tx_pin;
+  audio["dysv5w_busy_pin"] = cfg.dysv5w_busy_pin;
 
   JsonObject lidar = doc.createNestedObject("lidar");
   lidar["enabled"] = cfg.lidar_enabled;
@@ -350,10 +356,13 @@ bool configFromJson(const String& json) {
   JsonObject audio = doc["audio"];
   if (audio) {
     cfg.audio_enabled = audio["enabled"] | false;
+    strncpy(cfg.audio_backend, audio["backend"] | "i2s", sizeof(cfg.audio_backend) - 1);
     cfg.i2s_bclk_pin = audio["bclk_pin"] | 15;
     cfg.i2s_lrc_pin = audio["lrc_pin"] | 16;
     cfg.i2s_dout_pin = audio["dout_pin"] | 17;
     cfg.audio_volume = audio["volume"] | 10;
+    cfg.dysv5w_tx_pin = audio["dysv5w_tx_pin"] | 15;
+    cfg.dysv5w_busy_pin = audio["dysv5w_busy_pin"] | 16;
   }
 
   JsonObject lidar = doc["lidar"];
@@ -463,14 +472,17 @@ void getMacSuffix(char* buf, size_t len) {
 }
 
 void generateHostname(const char* role, const char* macSuffix, char* outBuf, size_t outLen) {
-  // Abbreviate "speedtrap" to "speed" for compact hostnames
+  // Abbreviate "speedtrap" to "trap" — the speedtrap IS the trap
   const char* abbrev = role;
-  if (strcmp(role, "speedtrap") == 0) abbrev = "speed";
+  if (strcmp(role, "speedtrap") == 0) abbrev = "trap";
 
+  // Configured devices get clean hostnames without MAC suffix:
+  //   mass-finish, mass-start, mass-trap
+  // MAC suffix only used for unconfigured/unknown roles as a fallback
   if (abbrev && strlen(abbrev) > 0) {
-    snprintf(outBuf, outLen, "masstrap-%s-%s", abbrev, macSuffix);
+    snprintf(outBuf, outLen, "%s-%s", HOSTNAME_PREFIX, abbrev);
   } else {
-    snprintf(outBuf, outLen, "masstrap-%s", macSuffix);
+    snprintf(outBuf, outLen, "%s-%s", HOSTNAME_PREFIX, macSuffix);
   }
 
   // Force lowercase (mDNS convention)

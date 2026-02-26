@@ -240,3 +240,209 @@ void onFinishGateESPNow(const ESPMessage& msg, uint64_t receiveTime) {
       break;
   }
 }
+
+// ============================================================================
+// TELEMETRY RECEIVE SYSTEM — Reassembles chunked IMU data from XIAO
+// ============================================================================
+
+// Telemetry receive state
+static IMUSample* telemBuffer = NULL;     // PSRAM-allocated receive buffer
+static uint16_t telemExpectedSamples = 0;
+static uint16_t telemReceivedSamples = 0;
+static uint16_t telemSampleRate = 0;
+static uint8_t  telemAccelRange = 0;
+static uint16_t telemGyroRange = 0;
+static uint32_t telemRunId = 0;
+static uint32_t telemDuration_ms = 0;
+static uint8_t  telemExpectedChunks = 0;
+static uint8_t  telemReceivedChunks = 0;
+static bool     telemInProgress = false;
+static unsigned long telemStartedAt = 0;
+static uint8_t  telemSrcMac[6] = {0};
+
+// Last completed telemetry info
+static bool     telemDataReady = false;
+static uint16_t telemLastSampleCount = 0;
+static uint32_t telemLastDuration_ms = 0;
+static uint32_t telemLastRunId = 0;
+static unsigned long telemLastReceivedAt = 0;
+
+// CRC16 for verification
+static uint16_t telemCRC16(const uint8_t* data, size_t len) {
+  uint16_t crc = 0xFFFF;
+  for (size_t i = 0; i < len; i++) {
+    crc ^= data[i];
+    for (int j = 0; j < 8; j++) {
+      if (crc & 1) crc = (crc >> 1) ^ 0xA001;
+      else crc >>= 1;
+    }
+  }
+  return crc;
+}
+
+void onTelemetryHeader(const uint8_t* srcMac, const TelemetryHeader& hdr) {
+  LOG.printf("[TELEM] Header: runId=%u, %d samples @ %dHz, ±%dg/±%ddps, %ums\n",
+             hdr.runId, hdr.sampleCount, hdr.sampleRate,
+             hdr.accelRange, hdr.gyroRange_div100 * 100, hdr.duration_ms);
+
+  // Allocate or reuse buffer in PSRAM
+  size_t bufSize = hdr.sampleCount * sizeof(IMUSample);
+  if (telemBuffer != NULL) {
+    free(telemBuffer);
+    telemBuffer = NULL;
+  }
+
+  telemBuffer = (IMUSample*)ps_malloc(bufSize);
+  if (telemBuffer == NULL) {
+    LOG.printf("[TELEM] ERROR: Failed to allocate %d bytes in PSRAM\n", bufSize);
+    return;
+  }
+  memset(telemBuffer, 0, bufSize);
+
+  // Store metadata
+  telemExpectedSamples = hdr.sampleCount;
+  telemReceivedSamples = 0;
+  telemSampleRate = hdr.sampleRate;
+  telemAccelRange = hdr.accelRange;
+  telemGyroRange = hdr.gyroRange_div100 * 100;
+  telemRunId = hdr.runId;
+  telemDuration_ms = hdr.duration_ms;
+  telemExpectedChunks = 0;  // Will be set from first chunk
+  telemReceivedChunks = 0;
+  telemInProgress = true;
+  telemStartedAt = millis();
+  memcpy(telemSrcMac, srcMac, 6);
+}
+
+void onTelemetryChunk(const uint8_t* srcMac, const TelemetryChunk& chunk) {
+  if (!telemInProgress || chunk.runId != telemRunId) {
+    LOG.printf("[TELEM] Stale chunk (runId %u, expected %u)\n", chunk.runId, telemRunId);
+    return;
+  }
+
+  if (telemBuffer == NULL) {
+    LOG.println("[TELEM] Buffer not allocated — ignoring chunk");
+    return;
+  }
+
+  // Store total chunks from first chunk
+  if (telemExpectedChunks == 0) {
+    telemExpectedChunks = chunk.totalChunks;
+  }
+
+  // Calculate offset into buffer
+  uint16_t sampleOffset = chunk.chunkIndex * TELEM_SAMPLES_PER_CHUNK;
+  uint8_t samplesToStore = chunk.samplesInChunk;
+
+  // Bounds check
+  if (sampleOffset + samplesToStore > telemExpectedSamples) {
+    LOG.printf("[TELEM] Chunk %d overflow: offset=%d + count=%d > expected=%d\n",
+               chunk.chunkIndex, sampleOffset, samplesToStore, telemExpectedSamples);
+    samplesToStore = telemExpectedSamples - sampleOffset;
+  }
+
+  // Copy samples into buffer
+  memcpy(&telemBuffer[sampleOffset], chunk.samples, samplesToStore * sizeof(IMUSample));
+  telemReceivedSamples += samplesToStore;
+  telemReceivedChunks++;
+
+  // Progress log every 10 chunks
+  if (telemReceivedChunks % 10 == 0 || telemReceivedChunks == telemExpectedChunks) {
+    LOG.printf("[TELEM] Chunk %d/%d (%d/%d samples)\n",
+               telemReceivedChunks, telemExpectedChunks,
+               telemReceivedSamples, telemExpectedSamples);
+  }
+}
+
+void onTelemetryEnd(const uint8_t* srcMac, const TelemetryEnd& end) {
+  if (!telemInProgress || end.runId != telemRunId) {
+    LOG.printf("[TELEM] Stale end marker (runId %u)\n", end.runId);
+    return;
+  }
+
+  telemInProgress = false;
+
+  // Verify
+  if (telemReceivedSamples != end.sampleCount) {
+    LOG.printf("[TELEM] WARNING: Received %d samples, end says %d\n",
+               telemReceivedSamples, end.sampleCount);
+  }
+
+  // CRC check
+  uint16_t localCRC = telemCRC16((uint8_t*)telemBuffer,
+                                  telemReceivedSamples * sizeof(IMUSample));
+  if (localCRC != end.checksum) {
+    LOG.printf("[TELEM] WARNING: CRC mismatch (local=0x%04X, remote=0x%04X)\n",
+               localCRC, end.checksum);
+  } else {
+    LOG.printf("[TELEM] CRC OK: 0x%04X\n", localCRC);
+  }
+
+  // Write CSV to LittleFS
+  File f = LittleFS.open("/telemetry_latest.csv", "w");
+  if (f) {
+    f.println("timestamp_ms,accel_x_g,accel_y_g,accel_z_g,gyro_x_dps,gyro_y_dps,gyro_z_dps");
+    for (uint16_t i = 0; i < telemReceivedSamples; i++) {
+      f.printf("%.3f,%.4f,%.4f,%.4f,%.2f,%.2f,%.2f\n",
+        telemBuffer[i].timestamp_us / 1000.0f,
+        telemBuffer[i].ax * TELEM_ACCEL_LSB_TO_G,
+        telemBuffer[i].ay * TELEM_ACCEL_LSB_TO_G,
+        telemBuffer[i].az * TELEM_ACCEL_LSB_TO_G,
+        telemBuffer[i].gx * TELEM_GYRO_LSB_TO_DPS,
+        telemBuffer[i].gy * TELEM_GYRO_LSB_TO_DPS,
+        telemBuffer[i].gz * TELEM_GYRO_LSB_TO_DPS);
+    }
+    f.close();
+
+    LOG.printf("[TELEM] ✓ Saved /telemetry_latest.csv (%d samples, %ums, run %u)\n",
+               telemReceivedSamples, telemDuration_ms, telemRunId);
+  } else {
+    LOG.println("[TELEM] ERROR: Failed to open /telemetry_latest.csv for writing");
+  }
+
+  // Update last-run info
+  telemDataReady = true;
+  telemLastSampleCount = telemReceivedSamples;
+  telemLastDuration_ms = telemDuration_ms;
+  telemLastRunId = telemRunId;
+  telemLastReceivedAt = millis();
+
+  // Send ACK
+  ESPMessage ack;
+  ack.type = MSG_TELEM_ACK;
+  ack.senderId = cfg.device_id;
+  ack.timestamp = nowUs();
+  ack.offset = telemReceivedSamples;
+  strncpy(ack.role, cfg.role, sizeof(ack.role));
+  strncpy(ack.hostname, cfg.hostname, sizeof(ack.hostname));
+  esp_now_send(srcMac, (uint8_t*)&ack, sizeof(ack));
+
+  LOG.printf("[TELEM] ACK sent. Elapsed: %ums\n", millis() - telemStartedAt);
+
+  // Free buffer (data is in CSV file now)
+  if (telemBuffer != NULL) {
+    free(telemBuffer);
+    telemBuffer = NULL;
+  }
+}
+
+bool hasTelemetryData() {
+  return telemDataReady;
+}
+
+String getTelemetryInfoJson() {
+  String json = "{";
+  json += "\"available\":" + String(telemDataReady ? "true" : "false");
+  if (telemDataReady) {
+    json += ",\"samples\":" + String(telemLastSampleCount);
+    json += ",\"duration_ms\":" + String(telemLastDuration_ms);
+    json += ",\"runId\":" + String(telemLastRunId);
+    json += ",\"sampleRate\":" + String(telemSampleRate);
+    json += ",\"accelRange\":" + String(telemAccelRange);
+    json += ",\"gyroRange\":" + String(telemGyroRange);
+    json += ",\"receivedAt\":" + String(telemLastReceivedAt);
+    json += ",\"uptime_ms\":" + String(millis());
+  }
+  json += "}";
+  return json;
+}

@@ -34,11 +34,23 @@ credentials.h
 secrets.h
 *.env
 
+# --- Cloudflare Wrangler (contains account ID) ---
+.wrangler/
+
 # --- Private data (order history, raw catalogs) ---
 amazon_orders_*.json
 amazon_parts_catalog.json
+
+# --- IP-sensitive documents (BIG6 protocol, patent strategy) ---
+BIG6_*
+PATENT_*
+ESPNOW_PROTOCOL_SPEC.md
+
+# --- Ben's science fair submissions (personal, not project code) ---
+BEN_*
 
 # --- Audio pipeline (generated files, not source) ---
 audio/raw/
 audio/radio/
 audio/esp32/
+audio/*.m4a

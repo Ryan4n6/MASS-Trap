@@ -2,99 +2,432 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#1a1a2e">
   <meta name="color-scheme" content="dark">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws: wss:; frame-ancestors 'none';">
-  <meta name="fw-version" content="2.5.0">
-  <title>Start Gate - M.A.S.S. Trap</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' ws: wss: http://192.168.1.83:* ws://192.168.1.83:* http://masstrap-finish.local:* ws://masstrap-finish.local:* https://api.github.com;">
+  <meta name="fw-version" content="2.6.0-beta">
+  <title>LAUNCH CONTROL - M.A.S.S. Trap</title>
   <link rel="stylesheet" href="/style.css">
+  <style>
+    /* ================================================================
+       GO/NO-GO LAUNCH CONTROL — Scoped styles
+       Designed for phone/tablet at arm's length. Everything BIG.
+       ================================================================ */
+
+    .lc-header {
+      text-align: center;
+      padding: 12px 0 4px;
+    }
+    .lc-header h1 {
+      font-size: 1.4rem;
+      letter-spacing: 4px;
+      margin: 0;
+      color: var(--accent);
+      text-transform: uppercase;
+    }
+    .lc-header .lc-sub {
+      font-size: 0.7rem;
+      letter-spacing: 6px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    /* === GO/NO-GO BANNER === */
+    .go-nogo {
+      text-align: center;
+      padding: 20px 16px;
+      margin: 8px 0;
+      border-radius: 8px;
+      font-family: Impact, 'Arial Narrow', sans-serif;
+      font-size: 3rem;
+      font-weight: 700;
+      letter-spacing: 6px;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      border: 3px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+    .go-nogo .go-nogo-reason {
+      display: block;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 0.65rem;
+      font-weight: 400;
+      letter-spacing: 2px;
+      margin-top: 4px;
+      opacity: 0.8;
+    }
+
+    /* GO — pulsing green, ready to launch */
+    .go-nogo.go {
+      background: linear-gradient(135deg, #004d00 0%, #006600 50%, #004d00 100%);
+      color: #33ff33;
+      border-color: #00aa00;
+      text-shadow: 0 0 20px rgba(51,255,51,0.4), 0 2px 4px rgba(0,0,0,0.5);
+      animation: go-pulse 2s ease-in-out infinite;
+    }
+    @keyframes go-pulse {
+      0%, 100% { box-shadow: 0 0 20px rgba(0,170,0,0.3), inset 0 0 30px rgba(0,100,0,0.2); }
+      50% { box-shadow: 0 0 40px rgba(0,170,0,0.5), inset 0 0 50px rgba(0,100,0,0.3); }
+    }
+
+    /* STANDBY — warm yellow, system ready but not armed */
+    .go-nogo.standby {
+      background: linear-gradient(135deg, #4d3d00 0%, #665200 50%, #4d3d00 100%);
+      color: var(--accent);
+      border-color: #997a00;
+      text-shadow: 0 0 15px rgba(255,204,0,0.3), 0 2px 4px rgba(0,0,0,0.5);
+      box-shadow: 0 0 20px rgba(153,122,0,0.2);
+    }
+
+    /* NO-GO — angry red, something is wrong */
+    .go-nogo.nogo {
+      background: linear-gradient(135deg, #4d0000 0%, #660000 50%, #4d0000 100%);
+      color: #ff4444;
+      border-color: #cc0000;
+      text-shadow: 0 0 20px rgba(255,68,68,0.4), 0 2px 4px rgba(0,0,0,0.5);
+      animation: nogo-flash 1s ease-in-out infinite;
+    }
+    @keyframes nogo-flash {
+      0%, 100% { box-shadow: 0 0 20px rgba(204,0,0,0.3); }
+      50% { box-shadow: 0 0 40px rgba(204,0,0,0.5); border-color: #ff0000; }
+    }
+
+    /* RESULT — brief flash showing timing */
+    .go-nogo.result {
+      background: linear-gradient(135deg, #1a1a3e 0%, #2a2a5e 50%, #1a1a3e 100%);
+      color: var(--accent);
+      border-color: var(--accent);
+      text-shadow: 0 0 15px rgba(255,204,0,0.3), 0 2px 4px rgba(0,0,0,0.5);
+      box-shadow: 0 0 30px rgba(255,204,0,0.2);
+    }
+
+    /* RACING — car in transit */
+    .go-nogo.racing {
+      background: linear-gradient(135deg, #1a003d 0%, #2a0066 50%, #1a003d 100%);
+      color: #cc99ff;
+      border-color: #6600cc;
+      text-shadow: 0 0 15px rgba(204,153,255,0.3), 0 2px 4px rgba(0,0,0,0.5);
+      animation: racing-sweep 0.8s linear infinite;
+    }
+    @keyframes racing-sweep {
+      0% { background-position: 0% 50%; }
+      100% { background-position: 200% 50%; }
+    }
+    .go-nogo.racing {
+      background: repeating-linear-gradient(90deg, #1a003d, #2a0066 30px, #3a0099 60px, #2a0066 90px, #1a003d 120px);
+      background-size: 240px 100%;
+    }
+
+    /* === PANELS GRID === */
+    .lc-panels {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin: 8px 0;
+    }
+    @media (max-width: 480px) {
+      .lc-panels { grid-template-columns: 1fr; }
+    }
+
+    .lc-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+    }
+    .lc-panel-title {
+      font-size: 0.6rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+    }
+
+    /* System check list */
+    .check-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 3px 0;
+      font-size: 0.8rem;
+    }
+    .check-item .check-name {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .check-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+    .check-dot.ok { background: var(--success); box-shadow: 0 0 6px rgba(0,200,83,0.4); }
+    .check-dot.fail { background: var(--danger); box-shadow: 0 0 6px rgba(255,0,0,0.4); }
+    .check-dot.stale { background: var(--accent); box-shadow: 0 0 6px rgba(255,204,0,0.3); }
+    .check-dot.unknown { background: var(--text-muted); }
+    .check-status {
+      font-family: 'Courier New', monospace;
+      font-size: 0.7rem;
+    }
+    .check-status.ok { color: var(--success); }
+    .check-status.fail { color: var(--danger); }
+
+    /* Current test info */
+    .test-car {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .test-detail {
+      display: flex;
+      justify-content: space-between;
+      padding: 2px 0;
+      font-size: 0.8rem;
+    }
+    .test-detail .td-label { color: var(--text-muted); }
+    .test-detail .td-value { font-family: 'Courier New', monospace; color: var(--text); }
+
+    /* === LAST RESULT === */
+    .result-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin: 8px 0;
+    }
+    .result-panel.fresh {
+      border-color: var(--accent);
+      box-shadow: 0 0 15px rgba(255,204,0,0.15);
+    }
+    .result-metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      text-align: center;
+      margin: 8px 0;
+    }
+    .result-metric {
+      padding: 6px 4px;
+      background: var(--bg-dark);
+      border-radius: 4px;
+    }
+    .result-metric .rm-value {
+      font-size: 1.4rem;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+      color: var(--text);
+      line-height: 1.1;
+    }
+    .result-metric .rm-unit {
+      font-size: 0.55rem;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .result-physics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+      text-align: center;
+      font-size: 0.7rem;
+    }
+    .result-physics .rp-item {
+      color: var(--text-muted);
+    }
+    .result-physics .rp-val {
+      font-family: 'Courier New', monospace;
+      color: var(--text);
+    }
+
+    .result-quality {
+      text-align: center;
+      padding: 6px 0 2px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .result-quality.good { color: var(--success); }
+    .result-quality.outlier { color: var(--danger); }
+    .result-quality.first { color: var(--accent); }
+
+    /* === RACE STATE BAR === */
+    .race-state-bar {
+      text-align: center;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 6px;
+      font-family: Impact, 'Arial Narrow', sans-serif;
+      font-size: 1.2rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+    .race-state-bar.idle { color: var(--text-muted); border-color: var(--border); }
+    .race-state-bar.armed { color: var(--success); border-color: var(--success); text-shadow: 0 0 10px rgba(0,200,83,0.3); }
+    .race-state-bar.racing { color: #cc99ff; border-color: #6600cc; text-shadow: 0 0 10px rgba(102,0,204,0.3); }
+    .race-state-bar.finished { color: var(--accent); border-color: var(--accent); text-shadow: 0 0 10px rgba(255,204,0,0.3); }
+
+    /* Run counter */
+    .run-counter {
+      text-align: center;
+      font-size: 0.65rem;
+      letter-spacing: 2px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .run-counter .rc-num {
+      color: var(--accent);
+      font-family: 'Courier New', monospace;
+      font-weight: 700;
+    }
+
+    /* Finish gate connection status */
+    .fg-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      margin: 4px 0;
+    }
+    .fg-status .fg-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+    .fg-status .fg-dot.ok { background: var(--success); }
+    .fg-status .fg-dot.fail { background: var(--danger); }
+
+    /* === MOBILE OPTIMIZATIONS === */
+    @media (max-width: 380px) {
+      .go-nogo { font-size: 2.2rem; padding: 14px 12px; }
+      .result-metric .rm-value { font-size: 1.1rem; }
+      .test-car { font-size: 1.1rem; }
+    }
+
+    /* === NO-SCROLL FULLSCREEN === */
+    .lc-container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 0 8px 60px;
+    }
+  </style>
 </head>
 <body>
-  <div id="navContainer"></div>
-  <div class="container">
-    <div class="page-header">
-      <div class="page-header-shield"></div>
-      <h1>M.A.S.S. TRAP</h1>
-      <div class="subtitle">Motion Analysis &amp; Speed System</div>
-      <div class="role-badge start">Start Gate</div>
-      <div class="theme-selector">
-        Theme: <select id="themePicker" onchange="setTheme(this.value)">
-          <option value="interceptor">Interceptor</option>
-          <option value="classic">Classic</option>
-          <option value="daytona">Daytona</option>
-          <option value="casefile">Case File</option>
-          <option value="cyber">Cyber</option>
-        </select>
-      </div>
+  <div class="lc-container">
+    <!-- Header -->
+    <div class="lc-header">
+      <h1 id="lcTitle">LAUNCH CONTROL</h1>
+      <div class="lc-sub" id="lcSubtitle">M.A.S.S. TRAP — START GATE</div>
     </div>
 
-    <!-- State Banner -->
-    <div id="stateBanner" class="state-banner">INITIALIZING</div>
-
-    <!-- System Status -->
-    <div class="section">
-      <div class="section-title">SYSTEM STATUS</div>
-      <div class="info-row" style="padding-top:12px;">
-        <span class="info-label"><span id="wsDot" class="ws-dot"></span>WebSocket</span>
-        <span class="info-value" id="wsStatus">Connecting...</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Race State</span>
-        <span class="info-value" id="raceState">--</span>
-      </div>
+    <!-- GO / NO-GO Banner -->
+    <div id="goNogo" class="go-nogo standby">
+      STANDBY
+      <span class="go-nogo-reason" id="goNogoReason">Initializing systems...</span>
     </div>
 
-    <!-- Peer Network -->
-    <div class="section" id="peerCard">
-      <div class="section-title secondary">PEER NETWORK</div>
-      <div id="peerList" style="padding-top:8px;">
-        <div class="info-row">
-          <span class="info-label">Scanning...</span>
-          <span class="info-value text-muted">Searching for peers</span>
+    <!-- Finish Gate Link -->
+    <div class="fg-status">
+      <span class="fg-dot" id="fgDot"></span>
+      <span id="fgLabel">Finish Gate: connecting...</span>
+    </div>
+
+    <!-- Panels: System Check + Current Test -->
+    <div class="lc-panels">
+      <!-- System Check -->
+      <div class="lc-panel">
+        <div class="lc-panel-title">SYSTEM CHECK</div>
+        <div id="systemCheck">
+          <div class="check-item">
+            <span class="check-name"><span class="check-dot unknown"></span> Loading...</span>
+            <span class="check-status">--</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current Test -->
+      <div class="lc-panel">
+        <div class="lc-panel-title">CURRENT TEST</div>
+        <div id="currentTest">
+          <div class="test-car" id="testCar">Waiting for data...</div>
+          <div class="test-detail">
+            <span class="td-label">Weight</span>
+            <span class="td-value" id="testWeight">--</span>
+          </div>
+          <div class="test-detail">
+            <span class="td-label">Track</span>
+            <span class="td-value" id="testTrack">--</span>
+          </div>
+          <div class="test-detail">
+            <span class="td-label">Scale</span>
+            <span class="td-value" id="testScale">--</span>
+          </div>
+          <div class="test-detail">
+            <span class="td-label">Total Runs</span>
+            <span class="td-value" id="testRuns">--</span>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- LiDAR Card -->
-    <div id="lidarCard" class="section" style="display:none;">
-      <div class="section-title">LIDAR STAGING SENSOR</div>
-      <div class="lidar-reading" style="padding-top:8px;">
-        <div><span id="lidarDist" class="lidar-distance">--</span><span class="unit"> mm</span></div>
-        <span id="lidarLabel" class="lidar-state-label empty">NO TARGET</span>
+    <!-- Last Result -->
+    <div id="resultPanel" class="result-panel" style="display:none;">
+      <div class="lc-panel-title">LAST RESULT</div>
+      <div class="result-metrics">
+        <div class="result-metric">
+          <div class="rm-value" id="resTime">--</div>
+          <div class="rm-unit">seconds</div>
+        </div>
+        <div class="result-metric">
+          <div class="rm-value" id="resSpeed">--</div>
+          <div class="rm-unit" id="resSpeedUnit">m/s</div>
+        </div>
+        <div class="result-metric">
+          <div class="rm-value" id="resScaleMph">--</div>
+          <div class="rm-unit">scale mph</div>
+        </div>
       </div>
-      <div class="lidar-bar-container">
-        <div id="lidarBar" class="lidar-bar" style="width:0%"></div>
+      <div class="result-physics">
+        <div class="rp-item">Momentum: <span class="rp-val" id="resMomentum">--</span></div>
+        <div class="rp-item">KE: <span class="rp-val" id="resKE">--</span> J</div>
+        <div class="rp-item" id="resMidTrack" style="display:none;">Mid: <span class="rp-val" id="resMidSpeed">--</span></div>
       </div>
+      <div class="result-quality" id="resQuality"></div>
     </div>
 
-    <!-- Device Info -->
-    <div class="section">
-      <div class="section-title">DEVICE INFORMATION</div>
-      <div class="info-row" style="padding-top:8px;">
-        <span class="info-label">IP Address</span>
-        <span class="info-value" id="ipAddr">--</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Uptime</span>
-        <span class="info-value" id="uptime">--</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">Free Memory</span>
-        <span class="info-value" id="freeHeap">--</span>
-      </div>
-      <div class="info-row">
-        <span class="info-label">WiFi Signal</span>
-        <span class="info-value" id="wifiRssi">--</span>
-      </div>
-    </div>
+    <!-- Race State Bar -->
+    <div id="raceStateBar" class="race-state-bar idle">PIT LANE</div>
 
-    <!-- Info Message -->
-    <div class="message-box">
-      This is the <strong>Start Gate</strong> sensor node.<br>
-      Race data, garage, and history are managed by the <strong>Finish Gate</strong>.<br>
-      Open the Finish Gate dashboard to control races and view results.
-    </div>
+    <!-- Run Counter -->
+    <div class="run-counter" id="runCounter"></div>
+  </div>
+
+  <!-- Theme selector (hidden but functional) -->
+  <div class="theme-selector" style="position:fixed;top:8px;right:8px;z-index:100;font-size:0.65rem;">
+    <select id="themePicker" onchange="setTheme(this.value)" style="background:rgba(0,0,0,0.6);color:#ccc;border:1px solid #444;border-radius:4px;padding:2px 4px;font-size:0.6rem;">
+      <option value="interceptor">Interceptor</option>
+      <option value="classic">Classic</option>
+      <option value="daytona">Daytona</option>
+      <option value="casefile">Case File</option>
+      <option value="cyber">Cyber</option>
+    </select>
   </div>
 
   <div id="versionBadge" class="version-badge">v--</div>
@@ -102,107 +435,410 @@
   <script src="/main.js"></script>
   <script>
     // ====================================================================
-    // WEBSOCKET — uses shared connectWebSocket from main.js
+    // LAUNCH CONTROL — GO/NO-GO Dashboard for Start Gate
+    // Two WebSocket strategy:
+    //   1. LOCAL WS (this device) — race state, peer status
+    //   2. FINISH GATE WS (cross-device) — car, weight, timing, physics
+    // ====================================================================
+
+    // State tracking
+    var localState = {};          // From start gate WS
+    var finishState = {};         // From finish gate WS
+    var finishWsConnected = false;
+    var finishWs = null;
+    var finishWsTimer = null;
+    var lastResult = null;        // Persisted last FINISHED data
+    var resultTimes = [];         // Running history for outlier detection
+    var resultFreshTimer = null;  // Timer to un-highlight result panel
+    var peerData = [];            // From /api/peers
+
+    // Finish gate discovery
+    var FINISH_IPS = ['masstrap-finish.local', '192.168.1.83'];
+    var finishGateIP = null;
+    var finishDiscoveryIdx = 0;
+
+    // State text mapping (theme-aware — matches dashboard.html)
+    var stateText = {
+      IDLE:     'PIT LANE',
+      ARMED:    'GREEN FLAG',
+      RACING:   'FULL SEND',
+      FINISHED: 'CHECKERED FLAG'
+    };
+
+    // ====================================================================
+    // FINISH GATE WEBSOCKET — Cross-device connection
+    // WebSocket is NOT subject to CORS preflight (unlike fetch), so we
+    // skip HTTP discovery and connect directly to ws://IP:81.
+    // We also check the peer list for the finish gate IP as a discovery hint.
+    // ====================================================================
+    function connectFinishWS() {
+      // If already connected, bail
+      if (finishWs && finishWs.readyState <= 1) return;
+
+      // Pick the next candidate to try
+      var ip = finishGateIP || FINISH_IPS[finishDiscoveryIdx % FINISH_IPS.length];
+      if (!finishGateIP) finishDiscoveryIdx++;
+
+      var wsUrl = 'ws://' + ip + ':81';
+      console.log('[LC] Trying finish gate WS: ' + wsUrl);
+
+      try {
+        finishWs = new WebSocket(wsUrl);
+      } catch (e) {
+        console.error('[LC] Finish WS constructor failed:', e);
+        finishWsTimer = setTimeout(connectFinishWS, 3000);
+        return;
+      }
+
+      // Timeout: if not connected in 4s, close and try next candidate
+      var connectTimeout = setTimeout(function() {
+        if (finishWs && finishWs.readyState !== 1) {
+          console.log('[LC] Finish WS timeout on ' + ip + ', trying next');
+          finishWs.close();
+        }
+      }, 4000);
+
+      finishWs.onopen = function() {
+        clearTimeout(connectTimeout);
+        finishWsConnected = true;
+        finishGateIP = ip; // Lock onto this IP
+        console.log('[LC] Finish gate WS connected: ' + wsUrl);
+        updateFgStatus();
+        updateGoNoGo();
+      };
+
+      finishWs.onmessage = function(event) {
+        try {
+          var d = JSON.parse(event.data);
+          finishState = d;
+
+          // Update current test info
+          updateCurrentTest(d);
+
+          // Capture results on FINISHED
+          if (d.state === 'FINISHED' && d.time && d.time > 0) {
+            captureResult(d);
+          }
+
+          updateGoNoGo();
+        } catch (e) {
+          console.error('[LC] Finish WS parse error:', e);
+        }
+      };
+
+      finishWs.onclose = function() {
+        clearTimeout(connectTimeout);
+        finishWsConnected = false;
+        updateFgStatus();
+        updateGoNoGo();
+        // If we haven't locked onto an IP yet, try the next candidate
+        if (!finishGateIP) {
+          finishWsTimer = setTimeout(connectFinishWS, 1000);
+        } else {
+          // Known IP — reconnect with backoff
+          finishWsTimer = setTimeout(connectFinishWS, 3000);
+        }
+      };
+
+      finishWs.onerror = function() {
+        console.error('[LC] Finish WS error on ' + ip);
+      };
+    }
+
+    function updateFgStatus() {
+      var dot = document.getElementById('fgDot');
+      var label = document.getElementById('fgLabel');
+      if (finishWsConnected) {
+        dot.className = 'fg-dot ok';
+        label.textContent = 'Finish Gate: LINKED';
+        label.style.color = 'var(--success)';
+      } else {
+        dot.className = 'fg-dot fail';
+        label.textContent = 'Finish Gate: ' + (finishGateIP ? 'reconnecting...' : 'searching...');
+        label.style.color = 'var(--danger)';
+      }
+    }
+
+    // ====================================================================
+    // GO/NO-GO LOGIC
+    // ====================================================================
+    function updateGoNoGo() {
+      var banner = document.getElementById('goNogo');
+      var reason = document.getElementById('goNogoReason');
+
+      var localOk = wsConnected;
+      var finishOk = finishWsConnected;
+      var state = (localState.state || finishState.state || 'UNKNOWN').toUpperCase();
+
+      // Find finish gate in peer list
+      var finishPeerOnline = false;
+      for (var i = 0; i < peerData.length; i++) {
+        if (peerData[i].role === 'finish' && peerData[i].status === 'online') {
+          finishPeerOnline = true;
+          break;
+        }
+      }
+
+      // Count online peers
+      var onlinePeers = 0;
+      for (var j = 0; j < peerData.length; j++) {
+        if (peerData[j].status === 'online') onlinePeers++;
+      }
+
+      // Determine GO/NO-GO
+      if (!localOk) {
+        setBanner('nogo', 'NO-GO', 'Start gate WebSocket disconnected');
+      } else if (!finishOk) {
+        setBanner('nogo', 'NO-GO', 'Finish gate not connected');
+      } else if (!finishPeerOnline && peerData.length > 0) {
+        setBanner('nogo', 'NO-GO', 'Finish gate ESP-NOW offline');
+      } else if (state === 'RACING') {
+        setBanner('racing', 'RACING', 'Car in transit \u2014 stand by');
+      } else if (state === 'FINISHED') {
+        // Brief result display
+        var t = lastResult ? lastResult.time.toFixed(3) + 's' : '';
+        setBanner('result', t || 'RESULT', 'Run complete');
+      } else if (state === 'ARMED') {
+        setBanner('go', 'GO', onlinePeers + ' node' + (onlinePeers !== 1 ? 's' : '') + ' online \u2014 release car');
+      } else if (state === 'IDLE') {
+        var idleMsg = 'Waiting for finish gate';
+        if (finishOk && localState.proxArm) {
+          idleMsg = localState.proxCar ? 'Car detected \u2014 arming...' : 'Place car at start to arm';
+        } else if (finishOk) {
+          idleMsg = 'Arm from finish gate to begin';
+        }
+        setBanner('standby', 'STANDBY', idleMsg);
+      } else {
+        setBanner('standby', 'STANDBY', 'State: ' + state);
+      }
+    }
+
+    function setBanner(cls, text, reasonText) {
+      var banner = document.getElementById('goNogo');
+      var reason = document.getElementById('goNogoReason');
+      banner.className = 'go-nogo ' + cls;
+      banner.firstChild.textContent = text;
+      reason.textContent = reasonText || '';
+    }
+
+    // ====================================================================
+    // SYSTEM CHECK — Peer status checklist
+    // ====================================================================
+    function updateSystemCheck() {
+      var container = document.getElementById('systemCheck');
+      var html = '';
+
+      // Always show local start gate WS status
+      html += makeCheckItem('Start Gate', 'start', wsConnected ? 'ok' : 'fail',
+                           wsConnected ? 'WS OK' : 'WS DOWN');
+
+      // Finish gate — from finish WS + peer list
+      var fgPeer = findPeerByRole('finish');
+      var fgStatus = finishWsConnected ? 'ok' : 'fail';
+      var fgText = finishWsConnected ? 'LINKED' : 'OFFLINE';
+      if (fgPeer && fgPeer.diag) {
+        fgText = 'RSSI ' + fgPeer.diag.rssi + 'dB';
+      }
+      html += makeCheckItem('Finish Gate', 'finish', fgStatus, fgText);
+
+      // Other peers from peer list
+      var shown = {};
+      for (var i = 0; i < peerData.length; i++) {
+        var p = peerData[i];
+        if (p.role === 'finish') continue; // Already shown
+        var key = p.role + ':' + p.hostname;
+        if (shown[key]) continue;
+        shown[key] = true;
+
+        var st = p.status === 'online' ? 'ok' : p.status === 'stale' ? 'stale' : 'fail';
+        var detail = p.status === 'online' ? 'ONLINE' : p.status === 'stale' ? 'STALE' : 'OFFLINE';
+        if (p.diag && p.diag.rssi && p.diag.rssi !== -127) {
+          detail = 'RSSI ' + p.diag.rssi + 'dB';
+        }
+        var name = p.hostname ? p.hostname.replace('masstrap-', '') : p.role;
+        html += makeCheckItem(name, p.role, st, detail);
+      }
+
+      // Proximity arm sensor (HW-870)
+      if (localState.proxArm) {
+        var proxSt = localState.proxCar ? 'ok' : 'stale';
+        var proxText = localState.proxCar ? 'CAR DETECTED' : 'CLEAR';
+        html += makeCheckItem('Arm Sensor', 'prox', proxSt, proxText);
+      }
+
+      // WiFi signal for THIS device
+      if (localState._rssi) {
+        html += makeCheckItem('WiFi', 'wifi', localState._rssi > -70 ? 'ok' : 'stale',
+                             localState._rssi + ' dBm');
+      }
+
+      container.innerHTML = html;
+    }
+
+    function makeCheckItem(name, role, status, detail) {
+      return '<div class="check-item">' +
+        '<span class="check-name">' +
+          '<span class="check-dot ' + status + '"></span> ' +
+          escHtml(name) +
+        '</span>' +
+        '<span class="check-status ' + status + '">' + escHtml(detail) + '</span>' +
+      '</div>';
+    }
+
+    function findPeerByRole(role) {
+      for (var i = 0; i < peerData.length; i++) {
+        if (peerData[i].role === role && peerData[i].status === 'online') return peerData[i];
+      }
+      return null;
+    }
+
+    // ====================================================================
+    // CURRENT TEST — Car, weight, track info from finish gate
+    // ====================================================================
+    function updateCurrentTest(d) {
+      document.getElementById('testCar').textContent = d.car || 'No car selected';
+      document.getElementById('testWeight').textContent = d.weight ? d.weight.toFixed(1) + 'g' : '--';
+      document.getElementById('testTrack').textContent = d.trackLength ? formatDistance(d.trackLength) + ' ' + distanceUnit() : '--';
+      document.getElementById('testScale').textContent = d.scaleFactor ? '1:' + d.scaleFactor : '--';
+      document.getElementById('testRuns').textContent = d.totalRuns != null ? d.totalRuns : '--';
+    }
+
+    // ====================================================================
+    // RESULTS — Capture and display race results
+    // ====================================================================
+    function captureResult(d) {
+      lastResult = {
+        time: d.time,
+        speed_mps: d.speed_mps || 0,
+        speed_mph: d.speed_mph || 0,
+        scale_mph: d.scale_mph || 0,
+        momentum: d.momentum || 0,
+        ke: d.ke || 0,
+        midTrack_mps: d.midTrack_mps || 0,
+        midTrack_mph: d.midTrack_mph || 0,
+        car: d.car || '',
+        weight: d.weight || 0,
+        timing_error: d.timing_error || false
+      };
+
+      // Track times for outlier detection
+      if (d.time > 0 && !d.timing_error) {
+        resultTimes.push(d.time);
+        if (resultTimes.length > 50) resultTimes.shift(); // Keep last 50
+      }
+
+      renderResult();
+
+      // Flash the result panel
+      var panel = document.getElementById('resultPanel');
+      panel.classList.add('fresh');
+      clearTimeout(resultFreshTimer);
+      resultFreshTimer = setTimeout(function() {
+        panel.classList.remove('fresh');
+      }, 8000);
+    }
+
+    function renderResult() {
+      if (!lastResult) return;
+      var r = lastResult;
+      var panel = document.getElementById('resultPanel');
+      panel.style.display = 'block';
+
+      document.getElementById('resTime').textContent = r.time.toFixed(3);
+      document.getElementById('resSpeed').textContent = formatSpeed(r.speed_mps);
+      document.getElementById('resSpeedUnit').textContent = speedUnit();
+      document.getElementById('resScaleMph').textContent = r.scale_mph ? r.scale_mph.toFixed(0) : '--';
+      document.getElementById('resMomentum').textContent = r.momentum ? r.momentum.toFixed(4) : '--';
+      document.getElementById('resKE').textContent = r.ke ? r.ke.toFixed(4) : '--';
+
+      // Mid-track speed (from speedtrap)
+      if (r.midTrack_mph > 0) {
+        document.getElementById('resMidTrack').style.display = '';
+        document.getElementById('resMidSpeed').textContent = r.midTrack_mph.toFixed(1) + ' mph';
+      }
+
+      // Quality assessment
+      var quality = assessQuality(r.time);
+      var qEl = document.getElementById('resQuality');
+      qEl.textContent = quality.text;
+      qEl.className = 'result-quality ' + quality.cls;
+    }
+
+    function assessQuality(time) {
+      if (resultTimes.length < 3) {
+        return { text: '\u2605 RUN ' + resultTimes.length + ' \u2014 building baseline', cls: 'first' };
+      }
+
+      // Calculate mean and std dev of previous times
+      var sum = 0;
+      for (var i = 0; i < resultTimes.length - 1; i++) sum += resultTimes[i];
+      var mean = sum / (resultTimes.length - 1);
+
+      var sqDiffSum = 0;
+      for (var j = 0; j < resultTimes.length - 1; j++) {
+        sqDiffSum += Math.pow(resultTimes[j] - mean, 2);
+      }
+      var stdDev = Math.sqrt(sqDiffSum / (resultTimes.length - 1));
+
+      var deviation = Math.abs(time - mean);
+      var zScore = stdDev > 0 ? deviation / stdDev : 0;
+
+      if (zScore > 2.5) {
+        return { text: '\u26a0 OUTLIER \u2014 ' + zScore.toFixed(1) + '\u03c3 from mean (' + mean.toFixed(3) + 's)', cls: 'outlier' };
+      } else if (zScore > 1.5) {
+        return { text: '\u26a0 CHECK \u2014 ' + zScore.toFixed(1) + '\u03c3 from mean', cls: 'outlier' };
+      } else {
+        return { text: '\u2713 GOOD \u2014 within expected range (\u00b1' + (stdDev * 1000).toFixed(0) + 'ms)', cls: 'good' };
+      }
+    }
+
+    // ====================================================================
+    // RACE STATE BAR
+    // ====================================================================
+    function updateRaceState(state) {
+      var bar = document.getElementById('raceStateBar');
+      var s = (state || 'IDLE').toUpperCase();
+      bar.className = 'race-state-bar ' + s.toLowerCase();
+      bar.textContent = stateText[s] || s;
+    }
+
+    // ====================================================================
+    // LOCAL WEBSOCKET HANDLER — Start gate's own broadcast
     // ====================================================================
     onWsMessage(function(d) {
-      // Update state banner
-      var banner = document.getElementById('stateBanner');
-      var state = (d.state || 'UNKNOWN').toLowerCase();
-      banner.className = 'state-banner ' + state;
-      banner.textContent = d.state || 'UNKNOWN';
-      document.getElementById('raceState').textContent = d.state || '--';
-
-      // LiDAR data
-      if (d.lidar) {
-        var lidarCard = document.getElementById('lidarCard');
-        lidarCard.style.display = 'block';
-
-        var dist = d.lidar.distance_mm;
-        document.getElementById('lidarDist').textContent = dist != null ? dist : '--';
-
-        var lidarState = d.lidar.state || 'empty';
-        var label = document.getElementById('lidarLabel');
-        label.className = 'lidar-state-label ' + lidarState;
-        if (lidarState === 'staged') label.textContent = 'CAR STAGED';
-        else if (lidarState === 'launched') label.textContent = 'LAUNCHED';
-        else label.textContent = 'NO TARGET';
-
-        var bar = document.getElementById('lidarBar');
-        var pct = dist != null ? Math.max(0, Math.min(100, (1 - dist / 300) * 100)) : 0;
-        bar.style.width = pct + '%';
-        bar.className = 'lidar-bar' + (lidarState === 'staged' ? ' staged' : '');
-      }
+      localState = d;
+      updateRaceState(d.state);
+      updateGoNoGo();
     });
 
     // ====================================================================
-    // DEVICE INFO (polled)
+    // POLLED DATA — Device health + peer list
     // ====================================================================
-    function loadInfo() {
+    function pollDeviceInfo() {
       fetch('/api/info').then(function(r) { return r.json(); }).then(function(info) {
-        document.getElementById('ipAddr').textContent = info.ip || '--';
-        document.getElementById('uptime').textContent = formatUptime(info.uptime_s);
-        document.getElementById('freeHeap').textContent = formatBytes(info.free_heap);
-        document.getElementById('wifiRssi').textContent = (info.wifi_rssi || 0) + ' dBm';
-
-        if (info.lidar_enabled) {
-          document.getElementById('lidarCard').style.display = 'block';
-        }
+        localState._rssi = info.wifi_rssi;
+        localState._uptime = info.uptime_s;
+        localState._heap = info.free_heap;
       }).catch(function() {});
     }
 
-    // ====================================================================
-    // PEER NETWORK STATUS
-    // ====================================================================
-    function loadPeers() {
+    function pollPeers() {
       fetch('/api/peers').then(function(r) { return r.json(); }).then(function(peers) {
-        var container = document.getElementById('peerList');
-        if (!peers || peers.length === 0) {
-          container.innerHTML = '<div class="info-row">' +
-            '<span class="info-label">No peers found</span>' +
-            '<span class="info-value text-muted">Beaconing...</span></div>';
-          return;
-        }
-
-        var html = '';
-        for (var i = 0; i < peers.length; i++) {
-          var p = peers[i];
-          var dotClass = p.status || 'offline';
-          var statusText = p.status === 'online' ? 'ONLINE' :
-                          p.status === 'stale' ? 'STALE' : 'OFFLINE';
-          var statusStyle = p.status === 'online' ? 'color:var(--success)' :
-                           p.status === 'stale' ? '' : 'color:var(--danger)';
-          var role = p.role || 'unknown';
-          var name = p.hostname || p.mac || '--';
-          var pairedBadge = p.paired ? ' *' : '';
-          var nameHtml = p.hostname ? '<a href="http://' + escHtml(p.hostname) + '.local/" target="_blank" style="color:var(--accent);text-decoration:underline;">' + escHtml(name) + '</a>' : escHtml(name);
-
-          html += '<div class="info-row">' +
-            '<span class="info-label">' +
-              '<span class="peer-dot ' + dotClass + '"></span>' +
-              nameHtml + pairedBadge +
-              '<span class="peer-role ' + role + '">' + role + '</span>' +
-            '</span>' +
-            '<span class="info-value" style="' + statusStyle + '">' + statusText + '</span>' +
-          '</div>';
-        }
-        container.innerHTML = html;
+        peerData = peers || [];
+        updateSystemCheck();
+        updateGoNoGo();
       }).catch(function() {});
     }
 
     // ====================================================================
-    // WS STATUS INDICATOR — sync with shared wsConnected state
+    // WS STATUS SYNC — update banner when local WS state changes
     // ====================================================================
-    function updateWsIndicator() {
-      var dot = document.getElementById('wsDot');
-      var label = document.getElementById('wsStatus');
-      if (wsConnected) {
-        dot.classList.add('live');
-        label.textContent = 'Connected';
-        label.style.color = 'var(--success)';
-      } else {
-        dot.classList.remove('live');
-        label.textContent = 'Disconnected';
-        label.style.color = 'var(--danger)';
+    var _lastWsState = null;
+    function checkWsState() {
+      if (wsConnected !== _lastWsState) {
+        _lastWsState = wsConnected;
+        updateGoNoGo();
+        updateSystemCheck();
       }
     }
 
@@ -210,13 +846,23 @@
     // INIT
     // ====================================================================
     window.onload = function() {
-      document.getElementById('navContainer').innerHTML = getNavHTML();
+      // Main.js shared init (theme, WS, fleet bar, version badge)
       massInit();
-      loadInfo();
-      loadPeers();
-      setInterval(loadInfo, 15000);
-      setInterval(loadPeers, 5000);
-      setInterval(updateWsIndicator, 1000);
+
+      // Start polling
+      pollDeviceInfo();
+      pollPeers();
+      setInterval(pollDeviceInfo, 10000);
+      setInterval(pollPeers, 5000);
+      setInterval(checkWsState, 1000);
+
+      // Connect to finish gate WS directly (no CORS-blocked fetch discovery)
+      connectFinishWS();
+
+      // Initial UI state
+      updateFgStatus();
+      updateSystemCheck();
+      updateGoNoGo();
     };
   </script>
 </body>

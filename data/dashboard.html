@@ -259,7 +259,7 @@
         <!-- Weight Conditions -->
         <div id="plWeightConditionsSection" style="margin:12px 0;">
           <h4 style="font-size:0.85rem;font-weight:700;color:var(--accent);margin-bottom:6px;">WEIGHT CONDITIONS</h4>
-          <p class="text-muted" style="font-size:0.75rem;margin-bottom:6px;">Define each weight condition. Baseline (no added weight) is automatic.</p>
+          <p class="text-muted" style="font-size:0.75rem;margin-bottom:6px;">Define each weight condition. Edit the baseline to account for sensor/payload weight.</p>
           <div id="plConditions">
             <div class="pl-condition-row" data-index="0">
               <input type="text" value="No added weight" class="pl-cond-label" aria-label="Condition label" readonly>
@@ -746,6 +746,7 @@
     var configSheetsUrl = '';
     var _lastAnnouncedState = '';
     var _lastRaceTime = '';
+    var _lastProcessedRunId = 0; // Dedup guard: tracks last processed totalRuns to prevent duplicate FINISHED handling
 
     // Update all unit labels on the page when units change
     function updateUnitLabels() {
@@ -871,6 +872,12 @@
 
       // Race finished
       if (data.state === 'FINISHED' && data.time !== undefined) {
+        // DEDUP GUARD: skip if we already processed this exact race (WS reconnect during FINISHED window)
+        var runId = data.totalRuns || 0;
+        if (runId > 0 && runId === _lastProcessedRunId) {
+          console.log('[WS] Skipping duplicate FINISHED for run #' + runId);
+        } else {
+        _lastProcessedRunId = runId;
         try { showGhostComparison(data); } catch(e) { console.warn('ghostComparison:', e.message); }
 
         // Dry-run guard: skip data persistence when dry-run is active
@@ -910,6 +917,7 @@
 
         var sheetsUrl = document.getElementById('sheetsUrl').value || configSheetsUrl;
         if (sheetsUrl && data.time > 0 && !data.dryRun) { uploadToSheets(data, sheetsUrl); }
+        } // end dedup guard
       }
 
       // Button states
@@ -1223,6 +1231,11 @@
     }
 
     async function saveGarageToESP() {
+      // SAFETY: never overwrite ESP32 garage with empty array — that's data loss, not a save
+      if (garage.length === 0) {
+        console.warn('[GARAGE] Refusing to save empty garage to ESP32 — would destroy data');
+        return false;
+      }
       localStorage.setItem('hw_garage', JSON.stringify(garage));
       var saved = false;
       for (var attempt = 0; attempt < 2; attempt++) {
@@ -1434,9 +1447,10 @@
         var isActive = activeCar && activeCar.id === car.id;
         var bestStr = hasBest ? safeFixed(car.stats.bestTime, 3) + ' seconds' : 'no runs';
         var label = escHtml(car.name) + ', ' + car.weight + ' grams, ' + bestStr + (isActive ? ', selected' : '');
-        var notes = car.notes || [];
+        var notes = Array.isArray(car.notes) ? car.notes : [];
         var notesHtml = notes.slice(-3).map(function(n) {
-          return '<div class="mech-note">' + new Date(n.ts).toLocaleDateString() + ': ' + escHtml(n.text) + '</div>';
+          if (!n || typeof n !== 'object') return '';
+          return '<div class="mech-note">' + new Date(n.ts).toLocaleDateString() + ': ' + escHtml(n.text || '') + '</div>';
         }).join('');
         return '<div class="garage-car ' + (isActive ? 'active' : '') + '" ' +
           'role="button" tabindex="0" ' +
@@ -1533,9 +1547,15 @@
     }
 
     function addToHistory(raceData) {
+      // Dedup: skip if the most recent entry has the same run number
+      var runNum = raceData.totalRuns || 0;
+      if (runNum > 0 && raceHistory.length > 0 && raceHistory[0].run === runNum) {
+        console.log('[HISTORY] Skipping duplicate run #' + runNum);
+        return;
+      }
       var entry = {
         timestamp: Date.now(),
-        run: raceData.totalRuns,
+        run: runNum,
         car: raceData.car,
         weight: raceData.weight,
         time: raceData.time,
@@ -1980,20 +2000,20 @@
       phase = parseInt(phase);
       if (phase < 1 || phase > 6) return;
 
+      // Save variables from Phase 1 inputs BEFORE validation (inputs must be read first)
+      if (playlistMode.currentPhase === 1) {
+        plSaveVariablesFromInputs();
+      }
+
       // Validation gates (skip during restore)
       if (!isRestore) {
-        if (phase >= 2 && !plValidatePhase1()) { announce('Complete experiment setup first.'); return; }
+        if (phase >= 2 && !plValidatePhase1()) { return; }
         if (phase >= 3 && playlistMode.config.selectedCarIds.length === 0) { announce('Select at least one car.'); return; }
         if (phase >= 3 && playlistMode.tests.length === 0) { announce('Generate test matrix first.'); return; }
         if (phase >= 5 && !playlistMode.active) {
           // Can only enter phase 5 via BEGIN DATA COLLECTION button
           if (phase === 5) { announce('Use the Begin Data Collection button.'); return; }
         }
-      }
-
-      // Save variables from Phase 1 inputs before leaving
-      if (playlistMode.currentPhase === 1) {
-        plSaveVariablesFromInputs();
       }
 
       playlistMode.currentPhase = phase;
@@ -2055,11 +2075,17 @@
 
     function plValidatePhase1() {
       var v = playlistMode.config.variables || {};
-      if (!v.iv && !v.dv) return false;
-      // Car vs Car and Calibration only need 1 condition; others need at least 2
+      if (!v.iv && !v.dv) {
+        announce('Fill in at least one variable (Independent or Dependent).');
+        return false;
+      }
+      // Car vs Car, Calibration, and Custom only need 1 condition; mass_vs_speed needs 2
       var tpl = playlistMode.config.experimentTemplate;
-      var minConditions = (tpl === 'car_vs_car' || tpl === 'calibration') ? 1 : 2;
-      if (playlistMode.config.conditions.length < minConditions) return false;
+      var minConditions = (tpl === 'mass_vs_speed') ? 2 : 1;
+      if (playlistMode.config.conditions.length < minConditions) {
+        announce('Add at least ' + minConditions + ' weight condition' + (minConditions > 1 ? 's' : '') + '.');
+        return false;
+      }
       return true;
     }
 
@@ -2143,6 +2169,11 @@
         document.getElementById('plVarCV').value = '';
         if (weightSection) weightSection.style.display = '';
         if (rampSec) rampSec.style.display = 'none';
+        // Ensure at least a baseline condition exists for custom template
+        if (!playlistMode.config.conditions || playlistMode.config.conditions.length === 0) {
+          playlistMode.config.conditions = [{ label: 'Baseline', addedWeight: 0 }];
+          plRenderConditions();
+        }
       }
 
       plSaveVariablesFromInputs();
@@ -2199,10 +2230,10 @@
         var isBaseline = (i === 0);
         return '<div class="pl-condition-row" data-index="' + i + '">' +
           '<input type="text" value="' + escHtml(cond.label) + '" class="pl-cond-label"' +
-            (isBaseline ? ' readonly' : ' onchange="plUpdateCondLabel(' + i + ', this.value)"') +
+            ' onchange="plUpdateCondLabel(' + i + ', this.value)"' +
             ' aria-label="Condition ' + (i + 1) + ' label">' +
           '<input type="number" value="' + cond.addedWeight + '" class="pl-cond-weight" step="0.001" min="0"' +
-            (isBaseline ? ' readonly' : ' onchange="plUpdateCondWeight(' + i + ', this.value)"') +
+            ' onchange="plUpdateCondWeight(' + i + ', this.value)"' +
             ' aria-label="Condition ' + (i + 1) + ' weight">' +
           '<span class="pl-cond-unit">g</span>' +
           (isBaseline ? '<span style="width:30px;"></span>' :
@@ -2759,19 +2790,23 @@
 
     function plPollForResult() {
       if (!playlistMode.active || playlistMode.paused || playlistMode.sanityPending) return;
+      // Skip polling when WebSocket is connected — WS is the primary path, poll is fallback only
+      if (wsConnected) return;
       var currentResult = playlistMode.results[playlistMode.currentIndex];
       if (currentResult !== null && currentResult !== undefined) return; // Already have result
 
       fetch('/api/history').then(function(r) { return r.json(); }).then(function(history) {
         if (!Array.isArray(history) || history.length === 0) return;
-        // Check if a new race appeared since we last armed
-        var latest = history[history.length - 1];
+        // History is newest-first (unshift), so index 0 is the latest race
+        var latest = history[0];
         if (!latest || !latest.time || latest.time <= 0) return;
 
-        // Guard against processing the same result twice — but allow retry if WS path failed
-        var latestTs = latest.timestamp || latest.ts || 0;
+        // Guard against processing the same result twice
+        // Re-check after async fetch — WS handler may have recorded while we were fetching
         var alreadyRecorded = playlistMode.results[playlistMode.currentIndex] != null;
-        if (_plLastHistoryCount === history.length && alreadyRecorded) return;
+        if (alreadyRecorded) { plDebug('POLL: result already recorded by WS path — skip'); return; }
+        var latestTs = latest.timestamp || latest.ts || 0;
+        if (_plLastHistoryCount === history.length) return;
         _plLastHistoryCount = history.length;
 
         // Check if this result is recent (within last 30 seconds)
@@ -2968,6 +3003,14 @@
       plDebug('plOnRaceFinished: active=' + playlistMode.active + ' paused=' + playlistMode.paused + ' idx=' + playlistMode.currentIndex + '/' + playlistMode.tests.length + ' t=' + data.time);
       if (!playlistMode.active) { plDebug('BAIL: not active'); return; }
       if (playlistMode.currentIndex >= playlistMode.tests.length) { plDebug('BAIL: idx past end'); return; }
+
+      // DEDUP GUARD: if we already recorded a result for this index, don't process again
+      // This prevents double-recording when both WebSocket and poll path fire
+      var existingResult = playlistMode.results[playlistMode.currentIndex];
+      if (existingResult && !existingResult.skipped) {
+        plDebug('BAIL: result already recorded at idx ' + playlistMode.currentIndex + ' (dedup)');
+        return;
+      }
 
       var test = playlistMode.tests[playlistMode.currentIndex];
       if (!test) { plDebug('BAIL: no test at idx ' + playlistMode.currentIndex); return; }
@@ -3331,7 +3374,9 @@
       var parentCase = playlistMode.caseNumber || 'UNKNOWN';
       var csv = '# Case: ' + parentCase + '\n';
       csv += '# Exported: ' + new Date().toISOString() + '\n';
-      csv += '# Track: ' + (playlistMode.config ? playlistMode.config.trackLength : '?') + 'm, Scale: 1:' + (playlistMode.config ? playlistMode.config.scaleFactor : '?') + '\n';
+      var csvTrackLen = parseFloat(document.getElementById('trackLength').value) || 6.01;
+      var csvScale = currentScaleFactor || 64;
+      csv += '# Track: ' + csvTrackLen + 'm, Scale: 1:' + csvScale + '\n';
       csv += 'Run,Case,RunID,Car,BaseWeight(g),AddedWeight(g),TotalWeight(g),Condition,Trial,Time(s),Speed(m/s),Speed(mph),Momentum(kg*m/s),KE(J)\n';
       for (var i = 0; i < playlistMode.tests.length; i++) {
         var test = playlistMode.tests[i];

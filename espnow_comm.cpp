@@ -35,6 +35,7 @@
 #include "config.h"
 #include <ArduinoJson.h>
 #include <LittleFS.h>
+#include <WiFi.h>
 
 // ============================================================================
 // GLOBAL STATE
@@ -47,6 +48,20 @@ unsigned long lastPeerSeen = 0;
 
 KnownPeer peers[MAX_PEERS];
 int peerCount = 0;
+
+// Fleet management
+volatile bool identifyActive = false;
+unsigned long identifyStartMs = 0;
+
+// Pending WiFi config change (deferred until IDLE to avoid mid-race reboot)
+static bool wifiConfigPending = false;
+static char pendingSSID[33] = {0};
+static char pendingPass[65] = {0};
+
+// Deferred WiFi reconnect (CMD_WIFI_RECONNECT sets this flag; main loop handles it)
+// WiFi APIs are NOT thread-safe — must only be called from Core 1 (main loop),
+// never from ESP-NOW callback (Core 0).
+volatile bool wifiReconnectRequested = false;
 
 // Timing
 static unsigned long lastBeaconTime = 0;
@@ -65,6 +80,10 @@ static bool isCompatibleRole(const char* myRole, const char* theirRole) {
   // Speedtrap ↔ Finish (speed data flows to dashboard)
   if (strcmp(myRole, "speedtrap") == 0 && strcmp(theirRole, "finish") == 0) return true;
   if (strcmp(myRole, "finish") == 0 && strcmp(theirRole, "speedtrap") == 0) return true;
+
+  // Telemetry ↔ Finish (IMU data flows to dashboard)
+  if (strcmp(myRole, "telemetry") == 0 && strcmp(theirRole, "finish") == 0) return true;
+  if (strcmp(myRole, "finish") == 0 && strcmp(theirRole, "telemetry") == 0) return true;
 
   return false;
 }
@@ -323,7 +342,7 @@ static void requestSave() {
 // JSON EXPORT — For web API (/api/peers)
 // ============================================================================
 String getPeersJson() {
-  StaticJsonDocument<1536> doc;
+  StaticJsonDocument<2048> doc;
   JsonArray arr = doc.to<JsonArray>();
 
   for (int i = 0; i < peerCount; i++) {
@@ -339,6 +358,25 @@ String getPeersJson() {
                     (st == PEER_STALE) ? "stale" : "offline";
     obj["lastSeen"] = peers[i].lastSeen > 0 ?
                       (int)((millis() - peers[i].lastSeen) / 1000) : -1;
+
+    // Beacon diagnostics (if we've received at least one beacon with data)
+    if (peers[i].diag.valid) {
+      JsonObject d = obj.createNestedObject("diag");
+      d["uptimeMin"]  = peers[i].diag.uptimeMin;
+      d["freeHeapKB"] = peers[i].diag.freeHeapKB;
+      d["rssi"]       = peers[i].diag.rssi;
+      const char* stateStr = "UNKNOWN";
+      switch (peers[i].diag.raceState) {
+        case IDLE:     stateStr = "IDLE";     break;
+        case ARMED:    stateStr = "ARMED";    break;
+        case RACING:   stateStr = "RACING";   break;
+        case FINISHED: stateStr = "FINISHED"; break;
+      }
+      d["raceState"]  = stateStr;
+      char fwBuf[12];
+      snprintf(fwBuf, sizeof(fwBuf), "%d.%d", peers[i].diag.fwMajor, peers[i].diag.fwMinor);
+      d["fwVersion"]  = fwBuf;
+    }
   }
 
   String output;
@@ -346,11 +384,65 @@ String getPeersJson() {
   return output;
 }
 
+// Forward declarations for fleet management handlers (defined after discoveryLoop)
+static void handleWiFiConfig(const WiFiConfigMsg& wcfg, const uint8_t* srcMac);
+static void handleRemoteCmd(const RemoteCmdMsg& rcmd, const uint8_t* srcMac);
+
 // ============================================================================
 // ESP-NOW RECEIVE CALLBACK — Heart of the "Brother's Six" protocol
 // ============================================================================
 static void onDataRecv(const esp_now_recv_info_t *info, const uint8_t *data, int len) {
-  if (len != sizeof(ESPMessage)) return;
+  if (len < 1) return;
+
+  // DEBUG: Uncomment to log unknown traffic (floods ring buffer at ~2/sec/peer)
+  // LOG.printf("[ESPNOW-RX] type=%d len=%d from=%02X:%02X:%02X:%02X:%02X:%02X\n",
+  //           data[0], len, info->src_addr[0], info->src_addr[1], info->src_addr[2],
+  //           info->src_addr[3], info->src_addr[4], info->src_addr[5]);
+
+  // ---- VARIABLE-SIZE MESSAGES: Route by type byte BEFORE size check ----
+
+  // Telemetry messages (232 bytes for chunks) — finish gate only
+  if (strcmp(cfg.role, "finish") == 0) {
+    uint8_t msgType = data[0];
+    if (msgType == MSG_TELEM_HEADER && len >= (int)sizeof(TelemetryHeader)) {
+      TelemetryHeader hdr;
+      memcpy(&hdr, data, sizeof(hdr));
+      onTelemetryHeader(info->src_addr, hdr);
+      return;
+    }
+    if (msgType == MSG_TELEM_CHUNK && len >= (int)sizeof(TelemetryChunk)) {
+      TelemetryChunk chunk;
+      memcpy(&chunk, data, sizeof(chunk));
+      onTelemetryChunk(info->src_addr, chunk);
+      return;
+    }
+    if (msgType == MSG_TELEM_END && len >= (int)sizeof(TelemetryEnd)) {
+      TelemetryEnd end;
+      memcpy(&end, data, sizeof(end));
+      onTelemetryEnd(info->src_addr, end);
+      return;
+    }
+  }
+
+  // Fleet management messages (all roles receive these)
+  {
+    uint8_t msgType = data[0];
+    if (msgType == MSG_WIFI_CONFIG && len >= (int)sizeof(WiFiConfigMsg)) {
+      WiFiConfigMsg wcfg;
+      memcpy(&wcfg, data, sizeof(wcfg));
+      handleWiFiConfig(wcfg, info->src_addr);
+      return;
+    }
+    if (msgType == MSG_REMOTE_CMD && len >= (int)sizeof(RemoteCmdMsg)) {
+      RemoteCmdMsg rcmd;
+      memcpy(&rcmd, data, sizeof(rcmd));
+      handleRemoteCmd(rcmd, info->src_addr);
+      return;
+    }
+  }
+
+  // ---- STANDARD MESSAGES: Fixed 56-byte ESPMessage ----
+  if (len != (int)sizeof(ESPMessage)) return;
 
   ESPMessage msg;
   memcpy(&msg, data, sizeof(msg));
@@ -361,6 +453,11 @@ static void onDataRecv(const esp_now_recv_info_t *info, const uint8_t *data, int
     int idx = upsertPeer(info->src_addr, msg.role, msg.hostname, msg.senderId);
     if (idx < 0) return;
 
+    // Unpack beacon diagnostics from offset field
+    if (msg.offset != 0) {
+      unpackBeaconDiag(msg.offset, peers[idx].diag);
+    }
+
     // Register in ESP-NOW so we can reply directly
     if (!peers[idx].espnowRegistered) {
       if (ensureESPNowPeer(info->src_addr)) {
@@ -368,9 +465,9 @@ static void onDataRecv(const esp_now_recv_info_t *info, const uint8_t *data, int
       }
     }
 
-    // Reply with ACK so they know we exist
+    // Reply with ACK so they know we exist (with our diagnostics too)
     ESPMessage ack;
-    buildMessage(ack, MSG_BEACON_ACK, nowUs(), 0);
+    buildMessage(ack, MSG_BEACON_ACK, nowUs(), packBeaconDiag());
     esp_now_send(info->src_addr, (uint8_t*)&ack, sizeof(ack));
 
     // Auto-pair: if compatible and not yet paired → initiate
@@ -388,6 +485,11 @@ static void onDataRecv(const esp_now_recv_info_t *info, const uint8_t *data, int
   if (msg.type == MSG_BEACON_ACK) {
     int idx = upsertPeer(info->src_addr, msg.role, msg.hostname, msg.senderId);
     if (idx < 0) return;
+
+    // Unpack beacon diagnostics from offset field
+    if (msg.offset != 0) {
+      unpackBeaconDiag(msg.offset, peers[idx].diag);
+    }
 
     if (!peers[idx].espnowRegistered) {
       if (ensureESPNowPeer(info->src_addr)) {
@@ -565,6 +667,175 @@ void sendToPeer(uint8_t type, uint64_t timestamp, int64_t offset) {
 }
 
 // ============================================================================
+// BEACON DIAGNOSTICS — Pack/unpack live telemetry in beacon offset field
+// ============================================================================
+
+int64_t packBeaconDiag() {
+  uint16_t upMin  = (uint16_t)(millis() / 60000UL);
+  uint16_t heapKB = (uint16_t)(ESP.getFreeHeap() / 1024);
+  uint8_t rssiEnc = (uint8_t)((int16_t)WiFi.RSSI() + 128);
+  uint8_t state   = (uint8_t)raceState;
+
+  // Parse FIRMWARE_VERSION "2.6.0-beta" → major=2, minor=6
+  uint8_t fwMaj = 0, fwMin = 0;
+  sscanf(FIRMWARE_VERSION, "%hhu.%hhu", &fwMaj, &fwMin);
+
+  int64_t packed = 0;
+  packed |= ((int64_t)upMin   << 48);
+  packed |= ((int64_t)heapKB  << 32);
+  packed |= ((int64_t)rssiEnc << 24);
+  packed |= ((int64_t)state   << 16);
+  packed |= ((int64_t)fwMaj   << 8);
+  packed |= ((int64_t)fwMin);
+  return packed;
+}
+
+void unpackBeaconDiag(int64_t packed, PeerDiagnostics& out) {
+  out.uptimeMin  = (uint16_t)((packed >> 48) & 0xFFFF);
+  out.freeHeapKB = (uint16_t)((packed >> 32) & 0xFFFF);
+  out.rssi       = (int8_t)((packed >> 24) & 0xFF) - 128;
+  out.raceState  = (uint8_t)((packed >> 16) & 0xFF);
+  out.fwMajor    = (uint8_t)((packed >> 8) & 0xFF);
+  out.fwMinor    = (uint8_t)(packed & 0xFF);
+  out.valid      = true;
+}
+
+// ============================================================================
+// FLEET MANAGEMENT — WiFi sharing and remote commands
+// ============================================================================
+
+// Verify that a sender is a paired "finish" peer (security: only hub can push commands)
+static bool isAuthorizedSender(const uint8_t* srcMac) {
+  int idx = findPeerByMac(srcMac);
+  if (idx < 0) return false;
+  return peers[idx].paired && strcmp(peers[idx].role, "finish") == 0;
+}
+
+// Handle incoming WiFi config from finish gate
+static void handleWiFiConfig(const WiFiConfigMsg& wcfg, const uint8_t* srcMac) {
+  // Security: only accept from paired finish gate
+  if (!isAuthorizedSender(srcMac)) {
+    LOG.printf("[FLEET] WiFi config rejected — sender not authorized (%s)\n",
+               macToStr(srcMac).c_str());
+    return;
+  }
+
+  LOG.printf("[FLEET] WiFi config received from %s: SSID='%s'\n",
+             wcfg.senderRole, wcfg.ssid);
+
+  // Check if creds are different from current config
+  if (strcmp(cfg.wifi_ssid, wcfg.ssid) == 0 && strcmp(cfg.wifi_pass, wcfg.pass) == 0) {
+    LOG.println("[FLEET] WiFi config unchanged — ignoring");
+    return;
+  }
+
+  // Defer reboot until race is IDLE (sanity check #7 in plan)
+  if (raceState != IDLE) {
+    LOG.println("[FLEET] WiFi config queued — waiting for IDLE state before applying");
+    strncpy(pendingSSID, wcfg.ssid, sizeof(pendingSSID) - 1);
+    pendingSSID[sizeof(pendingSSID) - 1] = '\0';
+    strncpy(pendingPass, wcfg.pass, sizeof(pendingPass) - 1);
+    pendingPass[sizeof(pendingPass) - 1] = '\0';
+    wifiConfigPending = true;
+    return;
+  }
+
+  // Apply immediately
+  strncpy(cfg.wifi_ssid, wcfg.ssid, sizeof(cfg.wifi_ssid) - 1);
+  cfg.wifi_ssid[sizeof(cfg.wifi_ssid) - 1] = '\0';
+  strncpy(cfg.wifi_pass, wcfg.pass, sizeof(cfg.wifi_pass) - 1);
+  cfg.wifi_pass[sizeof(cfg.wifi_pass) - 1] = '\0';
+  saveConfig();
+  LOG.println("[FLEET] WiFi config updated — rebooting in 2 seconds...");
+  delay(2000);
+  ESP.restart();
+}
+
+// Handle incoming remote command from finish gate
+static void handleRemoteCmd(const RemoteCmdMsg& rcmd, const uint8_t* srcMac) {
+  // Security: only accept from paired finish gate
+  if (!isAuthorizedSender(srcMac)) {
+    LOG.printf("[FLEET] Remote command rejected — sender not authorized (%s)\n",
+               macToStr(srcMac).c_str());
+    return;
+  }
+
+  LOG.printf("[FLEET] Remote command %d from %s (param=%u)\n",
+             rcmd.command, rcmd.senderRole, rcmd.param);
+
+  switch (rcmd.command) {
+    case CMD_REBOOT:
+      LOG.println("[FLEET] Remote reboot command — restarting in 1 second...");
+      delay(1000);
+      ESP.restart();
+      break;
+
+    case CMD_IDENTIFY:
+      LOG.println("[FLEET] Identify command — LED rapid blink for 10 seconds");
+      identifyActive = true;
+      identifyStartMs = millis();
+      break;
+
+    case CMD_DIAG_REPORT: {
+      // Send back detailed diagnostics in a PONG with packed offset
+      int64_t diag = packBeaconDiag();
+      sendToMac(srcMac, MSG_PONG, nowUs(), diag);
+      LOG.println("[FLEET] Diagnostics report sent");
+      break;
+    }
+
+    case CMD_WIFI_RECONNECT:
+      LOG.println("[FLEET] WiFi reconnect requested — deferring to main loop");
+      wifiReconnectRequested = true;  // Handled in MASS_Trap.ino loop() (thread-safe)
+      break;
+
+    default:
+      LOG.printf("[FLEET] Unknown command: %d\n", rcmd.command);
+      break;
+  }
+}
+
+void sendWiFiConfig(const uint8_t* mac) {
+  WiFiConfigMsg wcfg;
+  memset(&wcfg, 0, sizeof(wcfg));
+  wcfg.type = MSG_WIFI_CONFIG;
+  wcfg.senderId = cfg.device_id;
+  strncpy(wcfg.ssid, cfg.wifi_ssid, sizeof(wcfg.ssid) - 1);
+  strncpy(wcfg.pass, cfg.wifi_pass, sizeof(wcfg.pass) - 1);
+  strncpy(wcfg.senderRole, cfg.role, sizeof(wcfg.senderRole) - 1);
+
+  ensureESPNowPeer(mac);
+  esp_now_send(mac, (uint8_t*)&wcfg, sizeof(wcfg));
+  LOG.printf("[FLEET] WiFi config sent to %s\n", macToStr(mac).c_str());
+}
+
+void sendWiFiConfigAll() {
+  int sent = 0;
+  for (int i = 0; i < peerCount; i++) {
+    if (peers[i].paired) {
+      sendWiFiConfig(peers[i].mac);
+      sent++;
+      delay(5);  // Small gap to avoid ESP-NOW flooding
+    }
+  }
+  LOG.printf("[FLEET] WiFi config broadcast to %d paired peer(s)\n", sent);
+}
+
+void sendRemoteCmd(const uint8_t* mac, uint8_t cmd, uint32_t param) {
+  RemoteCmdMsg rcmd;
+  memset(&rcmd, 0, sizeof(rcmd));
+  rcmd.type = MSG_REMOTE_CMD;
+  rcmd.senderId = cfg.device_id;
+  rcmd.command = cmd;
+  rcmd.param = param;
+  strncpy(rcmd.senderRole, cfg.role, sizeof(rcmd.senderRole) - 1);
+
+  ensureESPNowPeer(mac);
+  esp_now_send(mac, (uint8_t*)&rcmd, sizeof(rcmd));
+  LOG.printf("[FLEET] Command %d sent to %s\n", cmd, macToStr(mac).c_str());
+}
+
+// ============================================================================
 // DISCOVERY LOOP — Called every iteration of main loop()
 //
 // The beacon runs FOREVER (not just 30 seconds). This is by design:
@@ -576,10 +847,10 @@ void sendToPeer(uint8_t type, uint64_t timestamp, int64_t offset) {
 void discoveryLoop() {
   unsigned long now = millis();
 
-  // ---- Beacon every 3 seconds ----
+  // ---- Beacon every 2 seconds (with packed diagnostics) ----
   if (now - lastBeaconTime > BEACON_INTERVAL_MS) {
     ESPMessage msg;
-    buildMessage(msg, MSG_BEACON, nowUs(), 0);
+    buildMessage(msg, MSG_BEACON, nowUs(), packBeaconDiag());
     uint8_t broadcastAddr[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
     esp_now_send(broadcastAddr, (uint8_t*)&msg, sizeof(msg));
     lastBeaconTime = now;
@@ -598,5 +869,19 @@ void discoveryLoop() {
   if (needsSave && now - saveRequestedAt > PEER_SAVE_DEBOUNCE_MS) {
     needsSave = false;
     savePeers();
+  }
+
+  // ---- Apply pending WiFi config when race is IDLE (safety: avoid mid-race reboot) ----
+  if (wifiConfigPending && raceState == IDLE) {
+    wifiConfigPending = false;
+    LOG.println("[FLEET] Applying deferred WiFi config now (race is IDLE)");
+    strncpy(cfg.wifi_ssid, pendingSSID, sizeof(cfg.wifi_ssid) - 1);
+    cfg.wifi_ssid[sizeof(cfg.wifi_ssid) - 1] = '\0';
+    strncpy(cfg.wifi_pass, pendingPass, sizeof(cfg.wifi_pass) - 1);
+    cfg.wifi_pass[sizeof(cfg.wifi_pass) - 1] = '\0';
+    saveConfig();
+    LOG.println("[FLEET] WiFi config updated — rebooting in 2 seconds...");
+    delay(2000);
+    ESP.restart();
   }
 }

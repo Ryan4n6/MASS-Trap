@@ -79,6 +79,14 @@ bool setupMode = false;
 bool wifiConnected = false;
 char wifiFailReason[64] = "";
 
+// BOOT button — physical WiFi mode toggle (hold 3s)
+volatile bool wifiDisabled = false;       // AP-only mode (RAM only, not persisted)
+static unsigned long bootBtnDownMs = 0;
+static bool bootBtnWasPressed = false;
+static bool bootBtnDebounced = false;     // True after 50ms stable LOW reading
+static unsigned long bootBtnFirstLow = 0; // When we first saw LOW (for debounce)
+static unsigned long lastWiFiRetry = 0;
+
 // Global log output — defaults to Serial, switched to serialTee in setup()
 Print* logOutput = &Serial;
 
@@ -167,6 +175,7 @@ void setup() {
   serialTee.begin(115200);
   logOutput = &serialTee;  // Redirect LOG macro to captured output
   delay(500);
+
   LOG.println("\n\n========================================");
   LOG.println("  " PROJECT_NAME " v" FIRMWARE_VERSION);
   LOG.println("  " PROJECT_FULL);
@@ -234,7 +243,8 @@ void setup() {
     char apName[48];
     snprintf(apName, sizeof(apName), "%s MassTrap Setup %s", getRoleEmoji(""), suffix);
 
-    WiFi.mode(WIFI_AP);
+    // Use AP_STA so ESP-NOW can work in setup mode (FNG onboarding)
+    WiFi.mode(WIFI_AP_STA);
     WiFi.softAP(apName);
     delay(500);
 
@@ -244,11 +254,18 @@ void setup() {
     // Start DNS server for captive portal
     dnsServer.start(53, "*", WiFi.softAPIP());
 
+    // Start ESP-NOW even in setup mode — listen for WiFi creds from brothers
+    initESPNow();
+    LOG.println("[BOOT] ESP-NOW active in setup mode (listening for WiFi config from brothers)");
+
     // Start web server in setup mode
     initSetupServer();
 
     // Blink LED to indicate setup mode (use default pin 2)
     pinMode(2, OUTPUT);
+
+    // BOOT button init
+    pinMode(BOOT_BUTTON_PIN, INPUT_PULLUP);
   }
   else {
     // ====================================================================
@@ -347,6 +364,9 @@ void setup() {
       setWLEDState("idle");
     }
 
+    // BOOT button — physical WiFi mode toggle
+    pinMode(BOOT_BUTTON_PIN, INPUT_PULLUP);
+
     LOG.println("========================================");
     LOG.println("  ALL SYSTEMS OPERATIONAL");
     LOG.println("========================================");
@@ -358,9 +378,10 @@ void setup() {
 // ============================================================================
 void loop() {
   if (setupMode) {
-    // Setup mode: handle captive portal
+    // Setup mode: handle captive portal + ESP-NOW (for FNG WiFi config sharing)
     dnsServer.processNextRequest();
     server.handleClient();
+    discoveryLoop();  // Beacon even in setup mode — lets brothers find us
 
     // Rapid LED blink to indicate setup mode
     static unsigned long lastBlink = 0;
@@ -377,8 +398,111 @@ void loop() {
   webSocket.loop();
   processFirmwareUpdate();  // Check for scheduled firmware download (non-blocking when idle)
 
-  // Discovery broadcasts
+  // Discovery broadcasts (with packed diagnostics in beacon offset)
   discoveryLoop();
+
+  // ---- BOOT button: hold 3s → toggle WiFi mode ----
+  // Debounced: require 50ms of stable LOW before registering as pressed.
+  // GPIO 0 is the ESP32-S3 BOOT button (active LOW with internal pull-up).
+  {
+    bool rawLow = (digitalRead(BOOT_BUTTON_PIN) == LOW);
+
+    if (rawLow && !bootBtnDebounced) {
+      // Button appears pressed — start or continue debounce
+      if (bootBtnFirstLow == 0) bootBtnFirstLow = millis();
+      if (millis() - bootBtnFirstLow >= 50) {
+        // 50ms stable LOW — register as real press
+        bootBtnDebounced = true;
+        bootBtnDownMs = millis();
+        bootBtnWasPressed = true;
+      }
+    }
+    if (!rawLow) {
+      // Button released — reset debounce state
+      bootBtnFirstLow = 0;
+      bootBtnDebounced = false;
+      bootBtnWasPressed = false;
+    }
+    if (bootBtnWasPressed && (millis() - bootBtnDownMs > BOOT_HOLD_MS)) {
+      bootBtnWasPressed = false;  // Consumed — don't re-trigger until released and pressed again
+      if (!wifiDisabled) {
+        // Disable WiFi (AP-only + ESP-NOW)
+        WiFi.disconnect();
+        WiFi.mode(WIFI_AP_STA);  // Keep STA mode for ESP-NOW
+        WiFi.softAP(cfg.hostname);
+        wifiDisabled = true;
+        wifiConnected = false;
+        LOG.println("[WIFI] BOOT button: WiFi disabled (AP-only + ESP-NOW mode)");
+        // Visual feedback: 3 slow blinks
+        uint8_t ledPin = cfg.led_pin > 0 ? cfg.led_pin : 2;
+        for (int i = 0; i < 3; i++) {
+          digitalWrite(ledPin, HIGH); delay(300);
+          digitalWrite(ledPin, LOW);  delay(300);
+        }
+      } else {
+        // Re-enable WiFi
+        wifiDisabled = false;
+        LOG.println("[WIFI] BOOT button: Reconnecting to WiFi...");
+        // Visual feedback: 3 fast blinks
+        uint8_t ledPin = cfg.led_pin > 0 ? cfg.led_pin : 2;
+        for (int i = 0; i < 3; i++) {
+          digitalWrite(ledPin, HIGH); delay(100);
+          digitalWrite(ledPin, LOW);  delay(100);
+        }
+        connectWiFi(cfg.wifi_ssid, cfg.wifi_pass, cfg.hostname);
+      }
+    }
+  }
+
+  // ---- Deferred WiFi reconnect (from CMD_WIFI_RECONNECT via ESP-NOW) ----
+  // WiFi APIs are NOT thread-safe — ESP-NOW callback runs on Core 0,
+  // so we defer the actual WiFi.disconnect()/begin() to Core 1 (main loop).
+  if (wifiReconnectRequested) {
+    wifiReconnectRequested = false;
+    LOG.println("[FLEET] Executing deferred WiFi reconnect...");
+    WiFi.disconnect(false);
+    delay(500);
+    WiFi.begin(cfg.wifi_ssid, cfg.wifi_pass);
+    wifiConnected = false;
+    lastWiFiRetry = millis();  // Reset retry timer so we don't double-reconnect
+    LOG.println("[FLEET] WiFi reconnecting...");
+  }
+
+  // ---- Non-blocking WiFi auto-reconnect (every 60s when disconnected) ----
+  if (!wifiConnected && !wifiDisabled && (millis() - lastWiFiRetry > WIFI_RETRY_INTERVAL_MS)) {
+    lastWiFiRetry = millis();
+    if (WiFi.status() != WL_CONNECTED) {
+      LOG.println("[WIFI] Auto-reconnect attempt...");
+      WiFi.disconnect(false);  // Clean up any stale connection state first
+      delay(100);              // Let driver settle
+      WiFi.begin(cfg.wifi_ssid, cfg.wifi_pass);
+    }
+  }
+  // Check if WiFi recovered (non-blocking)
+  if (!wifiConnected && !wifiDisabled && WiFi.status() == WL_CONNECTED) {
+    wifiConnected = true;
+    WiFi.mode(WIFI_AP_STA);
+    delay(10);  // Let mode switch settle before reading channel
+    uint8_t chan = WiFi.channel();
+    if (chan == 0) chan = 1;  // Fallback if STA channel not yet assigned
+    WiFi.softAP(cfg.hostname, NULL, chan);
+    WiFi.setSleep(false);
+    LOG.printf("[WIFI] Reconnected! IP: %s, Ch: %d, RSSI: %d dBm\n",
+               WiFi.localIP().toString().c_str(), chan, WiFi.RSSI());
+    serialTee.syncNTP(cfg.timezone);
+  }
+
+  // ---- CMD_IDENTIFY LED blink (10 seconds of rapid blinking) ----
+  if (identifyActive && identifyStartMs > 0) {
+    uint8_t ledPin = cfg.led_pin > 0 ? cfg.led_pin : 2;
+    if (millis() - identifyStartMs > 10000) {
+      identifyActive = false;
+      identifyStartMs = 0;
+      digitalWrite(ledPin, LOW);
+    } else {
+      digitalWrite(ledPin, (millis() / 100) % 2);
+    }
+  }
 
   // Audio loop (non-blocking DMA feed — guarded by config flag)
   if (cfg.audio_enabled) {

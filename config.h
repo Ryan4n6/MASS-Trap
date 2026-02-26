@@ -41,6 +41,11 @@
 #define FINISH_RESET_DELAY_MS   5000        // Finish gate: 5s display then IDLE
 #define START_RESET_DELAY_MS    2000        // Start gate: 2s then IDLE
 
+// Proximity arm sensor (HW-870 / TCRT5000 on sensor_pin_2)
+// DO output: LOW = reflective surface detected (car present), HIGH = clear
+#define PROX_ARM_DWELL_MS       750         // Car must be present this long before ARM
+// Re-arm uses physical clear detection (proxArmEligible flag), not a time lockout
+
 // Race timeout (milliseconds)
 #define RACE_TIMEOUT_MS         30000       // 30s — abort if no finish
 
@@ -55,6 +60,16 @@
 #define PEER_ONLINE_THRESH_MS   10000       // <10s since last heard = ONLINE (was 15000)
 #define PEER_STALE_THRESH_MS    30000       // <30s = STALE, >30s = OFFLINE (was 60000)
 #define PEER_SAVE_DEBOUNCE_MS   2000        // Delay before writing /peers.json
+
+// Hostname generation
+#define HOSTNAME_PREFIX         "mass"      // mass-finish, mass-start, mass-trap
+
+// BOOT button — physical WiFi mode toggle (hold 3s)
+#define BOOT_BUTTON_PIN         0           // GPIO 0 = BOOT button on ESP32-S3
+#define BOOT_HOLD_MS            3000        // Hold duration to toggle WiFi mode
+
+// WiFi resilience — non-blocking background reconnect
+#define WIFI_RETRY_INTERVAL_MS  60000       // Try reconnect every 60s when disconnected
 
 // Global log output — all Serial.printf calls should use LOG.printf instead
 // This captures output for the web serial monitor (/console)
@@ -87,12 +102,15 @@ struct DeviceConfig {
   uint8_t sensor_pin_2;  // Second sensor (speed trap dual-IR)
   uint8_t led_pin;
 
-  // Audio (MAX98357A I2S)
+  // Audio — backend selects driver: "i2s" (MAX98357A) or "dysv5w" (UART module)
   bool audio_enabled;
+  char audio_backend[12]; // "i2s" or "dysv5w"
   uint8_t i2s_bclk_pin;
   uint8_t i2s_lrc_pin;
   uint8_t i2s_dout_pin;
-  uint8_t audio_volume;  // 0-21
+  uint8_t audio_volume;  // 0-21 (I2S) or 0-30 (DY-SV5W)
+  uint8_t dysv5w_tx_pin; // UART TX to DY-SV5W RXD
+  uint8_t dysv5w_busy_pin; // DY-SV5W I/O1 (LOW = playing)
 
   // LiDAR Sensor (Benewake TF-Luna, UART)
   bool lidar_enabled;

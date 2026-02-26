@@ -1,7 +1,19 @@
 #include "audio_manager.h"
 #include "config.h"
+#include "dysv5w.h"
 #include <LittleFS.h>
 #include <driver/i2s.h>
+
+// ============================================================================
+// BACKEND SELECTION
+// ============================================================================
+enum AudioBackend {
+  BACKEND_NONE,
+  BACKEND_I2S,
+  BACKEND_DYSV5W
+};
+
+static AudioBackend activeBackend = BACKEND_NONE;
 
 // ============================================================================
 // I2S CONFIGURATION for MAX98357A
@@ -12,41 +24,36 @@
 #define SAMPLE_RATE       16000   // 16kHz mono — good balance of quality and size
 
 // ============================================================================
-// PLAYBACK STATE
+// I2S PLAYBACK STATE
 // ============================================================================
 static File audioFile;
 static bool audioPlaying = false;
 static bool audioInitialized = false;
-static uint32_t audioDataStart = 0;   // Byte offset where PCM data begins in WAV
-static uint32_t audioDataSize = 0;    // Total PCM data bytes
-static uint32_t audioBytesRead = 0;   // Bytes fed to I2S so far
-static uint8_t volumeLevel = 10;      // 0-21
-static uint8_t audioBuffer[512];      // Chunk buffer for DMA feeding
+static uint32_t audioDataStart = 0;
+static uint32_t audioDataSize = 0;
+static uint32_t audioBytesRead = 0;
+static uint8_t volumeLevel = 10;
+static uint8_t audioBuffer[512];
 
-// ============================================================================
-// WAV HEADER PARSER
-// Minimal parser — extracts data chunk offset and size from standard WAV files.
-// Supports 8-bit and 16-bit PCM. We convert everything to 16-bit for I2S.
-// ============================================================================
 static uint8_t wavBitsPerSample = 16;
 static uint16_t wavChannels = 1;
 static uint32_t wavSampleRate = 16000;
 
+// ============================================================================
+// WAV HEADER PARSER (I2S backend only)
+// ============================================================================
 static bool parseWavHeader(File& f) {
   uint8_t header[44];
   if (f.read(header, 44) != 44) return false;
 
-  // Check RIFF header
   if (header[0] != 'R' || header[1] != 'I' || header[2] != 'F' || header[3] != 'F') return false;
   if (header[8] != 'W' || header[9] != 'A' || header[10] != 'V' || header[11] != 'E') return false;
 
-  // Parse fmt chunk
   wavChannels = header[22] | (header[23] << 8);
   wavSampleRate = header[24] | (header[25] << 8) | (header[26] << 16) | (header[27] << 24);
   wavBitsPerSample = header[34] | (header[35] << 8);
 
-  // Find 'data' chunk — it's usually at offset 36 but can vary
-  f.seek(12); // After RIFF header
+  f.seek(12);
   while (f.available() >= 8) {
     uint8_t chunkHeader[8];
     if (f.read(chunkHeader, 8) != 8) return false;
@@ -61,7 +68,6 @@ static bool parseWavHeader(File& f) {
       return true;
     }
 
-    // Skip non-data chunk
     f.seek(f.position() + chunkSize);
   }
 
@@ -69,11 +75,9 @@ static bool parseWavHeader(File& f) {
 }
 
 // ============================================================================
-// SETUP
+// I2S SETUP
 // ============================================================================
-void audioSetup() {
-  if (!cfg.audio_enabled) return;
-
+static void i2sSetup() {
   i2s_config_t i2s_config = {
     .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX),
     .sample_rate = SAMPLE_RATE,
@@ -110,24 +114,23 @@ void audioSetup() {
 
   i2s_zero_dma_buffer(I2S_PORT);
   audioInitialized = true;
+  activeBackend = BACKEND_I2S;
 
   LOG.printf("[AUDIO] I2S initialized: BCLK=%d, LRC=%d, DOUT=%d\n",
                 cfg.i2s_bclk_pin, cfg.i2s_lrc_pin, cfg.i2s_dout_pin);
 }
 
 // ============================================================================
-// MAIN LOOP - Feed DMA buffer (non-blocking)
+// I2S LOOP — Feed DMA buffer (non-blocking)
 // ============================================================================
-void audioLoop() {
+static void i2sLoop() {
   if (!audioInitialized || !audioPlaying) return;
 
-  // Feed one chunk per loop iteration — keeps it non-blocking
   size_t bytesToRead = sizeof(audioBuffer);
   size_t remaining = audioDataSize - audioBytesRead;
   if (bytesToRead > remaining) bytesToRead = remaining;
 
   if (bytesToRead == 0) {
-    // Playback complete
     stopSound();
     return;
   }
@@ -138,19 +141,16 @@ void audioLoop() {
     return;
   }
 
-  // Convert to 16-bit samples with volume scaling
-  int16_t sampleBuf[256]; // Max 512 bytes = 256 16-bit samples
+  int16_t sampleBuf[256];
   size_t sampleCount = 0;
 
   if (wavBitsPerSample == 8) {
-    // Convert 8-bit unsigned to 16-bit signed with volume
     for (size_t i = 0; i < bytesRead; i++) {
       int16_t sample = ((int16_t)audioBuffer[i] - 128) << 8;
       sample = (sample * volumeLevel) / 21;
       sampleBuf[sampleCount++] = sample;
     }
   } else {
-    // 16-bit samples — apply volume
     sampleCount = bytesRead / 2;
     for (size_t i = 0; i < sampleCount; i++) {
       int16_t sample = (int16_t)(audioBuffer[i * 2] | (audioBuffer[i * 2 + 1] << 8));
@@ -159,17 +159,14 @@ void audioLoop() {
     }
   }
 
-  // If stereo, we only play left channel (MAX98357A is mono)
-  // For mono files this is a no-op
   if (wavChannels == 2) {
     size_t monoCount = sampleCount / 2;
     for (size_t i = 0; i < monoCount; i++) {
-      sampleBuf[i] = sampleBuf[i * 2]; // Take left channel
+      sampleBuf[i] = sampleBuf[i * 2];
     }
     sampleCount = monoCount;
   }
 
-  // Write to I2S — non-blocking with 0 timeout
   size_t bytesWritten = 0;
   i2s_write(I2S_PORT, sampleBuf, sampleCount * 2, &bytesWritten, 0);
 
@@ -177,15 +174,13 @@ void audioLoop() {
 }
 
 // ============================================================================
-// PLAY SOUND
+// I2S PLAY SOUND
 // ============================================================================
-void playSound(const char* filename) {
+static void i2sPlaySound(const char* filename) {
   if (!audioInitialized) return;
 
-  // Stop any current playback
   if (audioPlaying) stopSound();
 
-  // Open WAV file from LittleFS
   String path = String("/") + filename;
   if (!LittleFS.exists(path)) {
     LOG.printf("[AUDIO] File not found: %s\n", path.c_str());
@@ -198,19 +193,16 @@ void playSound(const char* filename) {
     return;
   }
 
-  // Parse WAV header to find data chunk
   if (!parseWavHeader(audioFile)) {
     LOG.printf("[AUDIO] Invalid WAV: %s\n", path.c_str());
     audioFile.close();
     return;
   }
 
-  // Reconfigure I2S sample rate if WAV differs from default
   if (wavSampleRate != SAMPLE_RATE) {
     i2s_set_sample_rates(I2S_PORT, wavSampleRate);
   }
 
-  // Seek to data start and begin playback
   audioFile.seek(audioDataStart);
   audioBytesRead = 0;
   audioPlaying = true;
@@ -220,9 +212,9 @@ void playSound(const char* filename) {
 }
 
 // ============================================================================
-// STOP SOUND
+// I2S STOP
 // ============================================================================
-void stopSound() {
+static void i2sStop() {
   if (!audioInitialized) return;
 
   audioPlaying = false;
@@ -231,7 +223,6 @@ void stopSound() {
   }
   i2s_zero_dma_buffer(I2S_PORT);
 
-  // Restore default sample rate
   if (wavSampleRate != SAMPLE_RATE) {
     i2s_set_sample_rates(I2S_PORT, SAMPLE_RATE);
     wavSampleRate = SAMPLE_RATE;
@@ -239,16 +230,70 @@ void stopSound() {
 }
 
 // ============================================================================
-// STATUS & CONTROL
+// PUBLIC API — dispatches to active backend
 // ============================================================================
+void audioSetup() {
+  if (!cfg.audio_enabled) return;
+
+  if (strcmp(cfg.audio_backend, "dysv5w") == 0) {
+    dysv5wSetup(cfg.dysv5w_tx_pin, cfg.dysv5w_busy_pin);
+    activeBackend = BACKEND_DYSV5W;
+
+    // Scale volume: config stores 0-21 for I2S, map to 0-30 for DY-SV5W
+    uint8_t vol = (uint8_t)((cfg.audio_volume * 30) / 21);
+    dysv5wSetVolume(vol);
+
+    LOG.println("[AUDIO] Backend: DY-SV5W (UART sound module)");
+  } else {
+    i2sSetup();
+    LOG.println("[AUDIO] Backend: I2S (MAX98357A)");
+  }
+}
+
+void audioLoop() {
+  if (activeBackend == BACKEND_I2S) {
+    i2sLoop();
+  }
+  // DY-SV5W is fire-and-forget, no loop needed
+}
+
+void playSound(const char* filename) {
+  if (activeBackend == BACKEND_I2S) {
+    i2sPlaySound(filename);
+  } else if (activeBackend == BACKEND_DYSV5W) {
+    uint16_t track = dysv5wLookupTrack(filename);
+    if (track > 0) {
+      dysv5wPlayTrack(track);
+    }
+  }
+}
+
+void stopSound() {
+  if (activeBackend == BACKEND_I2S) {
+    i2sStop();
+  } else if (activeBackend == BACKEND_DYSV5W) {
+    dysv5wStop();
+  }
+}
+
 bool isPlaying() {
-  return audioPlaying;
+  if (activeBackend == BACKEND_I2S) {
+    return audioPlaying;
+  } else if (activeBackend == BACKEND_DYSV5W) {
+    return dysv5wIsBusy();
+  }
+  return false;
 }
 
 void setVolume(uint8_t level) {
-  if (level > 21) level = 21;
-  volumeLevel = level;
-  LOG.printf("[AUDIO] Volume set to %d/21\n", level);
+  if (activeBackend == BACKEND_I2S) {
+    if (level > 21) level = 21;
+    volumeLevel = level;
+    LOG.printf("[AUDIO] Volume set to %d/21\n", level);
+  } else if (activeBackend == BACKEND_DYSV5W) {
+    if (level > 30) level = 30;
+    dysv5wSetVolume(level);
+  }
 }
 
 String getAudioFileList() {

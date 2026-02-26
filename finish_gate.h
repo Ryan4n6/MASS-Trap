@@ -23,4 +23,13 @@ void finishGateSetup();
 void finishGateLoop();
 void onFinishGateESPNow(const ESPMessage& msg, uint64_t receiveTime);
 
+// Telemetry receive handlers (called from espnow_comm.cpp for variable-size messages)
+void onTelemetryHeader(const uint8_t* srcMac, const TelemetryHeader& hdr);
+void onTelemetryChunk(const uint8_t* srcMac, const TelemetryChunk& chunk);
+void onTelemetryEnd(const uint8_t* srcMac, const TelemetryEnd& end);
+
+// Telemetry state query (for web API)
+bool hasTelemetryData();
+String getTelemetryInfoJson();
+
 #endif

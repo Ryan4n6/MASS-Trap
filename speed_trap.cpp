@@ -1,5 +1,6 @@
 #include "speed_trap.h"
 #include "config.h"
+#include "audio_manager.h"
 
 // ============================================================================
 // TIMING VARIABLES
@@ -107,6 +108,11 @@ void speedTrapLoop() {
       // Offset field encodes speed as speed_mps * 10000 (fixed-point int64)
       int64_t speed_encoded = (int64_t)(lastTrapSpeed_mps * SPEED_FIXED_POINT_SCALE);
       sendToPeer(MSG_SPEED_DATA, safeTime1, speed_encoded);
+
+      // Audio feedback
+      if (cfg.audio_enabled) {
+        playSound("speed_trap.wav");
+      }
 
       // Start non-blocking LED flash to indicate measurement
       isFlashing = true;

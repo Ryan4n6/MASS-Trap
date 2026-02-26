@@ -16,6 +16,14 @@ static unsigned long triggeredTime = 0;
 static unsigned long finishedAt = 0;
 static bool waitingToReset = false;
 
+// Proximity arm sensor (HW-870 / TCRT5000 on sensor_pin_2)
+// DO pin goes LOW when reflective surface detected (car present)
+static bool proxArmEnabled = false;       // Set true if sensor_pin_2 is configured
+static bool proxCarPresent = false;       // Debounced: car is currently detected
+static unsigned long proxDetectStart = 0; // When car was first detected (for dwell time)
+static unsigned long proxClearTime = 0;   // When car was last cleared (for re-arm lockout)
+static bool proxArmEligible = true;       // Must see sensor CLEAR before next arm
+
 // ============================================================================
 // START TRIGGER INTERRUPT
 // ============================================================================
@@ -35,8 +43,18 @@ void startGateSetup() {
   pinMode(cfg.sensor_pin, INPUT_PULLUP);
   pinMode(cfg.led_pin, OUTPUT);
   // Don't attach interrupt yet - only when ARMED
-  LOG.printf("[START] Setup complete. Trigger=GPIO%d, LED=GPIO%d\n",
-                cfg.sensor_pin, cfg.led_pin);
+
+  // Proximity arm sensor (HW-870 / TCRT5000) on sensor_pin_2
+  // DO output has onboard pull-up via LM393, so INPUT is fine (no pullup needed).
+  // LOW = car detected (reflective surface), HIGH = clear.
+  if (cfg.sensor_pin_2 > 0 && cfg.sensor_pin_2 != cfg.sensor_pin) {
+    pinMode(cfg.sensor_pin_2, INPUT);
+    proxArmEnabled = true;
+    LOG.printf("[START] Proximity arm sensor enabled on GPIO%d\n", cfg.sensor_pin_2);
+  }
+
+  LOG.printf("[START] Setup complete. Trigger=GPIO%d, LED=GPIO%d, ProxArm=%s\n",
+                cfg.sensor_pin, cfg.led_pin, proxArmEnabled ? "ON" : "OFF");
 }
 
 // ============================================================================
@@ -73,12 +91,70 @@ void startGateLoop() {
   if (waitingToReset && millis() - finishedAt > START_RESET_DELAY_MS) {
     waitingToReset = false;
     raceState = IDLE;
+    // Reset prox sensor — require car to CLEAR then re-detect before next arm.
+    // This means Ben must pull the old car out and put a new one in.
+    proxCarPresent = false;
+    proxDetectStart = 0;
+    proxClearTime = 0;
+    proxArmEligible = false; // Must see car REMOVED before next arm
     LOG.println("[START] Auto-reset to IDLE");
   }
 
   switch (raceState) {
     case IDLE:
       breatheLED();
+
+      // --- Proximity arm sensor (HW-870) polling ---
+      // DO goes LOW when car is detected. Arm after PROX_ARM_DWELL_MS dwell.
+      // Re-arm requires the sensor to CLEAR first (car removed), then detect
+      // a new car. This prevents the same car from re-arming without human action.
+      if (proxArmEnabled) {
+        bool carNow = (digitalRead(cfg.sensor_pin_2) == LOW);
+
+        if (carNow && !proxCarPresent) {
+          // Rising edge: car just appeared (or reappeared after clearing)
+          proxCarPresent = true;
+          // Only start dwell timer if eligible (sensor cleared since last arm)
+          if (proxArmEligible) {
+            proxDetectStart = millis();
+          }
+        } else if (!carNow && proxCarPresent) {
+          // Falling edge: car removed — this is the "human action" that
+          // makes the next detection eligible for arming
+          proxCarPresent = false;
+          proxClearTime = millis();
+          proxDetectStart = 0;
+          proxArmEligible = true;  // Car was physically removed → next detect can arm
+        } else if (!carNow && !proxCarPresent) {
+          // Sensor clear, no car — keep eligibility flag current
+          // (handles case where car was never detected after reset)
+          if (!proxArmEligible && proxClearTime == 0) {
+            proxArmEligible = true;  // Sensor is clear after reset → eligible
+            proxClearTime = millis();
+          }
+        }
+
+        // Arm when: car present for PROX_ARM_DWELL_MS AND eligible
+        // (sensor must have cleared since last arm, or first boot)
+        if (proxArmEligible && proxCarPresent && proxDetectStart > 0 &&
+            (millis() - proxDetectStart >= PROX_ARM_DWELL_MS)) {
+          raceState = ARMED;
+          triggerDetected = false;
+          portENTER_CRITICAL(&startMux);
+          triggerTime_us = 0;
+          portEXIT_CRITICAL(&startMux);
+          attachInterrupt(digitalPinToInterrupt(cfg.sensor_pin), startTriggerISR, FALLING);
+          sendToPeer(MSG_ARM_CMD, nowUs(), 0);
+          playSound("armed.wav");
+          LOG.println("[START] AUTO-ARMED via proximity sensor (HW-870)");
+          // Reset: require sensor to clear before next arm
+          proxDetectStart = 0;
+          proxClearTime = 0;
+          proxArmEligible = false; // Must see car REMOVED before next arm
+          break;
+        }
+      }
+
       // LiDAR auto-arm: if car has been staged for >1 second, auto-arm
       if (lidarAutoArmReady()) {
         raceState = ARMED;
@@ -132,6 +208,11 @@ void startGateLoop() {
       if (millis() - triggeredTime > RACE_TIMEOUT_MS) {
         LOG.println("[START] Race timeout - no finish confirmation");
         raceState = IDLE;
+        // Reset prox sensor — require clear→detect cycle
+        proxCarPresent = false;
+        proxDetectStart = 0;
+        proxClearTime = 0;
+        proxArmEligible = false;
       }
       break;
 
@@ -193,7 +274,23 @@ void onStartGateESPNow(const ESPMessage& msg, uint64_t receiveTime) {
       raceState = IDLE;
       triggerDetected = false;
       detachInterrupt(digitalPinToInterrupt(cfg.sensor_pin));
+      // Reset prox sensor — require clear→detect cycle before next arm
+      proxCarPresent = false;
+      proxDetectStart = 0;
+      proxClearTime = 0;
+      proxArmEligible = false; // Must see car REMOVED before next arm
       LOG.println("[START] DISARMED");
       break;
   }
+}
+
+// ============================================================================
+// PROXIMITY ARM SENSOR ACCESSORS
+// ============================================================================
+bool isProxArmEnabled() {
+  return proxArmEnabled;
+}
+
+bool isProxCarPresent() {
+  return proxCarPresent;
 }
